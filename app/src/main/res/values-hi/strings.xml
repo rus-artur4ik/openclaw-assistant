@@ -201,8 +201,8 @@
 <string name="voicevox_redownload">ऑडियो डेटा पुनः डाउनलोड करें</string>
 <string name="voicevox_setup_title">VOICEVOX सेटअप</string>
 <string name="voicevox_setup_description">VOICEVOX TTS का उपयोग करने के लिए ऑडियो डेटा डाउनलोड करें।</string>
-    <string name="voicevox_setup_steps">・OpenJTalk शब्दकोश की प्रतिलिपि बनाएं
-・VVM मॉडल डाउनलोड करें</string>
+    <string name="voicevox_setup_steps">• OpenJTalk शब्दकोश की प्रतिलिपि बनाएं
+• VVM मॉडल डाउनलोड करें</string>
 <string name="voicevox_step_dictionary">OpenJTalk शब्दकोश</string>
 <string name="voicevox_step_model">VVM मॉडल</string>
 <string name="voicevox_setup_complete">सेटअप पूरा हुआ!</string>
@@ -577,9 +577,9 @@
 <string name="permission_summary_format">%1$d standard permissions, %2$d special access granted</string>
     <!-- Missing translations -->
     <string name="approve_command_format">openclaw devices approve --latest %s</string>
-    <string name="credits_support_description">このアプリが役に立った場合は、Ko-fiでの支援をご検討ください。</string>
+    <string name="credits_support_description">अगर यह ऐप आपके काम आया है, तो कृपया Ko-fi पर सहयोग देने पर विचार करें।</string>
     <string name="credits_support_kofi_button">Support the Developer</string>
-    <string name="credits_support_title">開発をサポートする</string>
+    <string name="credits_support_title">विकास का समर्थन करें</string>
     <string name="operator_offline_command">openclaw devices approve --latest %s</string>
     <string name="qr_scan_desc">Align the QR code within the frame to scan it</string>
     <string name="qr_scan_prompt">Scan QR Code</string>

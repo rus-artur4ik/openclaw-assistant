@@ -37,6 +37,7 @@ class ElevenLabsProvider(private val context: Context) : TTSProvider {
         .build()
     
     private var mediaPlayer: MediaPlayer? = null
+    private var lastFailureReason: String? = null
     
     override suspend fun speak(text: String): Boolean = withContext(Dispatchers.IO) {
         if (!isConfigured()) {
@@ -103,16 +104,21 @@ class ElevenLabsProvider(private val context: Context) : TTSProvider {
             .post(requestBody.toRequestBody("application/json".toMediaType()))
             .build()
         
+        lastFailureReason = null
         try {
             client.newCall(request).execute().use { response ->
                 if (response.isSuccessful) {
                     response.body?.bytes()
                 } else {
-                    Log.e(TAG, "API error: ${response.code}")
+                    val detail = response.body?.string().orEmpty().take(200)
+                    lastFailureReason = "ElevenLabs API ${response.code}" +
+                        if (detail.isNotBlank()) ": $detail" else ""
+                    Log.e(TAG, "API error: ${response.code} $detail")
                     null
                 }
             }
         } catch (e: IOException) {
+            lastFailureReason = "Network error: ${e.message}"
             Log.e(TAG, "Network error: ${e.message}", e)
             null
         }
@@ -199,12 +205,13 @@ class ElevenLabsProvider(private val context: Context) : TTSProvider {
         val audioData = try {
             synthesizeSpeech(text)
         } catch (e: Exception) {
+            lastFailureReason = "Synthesis error: ${e.message}"
             Log.e(TAG, "Synthesis error", e)
             null
         }
-        
+
         if (audioData == null) {
-            send(TTSState.Error("Failed to synthesize speech"))
+            send(TTSState.Error(lastFailureReason ?: "Failed to synthesize speech"))
             return@channelFlow
         }
         

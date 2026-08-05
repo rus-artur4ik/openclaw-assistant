@@ -16,7 +16,7 @@ data class VoiceVoxCharacter(
     val termsUrl: String,
     val requiresCvCredit: Boolean = false
 ) {
-    override fun toString(): String = "$name（$styleName）"
+    override fun toString(): String = "$name ($styleName)"
 
     fun getFullCredit(): String = creditNotation
 }
@@ -35,118 +35,118 @@ data class VoiceVoxCharacter(
 object VoiceVoxCharacters {
 
     private val characters = listOf(
-        // ── 0.vvm ── 四国めたん
-        VoiceVoxCharacter(0,  "四国めたん", "あまあま", "0",
+        // ── 0.vvm ── Shikoku Metan
+        VoiceVoxCharacter(0,  "Shikoku Metan", "Sweet", "0",
             "VOICEVOX:四国めたん", "© 東北ずん子プロジェクト",
             "https://zunko.jp/con_ongen_kiyaku.html"),
-        VoiceVoxCharacter(2,  "四国めたん", "ノーマル",  "0",
+        VoiceVoxCharacter(2,  "Shikoku Metan", "Normal",  "0",
             "VOICEVOX:四国めたん", "© 東北ずん子プロジェクト",
             "https://zunko.jp/con_ongen_kiyaku.html"),
-        VoiceVoxCharacter(4,  "四国めたん", "セクシー", "0",
+        VoiceVoxCharacter(4,  "Shikoku Metan", "Sexy", "0",
             "VOICEVOX:四国めたん", "© 東北ずん子プロジェクト",
             "https://zunko.jp/con_ongen_kiyaku.html"),
-        VoiceVoxCharacter(6,  "四国めたん", "ツンツン", "0",
+        VoiceVoxCharacter(6,  "Shikoku Metan", "Tsundere", "0",
             "VOICEVOX:四国めたん", "© 東北ずん子プロジェクト",
             "https://zunko.jp/con_ongen_kiyaku.html"),
 
-        // ── 0.vvm ── ずんだもん
-        VoiceVoxCharacter(1,  "ずんだもん", "あまあま", "0",
+        // ── 0.vvm ── Zundamon
+        VoiceVoxCharacter(1,  "Zundamon", "Sweet", "0",
             "VOICEVOX:ずんだもん", "© 東北ずん子プロジェクト",
             "https://zunko.jp/con_ongen_kiyaku.html"),
-        VoiceVoxCharacter(3,  "ずんだもん", "ノーマル",  "0",
+        VoiceVoxCharacter(3,  "Zundamon", "Normal",  "0",
             "VOICEVOX:ずんだもん", "© 東北ずん子プロジェクト",
             "https://zunko.jp/con_ongen_kiyaku.html"),
-        VoiceVoxCharacter(5,  "ずんだもん", "セクシー", "0",
+        VoiceVoxCharacter(5,  "Zundamon", "Sexy", "0",
             "VOICEVOX:ずんだもん", "© 東北ずん子プロジェクト",
             "https://zunko.jp/con_ongen_kiyaku.html"),
-        VoiceVoxCharacter(7,  "ずんだもん", "ツンツン", "0",
+        VoiceVoxCharacter(7,  "Zundamon", "Tsundere", "0",
             "VOICEVOX:ずんだもん", "© 東北ずん子プロジェクト",
             "https://zunko.jp/con_ongen_kiyaku.html"),
 
-        // ── 0.vvm ── 春日部つむぎ
-        VoiceVoxCharacter(8,  "春日部つむぎ", "ノーマル", "0",
+        // ── 0.vvm ── Kasukabe Tsumugi
+        VoiceVoxCharacter(8,  "Kasukabe Tsumugi", "Normal", "0",
             "VOICEVOX:春日部つむぎ", "© 春日部つむぎ",
             "https://tsumugi-official.studio.site/rule"),
 
-        // ── 0.vvm ── 雨晴はう
-        VoiceVoxCharacter(10, "雨晴はう", "ノーマル", "0",
+        // ── 0.vvm ── Amehare Hau
+        VoiceVoxCharacter(10, "Amehare Hau", "Normal", "0",
             "VOICEVOX:雨晴はう", "© 雨晴はう",
             "https://amehau.com/rules/amehare-hau-rule"),
 
-        // ── 3.vvm ── 波音リツ
-        VoiceVoxCharacter(9,  "波音リツ", "ノーマル", "3",
+        // ── 3.vvm ── Namine Ritsu
+        VoiceVoxCharacter(9,  "Namine Ritsu", "Normal", "3",
             "VOICEVOX:波音リツ", "© カノンの落ちる城",
             "https://www.canon-voice.com/"),
 
-        // ── 4.vvm ── 玄野武宏
-        VoiceVoxCharacter(11, "玄野武宏", "ノーマル",  "4",
+        // ── 4.vvm ── Kurono Takehiro
+        VoiceVoxCharacter(11, "Kurono Takehiro", "Normal",  "4",
             "VOICEVOX:玄野武宏", "© 玄野武宏 (ViRVOX Project)",
             "https://virvoxproject.wixsite.com/official/voicevox%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84"),
 
-        // ── 5.vvm ── 四国めたん ささやき系
-        VoiceVoxCharacter(36, "四国めたん", "ささやき", "5",
+        // ── 5.vvm ── Shikoku Metan whisper styles
+        VoiceVoxCharacter(36, "Shikoku Metan", "Whisper", "5",
             "VOICEVOX:四国めたん", "© 東北ずん子プロジェクト",
             "https://zunko.jp/con_ongen_kiyaku.html"),
-        VoiceVoxCharacter(37, "四国めたん", "ヒソヒソ", "5",
+        VoiceVoxCharacter(37, "Shikoku Metan", "Hushed", "5",
             "VOICEVOX:四国めたん", "© 東北ずん子プロジェクト",
             "https://zunko.jp/con_ongen_kiyaku.html"),
 
-        // ── 5.vvm ── ずんだもん ささやき系
-        VoiceVoxCharacter(22, "ずんだもん", "ささやき", "5",
+        // ── 5.vvm ── Zundamon whisper styles
+        VoiceVoxCharacter(22, "Zundamon", "Whisper", "5",
             "VOICEVOX:ずんだもん", "© 東北ずん子プロジェクト",
             "https://zunko.jp/con_ongen_kiyaku.html"),
-        VoiceVoxCharacter(38, "ずんだもん", "ヒソヒソ", "5",
+        VoiceVoxCharacter(38, "Zundamon", "Hushed", "5",
             "VOICEVOX:ずんだもん", "© 東北ずん子プロジェクト",
             "https://zunko.jp/con_ongen_kiyaku.html"),
 
-        // ── 9.vvm ── 白上虎太郎
-        VoiceVoxCharacter(12, "白上虎太郎", "ふつう",   "9",
+        // ── 9.vvm ── Shirakami Kotaro
+        VoiceVoxCharacter(12, "Shirakami Kotaro", "Normal",   "9",
             "VOICEVOX:白上虎太郎", "© 白上虎太郎",
             "https://frontier.creatia.cc/fandoms/portal/creations/4"),
-        VoiceVoxCharacter(32, "白上虎太郎", "わーい",   "9",
+        VoiceVoxCharacter(32, "Shirakami Kotaro", "Joyful",   "9",
             "VOICEVOX:白上虎太郎", "© 白上虎太郎",
             "https://frontier.creatia.cc/fandoms/portal/creations/4"),
-        VoiceVoxCharacter(33, "白上虎太郎", "びくびく", "9",
+        VoiceVoxCharacter(33, "Shirakami Kotaro", "Nervous", "9",
             "VOICEVOX:白上虎太郎", "© 白上虎太郎",
             "https://frontier.creatia.cc/fandoms/portal/creations/4"),
-        VoiceVoxCharacter(34, "白上虎太郎", "おこ",     "9",
+        VoiceVoxCharacter(34, "Shirakami Kotaro", "Angry",     "9",
             "VOICEVOX:白上虎太郎", "© 白上虎太郎",
             "https://frontier.creatia.cc/fandoms/portal/creations/4"),
-        VoiceVoxCharacter(35, "白上虎太郎", "びえーん", "9",
+        VoiceVoxCharacter(35, "Shirakami Kotaro", "Crying", "9",
             "VOICEVOX:白上虎太郎", "© 白上虎太郎",
             "https://frontier.creatia.cc/fandoms/portal/creations/4"),
 
-        // ── 10.vvm ── 玄野武宏 追加スタイル
-        VoiceVoxCharacter(39, "玄野武宏", "喜び",     "10",
+        // ── 10.vvm ── Kurono Takehiro additional styles
+        VoiceVoxCharacter(39, "Kurono Takehiro", "Happy",     "10",
             "VOICEVOX:玄野武宏", "© 玄野武宏 (ViRVOX Project)",
             "https://virvoxproject.wixsite.com/official/voicevox%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84"),
-        VoiceVoxCharacter(40, "玄野武宏", "ツンギレ", "10",
+        VoiceVoxCharacter(40, "Kurono Takehiro", "Snappy", "10",
             "VOICEVOX:玄野武宏", "© 玄野武宏 (ViRVOX Project)",
             "https://virvoxproject.wixsite.com/official/voicevox%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84"),
-        VoiceVoxCharacter(41, "玄野武宏", "悲しみ",   "10",
+        VoiceVoxCharacter(41, "Kurono Takehiro", "Sad",   "10",
             "VOICEVOX:玄野武宏", "© 玄野武宏 (ViRVOX Project)",
             "https://virvoxproject.wixsite.com/official/voicevox%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84"),
 
-        // ── 15.vvm ── 青山龍星
-        VoiceVoxCharacter(13, "青山龍星", "ノーマル",  "15",
+        // ── 15.vvm ── Aoyama Ryusei
+        VoiceVoxCharacter(13, "Aoyama Ryusei", "Normal",  "15",
             "VOICEVOX:青山龍星", "© 青山龍星 (ViRVOX Project)",
             "https://virvoxproject.wixsite.com/official/voicevox%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84"),
-        VoiceVoxCharacter(81, "青山龍星", "熱血",     "15",
+        VoiceVoxCharacter(81, "Aoyama Ryusei", "Passionate",     "15",
             "VOICEVOX:青山龍星", "© 青山龍星 (ViRVOX Project)",
             "https://virvoxproject.wixsite.com/official/voicevox%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84"),
-        VoiceVoxCharacter(82, "青山龍星", "不機嫌",   "15",
+        VoiceVoxCharacter(82, "Aoyama Ryusei", "Grumpy",   "15",
             "VOICEVOX:青山龍星", "© 青山龍星 (ViRVOX Project)",
             "https://virvoxproject.wixsite.com/official/voicevox%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84"),
-        VoiceVoxCharacter(83, "青山龍星", "喜び",     "15",
+        VoiceVoxCharacter(83, "Aoyama Ryusei", "Happy",     "15",
             "VOICEVOX:青山龍星", "© 青山龍星 (ViRVOX Project)",
             "https://virvoxproject.wixsite.com/official/voicevox%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84"),
-        VoiceVoxCharacter(84, "青山龍星", "しっとり", "15",
+        VoiceVoxCharacter(84, "Aoyama Ryusei", "Calm", "15",
             "VOICEVOX:青山龍星", "© 青山龍星 (ViRVOX Project)",
             "https://virvoxproject.wixsite.com/official/voicevox%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84"),
-        VoiceVoxCharacter(85, "青山龍星", "かなしみ", "15",
+        VoiceVoxCharacter(85, "Aoyama Ryusei", "Sad", "15",
             "VOICEVOX:青山龍星", "© 青山龍星 (ViRVOX Project)",
             "https://virvoxproject.wixsite.com/official/voicevox%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84"),
-        VoiceVoxCharacter(86, "青山龍星", "囁き",     "15",
+        VoiceVoxCharacter(86, "Aoyama Ryusei", "Whisper",     "15",
             "VOICEVOX:青山龍星", "© 青山龍星 (ViRVOX Project)",
             "https://virvoxproject.wixsite.com/official/voicevox%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84")
     )

@@ -73,28 +73,28 @@ object ElevenLabsVoiceOptions {
     
     // Actual ElevenLabs Voice IDs from API
     val VOICES = listOf(
-        VoiceOption("", "デフォルト（API設定依存）", "API設定で指定されたデフォルト音声を使用"),
-        VoiceOption("pNInz6obpgDQGcFmaJgB", "Adam", "力強い男性"),
-        VoiceOption("EXAVITQu4vr4xnSDxMaL", "Bella", "明るいプロフェッショナル女性"),
-        VoiceOption("nPczCjzI2devNBz1zQrb", "Brian", "深みのある安心感のある男性"),
-        VoiceOption("IKne3meq5aSn9XLyUdCD", "Charlie", "低めで自信に満ちた男性"),
-        VoiceOption("SOYHLrjzK2X1ezoPC6cr", "Harry", "激しい戦士系男性"),
-        VoiceOption("XrExE9yKIg1WjnnlVkGX", "Matilda", "知識豊富なプロフェッショナル女性"),
-        VoiceOption("cgSgspJ2msm6clMCkdW9", "Jessica", "明るく温かみのある女性"),
-        VoiceOption("cjVigY5qzO86Huf0OWal", "Eric", "滑らかで信頼できる男性"),
-        VoiceOption("EXAVITQu4vr4xnSDxMaL", "Sarah", "成熟した自信に満ちた女性"),
-        VoiceOption("FGY2WhTYpPnrIDTdsKH5", "Laura", "熱心で独特な女性"),
-        VoiceOption("JBFqnCBsd6RMkjVDRZzb", "George", "温かみのある物語り男性"),
-        VoiceOption("CwhRBWXzGAHq8TQ4Fs17", "Roger", "落ち着いたカジュアル男性"),
-        VoiceOption("SAz9YHcvj6GT2YYXdXww", "River", "リラックスした中性"),
-        VoiceOption("bIHbv24MWmeRgasZH58o", "Will", "楽観的でリラックスした男性"),
-        VoiceOption("onwK4e9ZLuTAKqWW03F9", "Daniel", "安定した放送系男性"),
-        VoiceOption("pFZfaz1YfMItY4IjZDke", "Lily", "ベルベットのような女優系"),
-        VoiceOption("pqHfZKP75CvOlQylNhV4", "Bill", "賢明で成熟した男性"),
-        VoiceOption("Xb7hH8MSUJpSbSDYk0k2", "Alice", "明確で教育的な女性"),
-        VoiceOption("TX3AE5NoiEX1lRR4gU5H", "Liam", "エネルギッシュSNSクリエイター"),
-        VoiceOption("N2lVS1w4EtoT3dr4eOWO", "Callum", "ハスキーなトリックスター"),
-        VoiceOption("iP95p4xoKVk53GoZ742B", "Chris", "魅力的で親しみやすい男性")
+        VoiceOption("", "Default (from API settings)", "Uses the default voice configured in your API settings"),
+        VoiceOption("pNInz6obpgDQGcFmaJgB", "Adam", "Powerful male"),
+        VoiceOption("EXAVITQu4vr4xnSDxMaL", "Bella", "Bright professional female"),
+        VoiceOption("nPczCjzI2devNBz1zQrb", "Brian", "Deep, reassuring male"),
+        VoiceOption("IKne3meq5aSn9XLyUdCD", "Charlie", "Low, confident male"),
+        VoiceOption("SOYHLrjzK2X1ezoPC6cr", "Harry", "Intense warrior male"),
+        VoiceOption("XrExE9yKIg1WjnnlVkGX", "Matilda", "Knowledgeable professional female"),
+        VoiceOption("cgSgspJ2msm6clMCkdW9", "Jessica", "Bright, warm female"),
+        VoiceOption("cjVigY5qzO86Huf0OWal", "Eric", "Smooth, trustworthy male"),
+        VoiceOption("EXAVITQu4vr4xnSDxMaL", "Sarah", "Mature, confident female"),
+        VoiceOption("FGY2WhTYpPnrIDTdsKH5", "Laura", "Eager, quirky female"),
+        VoiceOption("JBFqnCBsd6RMkjVDRZzb", "George", "Warm storyteller male"),
+        VoiceOption("CwhRBWXzGAHq8TQ4Fs17", "Roger", "Calm, casual male"),
+        VoiceOption("SAz9YHcvj6GT2YYXdXww", "River", "Relaxed, neutral"),
+        VoiceOption("bIHbv24MWmeRgasZH58o", "Will", "Optimistic, laid-back male"),
+        VoiceOption("onwK4e9ZLuTAKqWW03F9", "Daniel", "Steady broadcast male"),
+        VoiceOption("pFZfaz1YfMItY4IjZDke", "Lily", "Velvety actress voice"),
+        VoiceOption("pqHfZKP75CvOlQylNhV4", "Bill", "Wise, mature male"),
+        VoiceOption("Xb7hH8MSUJpSbSDYk0k2", "Alice", "Clear, educational female"),
+        VoiceOption("TX3AE5NoiEX1lRR4gU5H", "Liam", "Energetic social media creator"),
+        VoiceOption("N2lVS1w4EtoT3dr4eOWO", "Callum", "Husky trickster"),
+        VoiceOption("iP95p4xoKVk53GoZ742B", "Chris", "Charming, approachable male")
     )
 }
 
@@ -107,23 +107,23 @@ object VoiceVoxCharacters {
     // VVM file mapping (actual downloaded files are 0.vvm, 3.vvm, etc.)
     // Maps official VOICEVOX style ID to VVM file number
     val VVM_FILE_MAPPING = mapOf(
-        // 0.vvm - 四国めたん（ノーマル系）, ずんだもん（ノーマル系）, 春日部つむぎ, 雨晴はう
-        0 to "0", 2 to "0", 4 to "0", 6 to "0",    // 四国めたん
-        1 to "0", 3 to "0", 5 to "0", 7 to "0",    // ずんだもん
-        8 to "0",                                    // 春日部つむぎ
-        10 to "0",                                   // 雨晴はう
-        // 3.vvm - 波音リツ
+        // 0.vvm - Shikoku Metan (normal styles), Zundamon (normal styles), Kasukabe Tsumugi, Amehare Hau
+        0 to "0", 2 to "0", 4 to "0", 6 to "0",    // Shikoku Metan
+        1 to "0", 3 to "0", 5 to "0", 7 to "0",    // Zundamon
+        8 to "0",                                    // Kasukabe Tsumugi
+        10 to "0",                                   // Amehare Hau
+        // 3.vvm - Namine Ritsu
         9 to "3",
-        // 4.vvm - 玄野武宏（ノーマル）
+        // 4.vvm - Kurono Takehiro (normal)
         11 to "4",
-        // 5.vvm - 四国めたん ささやき/ヒソヒソ, ずんだもん ささやき/ヒソヒソ
-        36 to "5", 37 to "5",                       // 四国めたん
-        22 to "5", 38 to "5",                       // ずんだもん
-        // 9.vvm - 白上虎太郎
+        // 5.vvm - Shikoku Metan Whisper/Hushed, Zundamon Whisper/Hushed
+        36 to "5", 37 to "5",                       // Shikoku Metan
+        22 to "5", 38 to "5",                       // Zundamon
+        // 9.vvm - Shirakami Kotaro
         12 to "9", 32 to "9", 33 to "9", 34 to "9", 35 to "9",
-        // 10.vvm - 玄野武宏 追加スタイル
+        // 10.vvm - Kurono Takehiro additional styles
         39 to "10", 40 to "10", 41 to "10",
-        // 15.vvm - 青山龍星
+        // 15.vvm - Aoyama Ryusei
         13 to "15", 81 to "15", 82 to "15", 83 to "15",
         84 to "15", 85 to "15", 86 to "15"
     )
@@ -137,7 +137,6 @@ object VoiceVoxCharacters {
         return CHARACTERS.filter { it.id in styleIds }
     }
     
-    // Get display name for VVM file (e.g., "四国めたん, ずんだもん 他3キャラ")
     fun getVvmDisplayName(vvmFile: String, context: android.content.Context): String {
         val chars = getCharactersInVvm(vvmFile)
         if (chars.isEmpty()) return context.getString(R.string.voicevox_unknown_vvm)
@@ -145,59 +144,59 @@ object VoiceVoxCharacters {
         val uniqueNames = chars.map { it.name }.distinct()
         return when {
             uniqueNames.size == 1 -> uniqueNames.first()
-            uniqueNames.size == 2 -> uniqueNames.joinToString("、")
-            uniqueNames.size == 3 -> uniqueNames.joinToString("、") + context.getString(R.string.voicevox_other_styles, chars.size - 3)
-            else -> uniqueNames.take(2).joinToString("、") + context.getString(R.string.voicevox_other_chars, uniqueNames.size - 2)
+            uniqueNames.size == 2 -> uniqueNames.joinToString(", ")
+            uniqueNames.size == 3 -> uniqueNames.joinToString(", ") + context.getString(R.string.voicevox_other_styles, chars.size - 3)
+            else -> uniqueNames.take(2).joinToString(", ") + context.getString(R.string.voicevox_other_chars, uniqueNames.size - 2)
         }
     }
     
     val CHARACTERS = listOf(
-        // ── 0.vvm ── 四国めたん
-        Character(0,  "四国めたん", "あまあま", "0",  120_000_000),
-        Character(2,  "四国めたん", "ノーマル",  "0",  120_000_000),
-        Character(4,  "四国めたん", "セクシー", "0",  120_000_000),
-        Character(6,  "四国めたん", "ツンツン", "0",  120_000_000),
-        // ── 0.vvm ── ずんだもん
-        Character(1,  "ずんだもん", "あまあま", "0",  120_000_000),
-        Character(3,  "ずんだもん", "ノーマル",  "0",  120_000_000),
-        Character(5,  "ずんだもん", "セクシー", "0",  120_000_000),
-        Character(7,  "ずんだもん", "ツンツン", "0",  120_000_000),
-        // ── 0.vvm ── 春日部つむぎ
-        Character(8,  "春日部つむぎ", "ノーマル", "0", 120_000_000),
-        // ── 0.vvm ── 雨晴はう
-        Character(10, "雨晴はう",   "ノーマル", "0",  120_000_000),
-        // ── 3.vvm ── 波音リツ
-        Character(9,  "波音リツ",   "ノーマル", "3",  120_000_000),
-        // ── 4.vvm ── 玄野武宏
-        Character(11, "玄野武宏",   "ノーマル",  "4",  120_000_000),
-        // ── 5.vvm ── 四国めたん ささやき系
-        Character(36, "四国めたん", "ささやき", "5",  60_000_000),
-        Character(37, "四国めたん", "ヒソヒソ", "5",  60_000_000),
-        // ── 5.vvm ── ずんだもん ささやき系
-        Character(22, "ずんだもん", "ささやき", "5",  60_000_000),
-        Character(38, "ずんだもん", "ヒソヒソ", "5",  60_000_000),
-        // ── 9.vvm ── 白上虎太郎
-        Character(12, "白上虎太郎", "ふつう",   "9",  120_000_000),
-        Character(32, "白上虎太郎", "わーい",   "9",  120_000_000),
-        Character(33, "白上虎太郎", "びくびく", "9",  120_000_000),
-        Character(34, "白上虎太郎", "おこ",     "9",  120_000_000),
-        Character(35, "白上虎太郎", "びえーん", "9",  120_000_000),
-        // ── 10.vvm ── 玄野武宏 追加スタイル
-        Character(39, "玄野武宏",   "喜び",     "10", 120_000_000),
-        Character(40, "玄野武宏",   "ツンギレ", "10", 120_000_000),
-        Character(41, "玄野武宏",   "悲しみ",   "10", 120_000_000),
-        // ── 15.vvm ── 青山龍星
-        Character(13, "青山龍星",   "ノーマル",  "15", 120_000_000),
-        Character(81, "青山龍星",   "熱血",     "15", 120_000_000),
-        Character(82, "青山龍星",   "不機嫌",   "15", 120_000_000),
-        Character(83, "青山龍星",   "喜び",     "15", 120_000_000),
-        Character(84, "青山龍星",   "しっとり", "15", 120_000_000),
-        Character(85, "青山龍星",   "かなしみ", "15", 120_000_000),
-        Character(86, "青山龍星",   "囁き",     "15", 60_000_000)
+        // ── 0.vvm ── Shikoku Metan
+        Character(0,  "Shikoku Metan", "Sweet", "0",  120_000_000),
+        Character(2,  "Shikoku Metan", "Normal",  "0",  120_000_000),
+        Character(4,  "Shikoku Metan", "Sexy", "0",  120_000_000),
+        Character(6,  "Shikoku Metan", "Tsundere", "0",  120_000_000),
+        // ── 0.vvm ── Zundamon
+        Character(1,  "Zundamon", "Sweet", "0",  120_000_000),
+        Character(3,  "Zundamon", "Normal",  "0",  120_000_000),
+        Character(5,  "Zundamon", "Sexy", "0",  120_000_000),
+        Character(7,  "Zundamon", "Tsundere", "0",  120_000_000),
+        // ── 0.vvm ── Kasukabe Tsumugi
+        Character(8,  "Kasukabe Tsumugi", "Normal", "0", 120_000_000),
+        // ── 0.vvm ── Amehare Hau
+        Character(10, "Amehare Hau",   "Normal", "0",  120_000_000),
+        // ── 3.vvm ── Namine Ritsu
+        Character(9,  "Namine Ritsu",   "Normal", "3",  120_000_000),
+        // ── 4.vvm ── Kurono Takehiro
+        Character(11, "Kurono Takehiro",   "Normal",  "4",  120_000_000),
+        // ── 5.vvm ── Shikoku Metan whisper styles
+        Character(36, "Shikoku Metan", "Whisper", "5",  60_000_000),
+        Character(37, "Shikoku Metan", "Hushed", "5",  60_000_000),
+        // ── 5.vvm ── Zundamon whisper styles
+        Character(22, "Zundamon", "Whisper", "5",  60_000_000),
+        Character(38, "Zundamon", "Hushed", "5",  60_000_000),
+        // ── 9.vvm ── Shirakami Kotaro
+        Character(12, "Shirakami Kotaro", "Normal",   "9",  120_000_000),
+        Character(32, "Shirakami Kotaro", "Joyful",   "9",  120_000_000),
+        Character(33, "Shirakami Kotaro", "Nervous", "9",  120_000_000),
+        Character(34, "Shirakami Kotaro", "Angry",     "9",  120_000_000),
+        Character(35, "Shirakami Kotaro", "Crying", "9",  120_000_000),
+        // ── 10.vvm ── Kurono Takehiro additional styles
+        Character(39, "Kurono Takehiro",   "Happy",     "10", 120_000_000),
+        Character(40, "Kurono Takehiro",   "Snappy", "10", 120_000_000),
+        Character(41, "Kurono Takehiro",   "Sad",   "10", 120_000_000),
+        // ── 15.vvm ── Aoyama Ryusei
+        Character(13, "Aoyama Ryusei",   "Normal",  "15", 120_000_000),
+        Character(81, "Aoyama Ryusei",   "Passionate",     "15", 120_000_000),
+        Character(82, "Aoyama Ryusei",   "Grumpy",   "15", 120_000_000),
+        Character(83, "Aoyama Ryusei",   "Happy",     "15", 120_000_000),
+        Character(84, "Aoyama Ryusei",   "Calm", "15", 120_000_000),
+        Character(85, "Aoyama Ryusei",   "Sad", "15", 120_000_000),
+        Character(86, "Aoyama Ryusei",   "Whisper",     "15", 60_000_000)
     )
     
     fun getById(id: Int): Character? = CHARACTERS.find { it.id == id }
-    fun getDisplayName(id: Int): String = getById(id)?.let { "${it.name}（${it.styleName}）" } ?: "Unknown"
+    fun getDisplayName(id: Int): String = getById(id)?.let { "${it.name} (${it.styleName})" } ?: "Unknown"
 }
 
 class SettingsActivity : ComponentActivity() {
@@ -1147,7 +1146,7 @@ fun SettingsScreen(
                                 value = ttsTypeLabel,
                                 onValueChange = {},
                                 readOnly = true,
-                                label = { Text("TTS種別") },
+                                label = { Text(stringResource(R.string.tts_provider_label)) },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showTtsTypeMenu) },
                                 modifier = Modifier.fillMaxWidth().menuAnchor()
                             )
@@ -2187,13 +2186,13 @@ private fun applyAppLanguage(languageTag: String) {
 private val DISPLAY_LANGUAGE_OPTIONS = listOf(
     "" to "System Default",
     "en" to "English",
-    "ja-JP" to "Japan（日本）",
-    "zh-CN" to "China（中国）",
-    "zh-TW" to "Taiwan（台灣）",
-    "hi-IN" to "India（भारत）",
-    "de-DE" to "Germany（Deutschland）",
-    "de-AT" to "Austria（Österreich）",
-    "ru-RU" to "Russia（Россия）",
+    "ja-JP" to "Japan (日本)",
+    "zh-CN" to "China (中国)",
+    "zh-TW" to "Taiwan (台灣)",
+    "hi-IN" to "India (भारत)",
+    "de-DE" to "Germany (Deutschland)",
+    "de-AT" to "Austria (Österreich)",
+    "ru-RU" to "Russia (Россия)",
     "fr" to "Français",
     "es" to "Español"
 )
@@ -2268,7 +2267,7 @@ fun ElevenLabsSettingsCard(
     val selectedVoice: ElevenLabsVoiceOptions.VoiceOption = remember(safeVoiceId) {
         ElevenLabsVoiceOptions.VOICES.find { it.id == safeVoiceId } 
             ?: ElevenLabsVoiceOptions.VOICES.firstOrNull()
-            ?: ElevenLabsVoiceOptions.VoiceOption("", "デフォルト", "")
+            ?: ElevenLabsVoiceOptions.VoiceOption("", "Default", "")
     }
     
     // Ensure we have a valid voice name for display
@@ -2659,7 +2658,7 @@ fun VoiceVoxSettingsCard(
                 onExpandedChange = { showCharacterDropdown = it }
             ) {
                 OutlinedTextField(
-                    value = selectedCharacter?.let { "${it.name}（${it.styleName}）" } ?: "Unknown",
+                    value = selectedCharacter?.let { "${it.name} (${it.styleName})" } ?: "Unknown",
                     onValueChange = {},
                     readOnly = true,
                     label = { Text(stringResource(R.string.select_character)) },
@@ -2691,7 +2690,7 @@ fun VoiceVoxSettingsCard(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    Text("${character.name}（${character.styleName}）")
+                                    Text("${character.name} (${character.styleName})")
                                     if (isVvmReady) {
                                         Icon(
                                             Icons.Default.Check,
@@ -2721,7 +2720,7 @@ fun VoiceVoxSettingsCard(
                 val isVvmReady = modelManager.isVvmModelReady(selectedCharacter.vvmFileName)
                 Text(
                     stringResource(R.string.voicevox_selected_character, 
-                        "${selectedCharacter.name}（${selectedCharacter.styleName}）", 
+                        "${selectedCharacter.name} (${selectedCharacter.styleName})", 
                         modelManager.getVvmFileSizeMB(selectedCharacter.vvmFileName) +
                         if (isVvmReady) " - ${context.getString(R.string.voicevox_downloaded)}" else ""
                     ),
@@ -2753,7 +2752,7 @@ fun VoiceVoxSettingsCard(
                                     tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                                 )
                                 Text(
-                                    "クレジット表記",
+                                    "Credit notation",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                                 )
@@ -2787,7 +2786,7 @@ fun VoiceVoxSettingsCard(
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    "利用規約を確認",
+                                    stringResource(R.string.credits_voicevox_open_terms),
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
@@ -2882,7 +2881,7 @@ fun VoiceVoxSettingsCard(
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                                 Text(
-                                    "${vvmFile}.vvm · ${modelManager.getVvmFileSizeMB(vvmFile)} · ${styleCount}スタイル",
+                                    "${vvmFile}.vvm · ${modelManager.getVvmFileSizeMB(vvmFile)} · $styleCount styles",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )

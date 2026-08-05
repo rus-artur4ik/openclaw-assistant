@@ -316,7 +316,6 @@ class OpenClawSession(
     override fun onHide() {
         super.onHide()
 
-        // ユーザーが明示的に Close ボタンを押した場合は、音声状態に関わらず必ずクリーンアップ
         if (isUserDismissed) {
             isUserDismissed = false
             cleanupSession()
@@ -562,7 +561,6 @@ class OpenClawSession(
         startThinkingSound()
         displayText.value = ""
 
-        // 相槌フレーズの再生（LLMへのリクエストと並行して実行）
         if (settings.fillerPhrasesEnabled) {
             scheduleInitialFillerPhrase()
         }
@@ -689,7 +687,7 @@ class OpenClawSession(
         waitPhraseJob?.cancel()
         if (!settings.fillerPhrasesEnabled || !settings.ttsEnabled) return
         waitPhraseJob = scope.launch {
-            delay(5000) // 5秒待機
+            delay(5000)
             if (currentState.value == AssistantState.THINKING && isActive) {
                 Log.d(TAG, "Wait phrase timer triggered (> 5s). Playing wait phrase.")
                 playWaitPhrase()
@@ -709,7 +707,7 @@ class OpenClawSession(
         var playbackJob: Job? = null
         playbackJob = scope.launch {
             try {
-                // 相槌は progress 監視せずに即座に発話だけさせる
+                // Fire-and-forget: playback completion is not awaited
                 ttsManager.speakWithProgress(phrase).collect {} 
             } catch (_: CancellationException) {
             } catch (e: Exception) {
@@ -761,7 +759,7 @@ class OpenClawSession(
         try {
             val assistantCountBefore = nodeRuntime.chatMessages.value.count { it.role == "assistant" }
 
-            startWaitPhraseTimer() // 待ちフレーズのタイマー開始
+            startWaitPhraseTimer()
 
             nodeRuntime.sendChat(
                 message = message,
@@ -932,6 +930,7 @@ class OpenClawSession(
 
         speakingJob = scope.launch {
             ignoreNextTtsStop = false
+            var speechFailureDetail: String? = null
             try {
                 val maxLen = minOf(TTSUtils.getMaxInputLength(null), 1000)
                 val chunks = TTSUtils.splitTextForTTS(cleanText, maxLen)
@@ -948,7 +947,7 @@ class OpenClawSession(
                                 Log.d(TAG, "TTS Speaking")
                                 stopThinkingSound()
                                 currentState.value = AssistantState.SPEAKING
-                                // Barge-inが有効な場合、読み上げ開始時にHotwordServiceを再開する
+                                // Barge-in keeps the HotwordService listening while TTS speaks
                                 if (settings.ttsBargeInEnabled) {
                                     sendResumeBroadcast()
                                 }
@@ -963,6 +962,7 @@ class OpenClawSession(
                                     return@collect
                                 }
                                 Log.e(TAG, "TTS Error: ${state.message}")
+                                speechFailureDetail = state.message
                                 chunkSuccess = false
                             }
                         }
@@ -973,13 +973,9 @@ class OpenClawSession(
                     }
                 }
 
-                // abandonAudioFocus() : 連続対話やBarge-in対応のため、ここでは即座にfocusを捨てない運用にするか、
-                // 次のアクション(マイクの起動等)まで保持しておく選択もある。
-                // 既存の挙動を尊重し一旦残す
                 abandonAudioFocus()
 
-                // 読み上げ終了時にBarge-inのために再開していたHotwordServiceを再度一時停止させる
-                // (この後すぐにlisteningに入る場合はそちらでpauseされるが念のため)
+                // Pause the HotwordService that barge-in resumed (the listening path also pauses it)
                 if (settings.ttsBargeInEnabled && !settings.continuousMode) {
                     sendPauseBroadcast()
                 }
@@ -1002,7 +998,8 @@ class OpenClawSession(
                     }
                 } else {
                     currentState.value = AssistantState.ERROR
-                    errorMessage.value = context.getString(R.string.error_speech_general)
+                    errorMessage.value = speechFailureDetail?.takeIf { it.isNotBlank() }
+                        ?: context.getString(R.string.error_speech_general)
                 }
             } catch (e: CancellationException) {
                 if (!ignoreNextTtsStop) {
@@ -1016,7 +1013,8 @@ class OpenClawSession(
                 abandonAudioFocus()
                 releaseWakeLock()
                 currentState.value = AssistantState.ERROR
-                errorMessage.value = context.getString(R.string.error_speech_general)
+                errorMessage.value = e.message?.takeIf { it.isNotBlank() }
+                    ?: context.getString(R.string.error_speech_general)
             }
         }
     }

@@ -518,7 +518,6 @@ private fun ConnectionStep(
     var pairingReview by remember { mutableStateOf<EditablePairingPayload?>(null) }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        // スクロール可能なコンテンツ部分
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -702,7 +701,6 @@ private fun ConnectionStep(
         } // end of if/else (Hermes / OpenClaw)
         } // end of scrollable Column
 
-        // --- 次へボタン・画面下部に固定 ---
         val canContinue = when (mode) {
             ConnectionMode.Hermes -> configuredBackendCount > 0 || pairingReview?.toPairingPayload() != null
             ConnectionMode.SetupCode -> GatewayConfigUtils.decodeGatewaySetupCode(setupCode) != null

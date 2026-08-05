@@ -273,7 +273,6 @@ class SettingsRepository(context: Context) {
         get() = prefs.getBoolean(KEY_THINKING_SOUND_ENABLED, true)
         set(value) = prefs.edit().putBoolean(KEY_THINKING_SOUND_ENABLED, value).apply()
 
-    // Filler phrases enabled (相槌 & 待ちフレーズ)
     var fillerPhrasesEnabled: Boolean
         get() = prefs.getBoolean(KEY_FILLER_PHRASES_ENABLED, false)
         set(value) = prefs.edit().putBoolean(KEY_FILLER_PHRASES_ENABLED, value).apply()
@@ -454,7 +453,7 @@ class SettingsRepository(context: Context) {
         
         // Default VOICEVOX speaker (none - user must select and download)
         const val DEFAULT_VOICEVOX_SPEAKER_ID = 0
-        const val DEFAULT_VOICEVOX_STYLE_ID = 0  // 四国めたん あまあま ( Style ID 0 )
+        const val DEFAULT_VOICEVOX_STYLE_ID = 0  // Shikoku Metan Sweet ( Style ID 0 )
 
         @Volatile
         private var instance: SettingsRepository? = null
