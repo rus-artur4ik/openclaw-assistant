@@ -201,9 +201,10 @@ dependencies {
     implementation("com.alphacephei:vosk-android:0.3.75")
     
     // VOICEVOX (full flavor only)
-    // libvoicevox_onnxruntime.so (VoiceVox custom ORT v1.17.3) is bundled in
+    // libvoicevox_onnxruntime.so (VoiceVox custom ORT v1.23.2) is bundled in
     // app/src/full/jniLibs/arm64-v8a/. The standard Microsoft ORT does not support
-    // the "vv-bin" model format required by voicevox_core 0.16.4.
+    // the "vv-bin" model format required by voicevox_core 0.16.4, and v1.23.2 is
+    // the first VoiceVox ORT build with 16 KB page alignment.
     add("fullImplementation", files("libs/voicevoxcore-android-0.16.4.aar"))
 
     // Tink (Crypto)

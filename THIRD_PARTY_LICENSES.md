@@ -46,8 +46,11 @@ It is not a complete list of all transitive Gradle dependencies. For those, refe
 
 - Usage: runtime required by the bundled VOICEVOX full flavor
 - Source in this repo: `app/src/full/jniLibs/arm64-v8a/libvoicevox_onnxruntime.so`
+- Upstream project: https://github.com/VOICEVOX/onnxruntime-builder
+- Upstream release: `voicevox_onnxruntime-1.23.2` (`voicevox_onnxruntime-android-arm64-1.23.2.tgz`)
 - Notes:
   - This binary is distributed together with the VOICEVOX full flavor assets.
+  - Upstream terms allow redistribution inside an application and require visible credit that VOICEVOX is used.
   - Review upstream ONNX Runtime and VOICEVOX release materials again before upgrading or replacing it.
 
 ### Open JTalk dictionary
