@@ -180,7 +180,7 @@
 <string name="voicevox_downloaded">Аудиоданные готовы</string>
 <string name="voicevox_downloading">Загрузка аудиоданных</string>
 <string name="voicevox_download_required">Требуется загрузка аудиоданных</string>
-<string name="voicevox_selected_character">選択中: %1$s (%2$s)</string>
+<string name="voicevox_selected_character">Выбрано: %1$s (%2$s)</string>
 <string name="voicevox_terms_title">Условия использования VOICEVOX</string>
 <string name="voicevox_terms_description">Для использования VOICEVOX необходимо принять условия использования. Аудиоданные генерируются с использованием библиотек с открытым исходным кодом.</string>
 <string name="voicevox_view_terms">Подробнее об условиях использования</string>
@@ -201,8 +201,8 @@
 <string name="voicevox_redownload">Перезагрузить аудиоданные</string>
 <string name="voicevox_setup_title">Настройка VOICEVOX</string>
 <string name="voicevox_setup_description">Загрузите аудиоданные, чтобы использовать VOICEVOX TTS.</string>
-    <string name="voicevox_setup_steps">・Скопировать словарь OpenJTalk
-・Загрузить модель VVM</string>
+    <string name="voicevox_setup_steps">• Скопировать словарь OpenJTalk
+• Загрузить модель VVM</string>
 <string name="voicevox_step_dictionary">Словарь OpenJTalk</string>
 <string name="voicevox_step_model">Модель VVM</string>
 <string name="voicevox_setup_complete">Настройка завершена!</string>
@@ -577,9 +577,9 @@
 <string name="permission_summary_format">%1$d standard permissions, %2$d special access granted</string>
     <!-- Missing translations -->
     <string name="approve_command_format">openclaw devices approve --latest %s</string>
-    <string name="credits_support_description">このアプリが役に立った場合は、Ko-fiでの支援をご検討ください。</string>
+    <string name="credits_support_description">Если приложение оказалось полезным, поддержите разработку на Ko-fi.</string>
     <string name="credits_support_kofi_button">Support the Developer</string>
-    <string name="credits_support_title">開発をサポートする</string>
+    <string name="credits_support_title">Поддержать разработку</string>
     <string name="operator_offline_command">openclaw devices approve --latest %s</string>
     <string name="qr_scan_desc">Align the QR code within the frame to scan it</string>
     <string name="qr_scan_prompt">Scan QR Code</string>

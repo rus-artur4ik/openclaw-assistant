@@ -520,7 +520,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             }
             startThinkingSound()
             scheduleInitialFillerPhrase()
-            startWaitPhraseTimer() // Gateway 経由送信の待ちフレーズタイマー開始
+            startWaitPhraseTimer()
 
             viewModelScope.launch {
                 try {
@@ -560,7 +560,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         }
         startThinkingSound()
         scheduleInitialFillerPhrase()
-        startWaitPhraseTimer() // HTTP 経由送信の待ちフレーズタイマー開始
+        startWaitPhraseTimer()
 
         viewModelScope.launch {
             try {
@@ -1100,7 +1100,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         waitPhraseJob?.cancel()
         if (!settings.fillerPhrasesEnabled || !settings.ttsEnabled) return
         waitPhraseJob = viewModelScope.launch {
-            delay(5000) // 5秒待機
+            delay(5000)
             if (_uiState.value.isThinking && isActive) {
                 Log.d(TAG, "Wait phrase timer triggered (> 5s). Playing wait phrase.")
                 playWaitPhrase()
@@ -1121,7 +1121,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         var playbackJob: Job? = null
         playbackJob = viewModelScope.launch {
             try {
-                ttsManager?.speakWithProgress(phrase)?.collect {} // 発話完了を待たない（progress監視のみだが実質投げっぱなし）
+                ttsManager?.speakWithProgress(phrase)?.collect {} // Fire-and-forget: playback completion is not awaited
             } catch (_: kotlinx.coroutines.CancellationException) {
             } catch (e: Exception) {
                 Log.w(TAG, "Failed to play filler phrase", e)

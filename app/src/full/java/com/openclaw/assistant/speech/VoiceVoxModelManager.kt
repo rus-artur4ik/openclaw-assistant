@@ -28,13 +28,13 @@ class VoiceVoxModelManager(private val context: Context) {
         private const val BASE_URL = "https://github.com/VOICEVOX/voicevox_vvm/releases/download/0.16.3"
 
         private val VVM_FILES = mapOf(
-            "0"  to "$BASE_URL/0.vvm",   // 四国めたん（ノーマル系）, ずんだもん（ノーマル系）, 春日部つむぎ, 雨晴はう
-            "3"  to "$BASE_URL/3.vvm",   // 波音リツ
-            "4"  to "$BASE_URL/4.vvm",   // 玄野武宏（ノーマル）
-            "5"  to "$BASE_URL/5.vvm",   // 四国めたん ささやき/ヒソヒソ, ずんだもん ささやき/ヒソヒソ
-            "9"  to "$BASE_URL/9.vvm",   // 白上虎太郎
-            "10" to "$BASE_URL/10.vvm",  // 玄野武宏 追加スタイル
-            "15" to "$BASE_URL/15.vvm"   // 青山龍星
+            "0"  to "$BASE_URL/0.vvm",   // Shikoku Metan (normal styles), Zundamon (normal styles), Kasukabe Tsumugi, Amehare Hau
+            "3"  to "$BASE_URL/3.vvm",   // Namine Ritsu
+            "4"  to "$BASE_URL/4.vvm",   // Kurono Takehiro (normal)
+            "5"  to "$BASE_URL/5.vvm",   // Shikoku Metan Whisper/Hushed, Zundamon Whisper/Hushed
+            "9"  to "$BASE_URL/9.vvm",   // Shirakami Kotaro
+            "10" to "$BASE_URL/10.vvm",  // Kurono Takehiro additional styles
+            "15" to "$BASE_URL/15.vvm"   // Aoyama Ryusei
         )
     }
     
