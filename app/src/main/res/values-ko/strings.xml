@@ -461,6 +461,11 @@
     <string name="filler_checking_1">잠깐 확인해 볼게요.</string>
     <string name="filler_checking_2">한번 볼게요.</string>
     <string name="filler_checking_3">바로 찾아볼게요.</string>
+    <string name="filler_provider_label">필러 음성 제공자</string>
+    <string name="filler_provider_same">기본과 동일</string>
+    <string name="filler_voice_label">필러 음성</string>
+    <string name="filler_voice_same">기본 음성과 동일</string>
+    <string name="filler_provider_hint">필러 문구는 답변보다 빠르거나 더 좋은 음성을 사용할 수 있습니다.</string>
     <string name="wait_phrase_let_me_think">잠시 생각해볼게요…</string>
     <string name="wait_phrase_one_moment">잠시만요…</string>
     <string name="wait_phrase_checking">확인해볼게요…</string>

@@ -236,6 +236,11 @@
     <string name="filler_checking_1">稍等，我看一下。</string>
     <string name="filler_checking_2">我查一下。</string>
     <string name="filler_checking_3">馬上看看。</string>
+    <string name="filler_provider_label">填充語音供應商</string>
+    <string name="filler_provider_same">與主語音相同</string>
+    <string name="filler_voice_label">填充語音</string>
+    <string name="filler_voice_same">與主語音相同</string>
+    <string name="filler_provider_hint">填充語可以使用比回答更快或音質更好的語音。</string>
     <string name="wait_phrase_let_me_think">讓我想想…</string>
     <string name="wait_phrase_one_moment">稍等一下…</string>
     <string name="wait_phrase_checking">我查看一下…</string>

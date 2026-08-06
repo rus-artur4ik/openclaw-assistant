@@ -470,6 +470,11 @@ See the official VOICEVOX website for details.</string>
     <string name="filler_checking_1">One sec, let me check.</string>
     <string name="filler_checking_2">Let me have a look.</string>
     <string name="filler_checking_3">Looking into it.</string>
+    <string name="filler_provider_label">Filler voice provider</string>
+    <string name="filler_provider_same">Same as main</string>
+    <string name="filler_voice_label">Filler voice</string>
+    <string name="filler_voice_same">Same as main voice</string>
+    <string name="filler_provider_hint">Fillers can use a faster or better-sounding voice than the answer.</string>
     <string name="wait_phrase_let_me_think">Let me think…</string>
     <string name="wait_phrase_one_moment">One moment…</string>
     <string name="wait_phrase_checking">Let me check…</string>

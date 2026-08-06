@@ -237,6 +237,11 @@
     <string name="filler_checking_1">एक सेकंड, देखता हूँ।</string>
     <string name="filler_checking_2">मैं देखता हूँ।</string>
     <string name="filler_checking_3">अभी देखता हूँ।</string>
+    <string name="filler_provider_label">फिलर आवाज़ प्रदाता</string>
+    <string name="filler_provider_same">मुख्य जैसा</string>
+    <string name="filler_voice_label">फिलर आवाज़</string>
+    <string name="filler_voice_same">मुख्य आवाज़ जैसी</string>
+    <string name="filler_provider_hint">फिलर वाक्य उत्तर से तेज़ या बेहतर आवाज़ का उपयोग कर सकते हैं।</string>
     <string name="wait_phrase_let_me_think">मुझे सोचने दो…</string>
     <string name="wait_phrase_one_moment">एक पल…</string>
     <string name="wait_phrase_checking">मैं जाँचता हूँ…</string>

@@ -237,6 +237,11 @@ Para más detalles, consulta el sitio oficial de VOICEVOX.</string>
     <string name="filler_checking_1">Un segundo, voy a ver.</string>
     <string name="filler_checking_2">Déjame mirarlo.</string>
     <string name="filler_checking_3">Ya lo estoy viendo.</string>
+    <string name="filler_provider_label">Proveedor de voz de relleno</string>
+    <string name="filler_provider_same">Igual que la principal</string>
+    <string name="filler_voice_label">Voz de relleno</string>
+    <string name="filler_voice_same">Igual que la voz principal</string>
+    <string name="filler_provider_hint">Las frases de relleno pueden usar una voz más rápida o de mejor calidad que la respuesta.</string>
     <string name="wait_phrase_let_me_think">Déjame pensar…</string>
     <string name="wait_phrase_one_moment">Un momento…</string>
     <string name="wait_phrase_checking">Déjame verificar…</string>

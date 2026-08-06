@@ -66,9 +66,9 @@ class OpenAIProvider(private val context: Context) : TTSProvider {
         }
     }
     
-    private suspend fun synthesizeSpeech(text: String): ByteArray? = withContext(Dispatchers.IO) {
+    private suspend fun synthesizeSpeech(text: String, voiceOverride: String? = null): ByteArray? = withContext(Dispatchers.IO) {
         val apiKey = settings.openAiApiKey
-        val voice = settings.openAiVoice
+        val voice = voiceOverride?.takeIf { it.isNotBlank() } ?: settings.openAiVoice
         val model = settings.openAiModel
         
         val requestBody = JSONObject().apply {
@@ -166,17 +166,19 @@ class OpenAIProvider(private val context: Context) : TTSProvider {
         } else null
     }
     
-    override fun speakWithProgress(text: String): Flow<TTSState> = channelFlow {
+    override fun speakWithProgress(text: String): Flow<TTSState> = speakWithProgress(text, null)
+
+    override fun speakWithProgress(text: String, voiceOverride: String?): Flow<TTSState> = channelFlow {
         send(TTSState.Preparing)
-        
+
         if (!isConfigured()) {
             send(TTSState.Error(getConfigurationError() ?: context.getString(R.string.tts_error_not_initialized)))
             return@channelFlow
         }
-        
+
         // Synthesize speech (API call)
         val audioData = try {
-            synthesizeSpeech(text)
+            synthesizeSpeech(text, voiceOverride)
         } catch (e: Exception) {
             Log.e(TAG, "Synthesis error", e)
             null

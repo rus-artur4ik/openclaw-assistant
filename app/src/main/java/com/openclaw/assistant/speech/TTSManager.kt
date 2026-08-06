@@ -119,16 +119,32 @@ class TTSManager(private val context: Context) {
     }
 
     /**
-     * Speak a short filler/wait phrase. Prefers the local Android engine so the phrase
-     * starts instantly even when the answer voice is a network provider; falls back to
-     * the current provider while local TTS is still initializing.
+     * Resolve which provider voices filler/wait phrases. Falls back to the answer provider
+     * when the configured filler provider is unusable (missing key, engine not initialized).
+     */
+    private fun getFillerProvider(): TTSProvider? {
+        val type = settings.fillerTtsType
+        if (type == SettingsRepository.FILLER_TTS_TYPE_SAME) return getCurrentProvider()
+        val provider = providers[type]
+        if (provider != null && provider.isAvailable() && provider.isConfigured()) return provider
+        Log.w(TAG, "filler provider '$type' unusable, falling back to '${settings.ttsType}'")
+        return getCurrentProvider()
+    }
+
+    /**
+     * Speak a short filler/wait phrase through the filler provider and voice, which may
+     * differ from the answer voice (see [getFillerProvider]).
      */
     fun speakFillerWithProgress(text: String): Flow<TTSState> {
-        val local = providers[TTSProviderType.LOCAL]
-        if (local != null && local.isAvailable() && local.isConfigured()) {
-            return local.speakWithProgress(TTSUtils.stripMarkdownForSpeech(text))
-        }
-        return speakWithProgress(text)
+        val provider = getFillerProvider()
+            ?: return callbackFlow {
+                trySend(TTSState.Error("No provider found"))
+                close()
+            }
+        return provider.speakWithProgress(
+            TTSUtils.stripMarkdownForSpeech(text),
+            settings.fillerVoiceId.takeIf { it.isNotBlank() }
+        )
     }
 
     /**

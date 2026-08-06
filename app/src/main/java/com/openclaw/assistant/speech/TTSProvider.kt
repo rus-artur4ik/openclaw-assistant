@@ -54,6 +54,16 @@ interface TTSProvider {
     fun speakWithProgress(text: String): Flow<TTSState> {
         throw NotImplementedError("Progress tracking not implemented for this provider")
     }
+
+    /**
+     * Speak with progress updates using a one-off voice instead of the configured one.
+     * Providers that cannot switch voices per utterance ignore the override.
+     *
+     * @param voiceOverride provider-specific voice id (ElevenLabs voice id, OpenAI voice name);
+     *                      null or blank keeps the provider's configured voice.
+     */
+    fun speakWithProgress(text: String, voiceOverride: String?): Flow<TTSState> =
+        speakWithProgress(text)
 }
 
 /**
