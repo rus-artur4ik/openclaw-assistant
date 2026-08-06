@@ -233,7 +233,17 @@ Weitere Informationen finden Sie auf der offiziellen Website von VOICEVOX.</stri
     <string name="tts_barge_in_desc">Aktivierungswort während der Sprachausgabe sagen, um zu unterbrechen</string>
 
     <!-- Filler phrase content (spoken by TTS) -->
-    <string name="filler_ok">OK</string>
+    <string name="filler_checking_1">Moment, ich schaue nach.</string>
+    <string name="filler_checking_2">Ich sehe mal nach.</string>
+    <string name="filler_checking_3">Ich prüfe das.</string>
+    <string name="filler_provider_label">Stimme für Füllphrasen</string>
+    <string name="filler_provider_same">Wie Hauptstimme</string>
+    <string name="filler_voice_label">Füllphrasen-Stimme</string>
+    <string name="filler_model_label">Füllsatz-Modell</string>
+    <string name="filler_engine_label">Füllsatz-Engine</string>
+    <string name="filler_speed_label">Füllsatz-Tempo</string>
+    <string name="filler_provider_unconfigured">Dieser Anbieter ist nicht eingerichtet; Füllphrasen nutzen die Antwortstimme. Wähle ihn als Hauptanbieter, um ihn einzurichten.</string>
+    <string name="filler_provider_hint">Füllphrasen können eine schnellere oder bessere Stimme als die Antwort nutzen.</string>
     <string name="wait_phrase_let_me_think">Lass mich nachdenken…</string>
     <string name="wait_phrase_one_moment">Einen Moment…</string>
     <string name="wait_phrase_checking">Ich prüfe das…</string>

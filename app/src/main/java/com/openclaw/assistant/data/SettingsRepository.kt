@@ -274,8 +274,33 @@ class SettingsRepository(context: Context) {
         set(value) = prefs.edit().putBoolean(KEY_THINKING_SOUND_ENABLED, value).apply()
 
     var fillerPhrasesEnabled: Boolean
-        get() = prefs.getBoolean(KEY_FILLER_PHRASES_ENABLED, false)
+        get() = prefs.getBoolean(KEY_FILLER_PHRASES_ENABLED, true)
         set(value) = prefs.edit().putBoolean(KEY_FILLER_PHRASES_ENABLED, value).apply()
+
+    // Provider voicing filler phrases: FILLER_TTS_TYPE_SAME or one of the TTS_TYPE_* values
+    var fillerTtsType: String
+        get() = prefs.getString(KEY_FILLER_TTS_TYPE, FILLER_TTS_TYPE_SAME) ?: FILLER_TTS_TYPE_SAME
+        set(value) = prefs.edit().putString(KEY_FILLER_TTS_TYPE, value).apply()
+
+    // Voice for filler phrases; blank keeps the filler provider's configured voice
+    var fillerVoiceId: String
+        get() = prefs.getString(KEY_FILLER_VOICE_ID, "") ?: ""
+        set(value) = prefs.edit().putString(KEY_FILLER_VOICE_ID, value).apply()
+
+    // Synthesis model for filler phrases (ElevenLabs/OpenAI); blank keeps the provider's model
+    var fillerModel: String
+        get() = prefs.getString(KEY_FILLER_MODEL, "") ?: ""
+        set(value) = prefs.edit().putString(KEY_FILLER_MODEL, value).apply()
+
+    // System TTS engine for filler phrases; blank keeps the engine the answers use
+    var fillerTtsEngine: String
+        get() = prefs.getString(KEY_FILLER_TTS_ENGINE, "") ?: ""
+        set(value) = prefs.edit().putString(KEY_FILLER_TTS_ENGINE, value).apply()
+
+    // Speech rate for filler phrases; 0 keeps the filler provider's configured rate
+    var fillerSpeed: Float
+        get() = prefs.getFloat(KEY_FILLER_SPEED, 0f)
+        set(value) = prefs.edit().putFloat(KEY_FILLER_SPEED, value).apply()
 
     // Barge-in during TTS (WakeWord interruption while speaking)
     var ttsBargeInEnabled: Boolean
@@ -395,6 +420,11 @@ class SettingsRepository(context: Context) {
         private const val KEY_SPEECH_SILENCE_TIMEOUT = "speech_silence_timeout"
         private const val KEY_THINKING_SOUND_ENABLED = "thinking_sound_enabled"
         private const val KEY_FILLER_PHRASES_ENABLED = "filler_phrases_enabled"
+        private const val KEY_FILLER_TTS_TYPE = "filler_tts_type"
+        private const val KEY_FILLER_VOICE_ID = "filler_voice_id"
+        private const val KEY_FILLER_MODEL = "filler_model"
+        private const val KEY_FILLER_TTS_ENGINE = "filler_tts_engine"
+        private const val KEY_FILLER_SPEED = "filler_speed"
         private const val KEY_TTS_BARGE_IN_ENABLED = "tts_barge_in_enabled"
         private const val KEY_WAKE_WORD_DEBUG_ENABLED = "wake_word_debug_enabled"
         private const val KEY_MEDIA_BUTTON_ENABLED = "media_button_enabled"
@@ -442,6 +472,9 @@ class SettingsRepository(context: Context) {
         const val TTS_TYPE_ELEVENLABS = "elevenlabs"
         const val TTS_TYPE_OPENAI = "openai"
         const val TTS_TYPE_VOICEVOX = "voicevox"
+
+        // Filler phrases reuse the answer provider unless overridden with a TTS_TYPE_* value
+        const val FILLER_TTS_TYPE_SAME = "same"
         
         // Default ElevenLabs voice ID (empty - user must set)
         const val DEFAULT_ELEVENLABS_VOICE_ID = ""

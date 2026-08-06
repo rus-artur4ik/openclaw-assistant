@@ -54,6 +54,32 @@ interface TTSProvider {
     fun speakWithProgress(text: String): Flow<TTSState> {
         throw NotImplementedError("Progress tracking not implemented for this provider")
     }
+
+    /**
+     * Speak with progress updates using one-off settings instead of the configured ones.
+     * Providers ignore the fields they cannot vary per utterance.
+     */
+    fun speakWithProgress(text: String, overrides: TTSOverrides?): Flow<TTSState> =
+        speakWithProgress(text)
+}
+
+/**
+ * Per-utterance overrides. Null fields keep the provider's configured value.
+ *
+ * The local TTS engine is not here: [android.speech.tts.TextToSpeech] binds an engine at
+ * construction, so a different engine means a separate provider instance.
+ */
+data class TTSOverrides(
+    /** Provider-specific voice: ElevenLabs voice id, OpenAI voice name. */
+    val voice: String? = null,
+    /** Provider-specific synthesis model, e.g. eleven_flash_v2_5 / gpt-4o-mini-tts. */
+    val model: String? = null,
+    /** Speech rate multiplier, clamped by each provider to what its API accepts. */
+    val speed: Float? = null,
+) {
+    fun voiceOrNull(): String? = voice?.takeIf { it.isNotBlank() }
+    fun modelOrNull(): String? = model?.takeIf { it.isNotBlank() }
+    fun speedOrNull(): Float? = speed?.takeIf { it > 0f }
 }
 
 /**

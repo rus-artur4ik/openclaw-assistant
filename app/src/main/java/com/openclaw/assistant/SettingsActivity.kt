@@ -69,6 +69,19 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 // ElevenLabs Voice Options
+object OpenAIVoiceOptions {
+    val ALL = listOf("alloy", "echo", "fable", "onyx", "nova", "shimmer")
+}
+
+object OpenAITtsModelOptions {
+    // id to label; tts-1 is the low-latency pick that suits short filler phrases
+    val ALL = listOf(
+        "gpt-4o-mini-tts" to "GPT-4o mini TTS",
+        "tts-1" to "TTS-1 (fastest)",
+        "tts-1-hd" to "TTS-1 HD"
+    )
+}
+
 object ElevenLabsVoiceOptions {
     data class VoiceOption(val id: String, val name: String, val description: String)
     
@@ -271,6 +284,15 @@ fun SettingsScreen(
     var appLanguage by rememberSaveable { mutableStateOf(settings.appLanguage) }
     var thinkingSoundEnabled by rememberSaveable { mutableStateOf(settings.thinkingSoundEnabled) }
     var fillerPhrasesEnabled by rememberSaveable { mutableStateOf(settings.fillerPhrasesEnabled) }
+    var fillerTtsType by rememberSaveable { mutableStateOf(settings.fillerTtsType) }
+    var fillerVoiceId by rememberSaveable { mutableStateOf(settings.fillerVoiceId) }
+    var fillerModel by rememberSaveable { mutableStateOf(settings.fillerModel) }
+    var fillerTtsEngine by rememberSaveable { mutableStateOf(settings.fillerTtsEngine) }
+    var fillerSpeed by rememberSaveable { mutableStateOf(settings.fillerSpeed) }
+    var showFillerProviderMenu by rememberSaveable { mutableStateOf(false) }
+    var showFillerVoiceMenu by rememberSaveable { mutableStateOf(false) }
+    var showFillerModelMenu by rememberSaveable { mutableStateOf(false) }
+    var showFillerEngineMenu by rememberSaveable { mutableStateOf(false) }
     var ttsBargeInEnabled by rememberSaveable { mutableStateOf(settings.ttsBargeInEnabled) }
     var wakeWordDebugEnabled by rememberSaveable { mutableStateOf(settings.wakeWordDebugEnabled) }
     var mediaButtonEnabled by rememberSaveable { mutableStateOf(settings.mediaButtonEnabled) }
@@ -521,6 +543,11 @@ fun SettingsScreen(
                                 settings.appLanguage = appLanguage
                                 settings.thinkingSoundEnabled = thinkingSoundEnabled
                                 settings.fillerPhrasesEnabled = fillerPhrasesEnabled
+                                settings.fillerTtsType = fillerTtsType
+                                settings.fillerVoiceId = fillerVoiceId
+                                settings.fillerModel = fillerModel
+                                settings.fillerTtsEngine = fillerTtsEngine
+                                settings.fillerSpeed = fillerSpeed
                                 settings.ttsBargeInEnabled = ttsBargeInEnabled
                                 settings.wakeWordDebugEnabled = wakeWordDebugEnabled
                                 settings.mediaButtonEnabled = mediaButtonEnabled
@@ -1366,6 +1393,283 @@ fun SettingsScreen(
                             Text(stringResource(R.string.filler_phrases_desc), style = MaterialTheme.typography.bodySmall, color = Color.Gray)
                         }
                         Switch(checked = fillerPhrasesEnabled, onCheckedChange = { fillerPhrasesEnabled = it })
+                    }
+
+                    if (fillerPhrasesEnabled && ttsEnabled) {
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        val sameAsMainLabel = stringResource(R.string.filler_provider_same)
+                        val fillerProviderOptions = buildList {
+                            add(SettingsRepository.FILLER_TTS_TYPE_SAME to sameAsMainLabel)
+                            add(SettingsRepository.TTS_TYPE_LOCAL to "System TTS")
+                            add(SettingsRepository.TTS_TYPE_ELEVENLABS to "ElevenLabs")
+                            add(SettingsRepository.TTS_TYPE_OPENAI to "OpenAI")
+                            if (BuildConfig.VOICEVOX_ENABLED) {
+                                add(SettingsRepository.TTS_TYPE_VOICEVOX to "VOICEVOX")
+                            }
+                        }
+
+                        ExposedDropdownMenuBox(
+                            expanded = showFillerProviderMenu,
+                            onExpandedChange = { showFillerProviderMenu = it }
+                        ) {
+                            OutlinedTextField(
+                                value = fillerProviderOptions.firstOrNull { it.first == fillerTtsType }?.second
+                                    ?: sameAsMainLabel,
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text(stringResource(R.string.filler_provider_label)) },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showFillerProviderMenu) },
+                                modifier = Modifier.fillMaxWidth().menuAnchor()
+                            )
+                            ExposedDropdownMenu(
+                                expanded = showFillerProviderMenu,
+                                onDismissRequest = { showFillerProviderMenu = false }
+                            ) {
+                                fillerProviderOptions.forEach { (type, label) ->
+                                    DropdownMenuItem(
+                                        text = { Text(label) },
+                                        onClick = {
+                                            if (type != fillerTtsType) {
+                                                // Voice/model/engine ids are provider-specific; start
+                                                // from whatever that provider already speaks with
+                                                fillerVoiceId = when (type) {
+                                                    SettingsRepository.TTS_TYPE_ELEVENLABS ->
+                                                        elevenLabsVoiceId.takeIf { it.isNotBlank() }
+                                                            ?: ElevenLabsVoiceOptions.VOICES.first { it.id.isNotEmpty() }.id
+                                                    SettingsRepository.TTS_TYPE_OPENAI ->
+                                                        openAiVoice.takeIf { it.isNotBlank() }
+                                                            ?: OpenAIVoiceOptions.ALL.first()
+                                                    else -> ""
+                                                }
+                                                fillerModel = when (type) {
+                                                    SettingsRepository.TTS_TYPE_ELEVENLABS -> elevenLabsModel
+                                                    SettingsRepository.TTS_TYPE_OPENAI -> settings.openAiModel
+                                                    else -> ""
+                                                }
+                                                fillerTtsEngine = if (type == SettingsRepository.TTS_TYPE_LOCAL) ttsEngine else ""
+                                                fillerSpeed = when (type) {
+                                                    SettingsRepository.TTS_TYPE_ELEVENLABS -> elevenLabsSpeed
+                                                    SettingsRepository.FILLER_TTS_TYPE_SAME -> 0f
+                                                    else -> ttsSpeed
+                                                }
+                                            }
+                                            fillerTtsType = type
+                                            showFillerProviderMenu = false
+                                        },
+                                        leadingIcon = {
+                                            if (fillerTtsType == type) {
+                                                Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        // Voice picker: only for an explicitly chosen provider that can switch
+                        // voices. "Same as main" lives in the provider selector alone, so the
+                        // voice list never mixes voices from a provider that will not speak.
+                        val fillerVoiceOptions: List<Pair<String, String>> = when (fillerTtsType) {
+                            SettingsRepository.TTS_TYPE_ELEVENLABS ->
+                                ElevenLabsVoiceOptions.VOICES.filter { it.id.isNotEmpty() }.map { it.id to it.name }
+                            SettingsRepository.TTS_TYPE_OPENAI ->
+                                OpenAIVoiceOptions.ALL.map { it to it.replaceFirstChar { c -> c.uppercase() } }
+                            else -> emptyList()
+                        }
+
+                        if (fillerVoiceOptions.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            ExposedDropdownMenuBox(
+                                expanded = showFillerVoiceMenu,
+                                onExpandedChange = { showFillerVoiceMenu = it }
+                            ) {
+                                OutlinedTextField(
+                                    value = fillerVoiceOptions.firstOrNull { it.first == fillerVoiceId }?.second
+                                        ?: fillerVoiceId.ifBlank { fillerVoiceOptions.first().second },
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = { Text(stringResource(R.string.filler_voice_label)) },
+                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showFillerVoiceMenu) },
+                                    modifier = Modifier.fillMaxWidth().menuAnchor()
+                                )
+                                ExposedDropdownMenu(
+                                    expanded = showFillerVoiceMenu,
+                                    onDismissRequest = { showFillerVoiceMenu = false }
+                                ) {
+                                    fillerVoiceOptions.forEach { (id, label) ->
+                                        DropdownMenuItem(
+                                            text = { Text(label) },
+                                            onClick = {
+                                                fillerVoiceId = id
+                                                showFillerVoiceMenu = false
+                                            },
+                                            leadingIcon = {
+                                                if (fillerVoiceId == id) {
+                                                    Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        // Model picker: same rule as the voice list — only for a provider that
+                        // was explicitly chosen, so it never shows models nothing will use.
+                        val fillerModelOptions: List<Pair<String, String>> = when (fillerTtsType) {
+                            SettingsRepository.TTS_TYPE_ELEVENLABS ->
+                                ElevenLabsModels.ALL.map { it.id to it.displayName }
+                            SettingsRepository.TTS_TYPE_OPENAI -> OpenAITtsModelOptions.ALL
+                            else -> emptyList()
+                        }
+
+                        if (fillerModelOptions.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            ExposedDropdownMenuBox(
+                                expanded = showFillerModelMenu,
+                                onExpandedChange = { showFillerModelMenu = it }
+                            ) {
+                                OutlinedTextField(
+                                    value = fillerModelOptions.firstOrNull { it.first == fillerModel }?.second
+                                        ?: fillerModel.ifBlank { fillerModelOptions.first().second },
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = { Text(stringResource(R.string.filler_model_label)) },
+                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showFillerModelMenu) },
+                                    modifier = Modifier.fillMaxWidth().menuAnchor()
+                                )
+                                ExposedDropdownMenu(
+                                    expanded = showFillerModelMenu,
+                                    onDismissRequest = { showFillerModelMenu = false }
+                                ) {
+                                    fillerModelOptions.forEach { (id, label) ->
+                                        DropdownMenuItem(
+                                            text = { Text(label) },
+                                            onClick = {
+                                                fillerModel = id
+                                                showFillerModelMenu = false
+                                            },
+                                            leadingIcon = {
+                                                if (fillerModel == id) {
+                                                    Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        // System TTS engine: bound at construction, so fillers get their own
+                        // TextToSpeech instance when this differs from the answer engine.
+                        if (fillerTtsType == SettingsRepository.TTS_TYPE_LOCAL) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            ExposedDropdownMenuBox(
+                                expanded = showFillerEngineMenu,
+                                onExpandedChange = { showFillerEngineMenu = it }
+                            ) {
+                                OutlinedTextField(
+                                    value = if (fillerTtsEngine.isEmpty()) {
+                                        stringResource(R.string.tts_engine_auto)
+                                    } else {
+                                        availableEngines.find { it.name == fillerTtsEngine }?.label ?: fillerTtsEngine
+                                    },
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = { Text(stringResource(R.string.filler_engine_label)) },
+                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showFillerEngineMenu) },
+                                    modifier = Modifier.fillMaxWidth().menuAnchor()
+                                )
+                                ExposedDropdownMenu(
+                                    expanded = showFillerEngineMenu,
+                                    onDismissRequest = { showFillerEngineMenu = false }
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.tts_engine_auto)) },
+                                        onClick = {
+                                            fillerTtsEngine = ""
+                                            showFillerEngineMenu = false
+                                        },
+                                        leadingIcon = {
+                                            if (fillerTtsEngine.isEmpty()) {
+                                                Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                            }
+                                        }
+                                    )
+                                    availableEngines.forEach { engine ->
+                                        DropdownMenuItem(
+                                            text = { Text(engine.label) },
+                                            onClick = {
+                                                fillerTtsEngine = engine.name
+                                                showFillerEngineMenu = false
+                                            },
+                                            leadingIcon = {
+                                                if (fillerTtsEngine == engine.name) {
+                                                    Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        // Speed applies to every provider that can vary it per utterance;
+                        // VOICEVOX always speaks with its own configured settings.
+                        // 0.7..1.2 is the narrowest range across them (ElevenLabs clamps there).
+                        if (fillerTtsType == SettingsRepository.TTS_TYPE_LOCAL ||
+                            fillerTtsType == SettingsRepository.TTS_TYPE_ELEVENLABS ||
+                            fillerTtsType == SettingsRepository.TTS_TYPE_OPENAI
+                        ) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            // Until the slider is touched, show what this provider actually uses
+                            val inheritedSpeed = if (fillerTtsType == SettingsRepository.TTS_TYPE_ELEVENLABS) {
+                                elevenLabsSpeed
+                            } else {
+                                ttsSpeed
+                            }
+                            val effectiveFillerSpeed = (if (fillerSpeed > 0f) fillerSpeed else inheritedSpeed)
+                                .coerceIn(0.7f, 1.2f)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(stringResource(R.string.filler_speed_label), style = MaterialTheme.typography.bodyMedium)
+                                Text(
+                                    text = "%.1fx".format(effectiveFillerSpeed),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                            Slider(
+                                value = effectiveFillerSpeed,
+                                onValueChange = { fillerSpeed = it },
+                                valueRange = 0.7f..1.2f,
+                                steps = 9,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+
+                        // A filler-only provider has no settings card here, so a missing key
+                        // would otherwise silently fall back to the answer provider
+                        val fillerProviderUnconfigured = when (fillerTtsType) {
+                            SettingsRepository.TTS_TYPE_ELEVENLABS -> elevenLabsApiKey.isBlank()
+                            SettingsRepository.TTS_TYPE_OPENAI -> openAiApiKey.isBlank()
+                            SettingsRepository.TTS_TYPE_VOICEVOX -> !voiceVoxTermsAccepted
+                            else -> false
+                        }
+
+                        Text(
+                            stringResource(
+                                if (fillerProviderUnconfigured) R.string.filler_provider_unconfigured
+                                else R.string.filler_provider_hint
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (fillerProviderUnconfigured) MaterialTheme.colorScheme.error else Color.Gray,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
                     }
                 }
             }
@@ -2525,7 +2829,7 @@ fun OpenAISettingsCard(
     onShowApiKeyChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val voiceOptions = listOf("alloy", "echo", "fable", "onyx", "nova", "shimmer")
+    val voiceOptions = OpenAIVoiceOptions.ALL
     var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
     
