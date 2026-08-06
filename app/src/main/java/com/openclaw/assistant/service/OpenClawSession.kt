@@ -217,21 +217,25 @@ class OpenClawSession(
                         finish()
                     },
                     onRetry = { startListening() },
-                    onInterrupt = { interruptAndListen() }
+                    onInterrupt = { interruptAndListen() },
+                    onProcessingStuck = { recoverFromStalledProcessing() }
                 )
             }
         }
         return composeView
     }
 
+    private fun ensureScopeAlive() {
+        if (!scope.isActive) {
+            scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+        }
+    }
+
     override fun onShow(args: Bundle?, showFlags: Int) {
         super.onShow(args, showFlags)
         sessionArgs = args
 
-        // Recreate scope if it was cancelled by a previous onHide()
-        if (!scope.isActive) {
-            scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-        }
+        ensureScopeAlive()
 
         // Ensure any existing SpeechRecognizerManager is cleaned up before creating a new one
         if (this::speechManager.isInitialized) {
@@ -417,6 +421,7 @@ class OpenClawSession(
 
     private fun startListening(initialDelayMs: Long = 50L) {
         Log.d(TAG, "startListening() called, currentState=${currentState.value}, listeningJob=${listeningJob}, speakingJob=${speakingJob}")
+        ensureScopeAlive()
         listeningJob?.cancel()
         acquireWakeLock()
         sendPauseBroadcast()
@@ -926,7 +931,18 @@ class OpenClawSession(
         }
     }
 
+    private fun recoverFromStalledProcessing() {
+        Log.w(TAG, "PROCESSING stalled past watchdog, recovering to ERROR")
+        listeningJob?.cancel()
+        stopThinkingSound()
+        speechManager.destroy()
+        abandonAudioFocus()
+        currentState.value = AssistantState.ERROR
+        errorMessage.value = context.getString(R.string.error_processing_stuck)
+    }
+
     private fun interruptAndListen() {
+        ensureScopeAlive()
         cancelInitialFillerPhrase()
         cancelWaitPhraseTimer()
         stopThinkingSound()
@@ -1113,6 +1129,8 @@ enum class AssistantState {
 /**
  * Assistant UI (Compose)
  */
+private const val PROCESSING_STUCK_WATCHDOG_MS = 8_000L
+
 @Composable
 fun AssistantUI(
     state: AssistantState,
@@ -1123,8 +1141,16 @@ fun AssistantUI(
     audioLevel: Float,
     onClose: () -> Unit,
     onRetry: () -> Unit,
-    onInterrupt: () -> Unit = {}
+    onInterrupt: () -> Unit = {},
+    onProcessingStuck: () -> Unit = {}
 ) {
+    // Lives in the dialog's composition, so it fires even when the session scope is dead.
+    LaunchedEffect(state) {
+        if (state == AssistantState.PROCESSING) {
+            delay(PROCESSING_STUCK_WATCHDOG_MS)
+            onProcessingStuck()
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
