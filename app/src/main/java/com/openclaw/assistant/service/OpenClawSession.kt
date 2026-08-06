@@ -263,8 +263,12 @@ class OpenClawSession(
             // Gateway mode: manage session on the gateway side, not in local DB
             val nodeRuntime = (context.applicationContext as OpenClawApplication).nodeRuntime
             if (!settings.resumeLatestSession) {
-                // Start a fresh gateway session with a human-readable label
-                val newKey = java.util.UUID.randomUUID().toString()
+                // Start a fresh gateway session with a human-readable label.
+                // An agent-scoped key routes the session to the configured voice
+                // agent; a bare key would land on the gateway's default agent.
+                val voiceAgentId = settings.defaultAgentId.trim().takeIf { it.isNotEmpty() && it != "main" }
+                val sessionUuid = java.util.UUID.randomUUID().toString()
+                val newKey = if (voiceAgentId != null) "agent:$voiceAgentId:$sessionUuid" else sessionUuid
                 val timeStr = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date())
                 val label = String.format(context.getString(R.string.default_session_title_format), timeStr)
                 nodeRuntime.switchChatSession(newKey)
