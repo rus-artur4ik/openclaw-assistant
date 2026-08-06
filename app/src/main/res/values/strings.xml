@@ -397,6 +397,7 @@
     <string name="elevenlabs_voice_id_label">Voice ID</string>
     <string name="elevenlabs_model_label">Model</string>
     <string name="elevenlabs_custom_voice_help">You can also use the ID of a voice you created in the ElevenLabs dashboard</string>
+    <string name="elevenlabs_speed_unsupported">This model does not support speed adjustment</string>
     <string name="openai_api_key_label">OpenAI API Key</string>
     <string name="openai_voice_label">Voice</string>
     <string name="openai_model_label">Model</string>

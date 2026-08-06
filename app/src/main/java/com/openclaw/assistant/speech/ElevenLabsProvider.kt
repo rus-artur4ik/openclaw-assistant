@@ -74,11 +74,14 @@ class ElevenLabsProvider(private val context: Context) : TTSProvider {
         val modelId = settings.elevenLabsModel
         
         val url = "$API_BASE_URL/text-to-speech/$voiceId"
-        
-        // ElevenLabs API requires speed to be between 0.7 and 1.2
-        // Use String.format to avoid floating point precision issues
+
+        val model = ElevenLabsModels.find(modelId)
+        val supportsLanguageCode = model?.supportsLanguageCode ?: false
+        val supportsVoiceTuning = model?.supportsVoiceTuning ?: true
+
+        // String.format avoids float precision artifacts the API rejects
         val speed = String.format(Locale.US, "%.2f", settings.elevenLabsSpeed.coerceIn(0.7f, 1.2f)).toDouble()
-        
+
         val requestBody = JSONObject().apply {
             put("text", text)
             put("model_id", modelId)
@@ -86,14 +89,16 @@ class ElevenLabsProvider(private val context: Context) : TTSProvider {
                 .takeIf { it.isNotEmpty() }
                 ?.let { Locale.forLanguageTag(it).language }
                 ?.takeIf { it.isNotEmpty() }
-            if (langCode != null) {
+            if (langCode != null && supportsLanguageCode) {
                 put("language_code", langCode)
             }
             put("voice_settings", JSONObject().apply {
                 put("stability", 0.5)
-                put("similarity_boost", 0.75)
-                put("style", 0.3)
-                put("speed", speed)
+                if (supportsVoiceTuning) {
+                    put("similarity_boost", 0.75)
+                    put("style", 0.3)
+                    put("speed", speed)
+                }
             })
         }.toString()
         
