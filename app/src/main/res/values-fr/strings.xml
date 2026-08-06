@@ -240,7 +240,7 @@ Pour plus de détails, consultez le site officiel de VOICEVOX.</string>
     <string name="filler_provider_label">Fournisseur de voix de transition</string>
     <string name="filler_provider_same">Comme la principale</string>
     <string name="filler_voice_label">Voix de transition</string>
-    <string name="filler_voice_same">Comme la voix principale</string>
+    <string name="filler_provider_unconfigured">Ce fournisseur n\'est pas configuré ; les transitions utiliseront la voix de réponse. Sélectionnez-le comme fournisseur principal pour le configurer.</string>
     <string name="filler_provider_hint">Les phrases de transition peuvent utiliser une voix plus rapide ou de meilleure qualité que la réponse.</string>
     <string name="wait_phrase_let_me_think">Laissez-moi réfléchir…</string>
     <string name="wait_phrase_one_moment">Un instant…</string>

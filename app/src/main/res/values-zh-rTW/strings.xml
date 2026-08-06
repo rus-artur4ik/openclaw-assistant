@@ -239,7 +239,7 @@
     <string name="filler_provider_label">填充語音供應商</string>
     <string name="filler_provider_same">與主語音相同</string>
     <string name="filler_voice_label">填充語音</string>
-    <string name="filler_voice_same">與主語音相同</string>
+    <string name="filler_provider_unconfigured">該供應商尚未設定，填充語將使用回答的語音。將其選為主要供應商即可設定。</string>
     <string name="filler_provider_hint">填充語可以使用比回答更快或音質更好的語音。</string>
     <string name="wait_phrase_let_me_think">讓我想想…</string>
     <string name="wait_phrase_one_moment">稍等一下…</string>

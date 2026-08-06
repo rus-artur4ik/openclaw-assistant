@@ -141,10 +141,11 @@ class TTSManager(private val context: Context) {
                 trySend(TTSState.Error("No provider found"))
                 close()
             }
-        return provider.speakWithProgress(
-            TTSUtils.stripMarkdownForSpeech(text),
-            settings.fillerVoiceId.takeIf { it.isNotBlank() }
-        )
+        // Voice ids only mean something to the provider they were picked for: after a
+        // fallback (or with "same as main") the provider speaks with its own voice.
+        val voiceOverride = settings.fillerVoiceId
+            .takeIf { it.isNotBlank() && provider.getType() == settings.fillerTtsType }
+        return provider.speakWithProgress(TTSUtils.stripMarkdownForSpeech(text), voiceOverride)
     }
 
     /**
@@ -187,7 +188,16 @@ class TTSManager(private val context: Context) {
      * Call this before using TTS
      */
     fun initializeCurrentProvider(): Boolean {
-        val provider = getCurrentProvider()
+        val ready = initializeIfNeeded(getCurrentProvider())
+        // Fillers may run on a different provider, which needs the same explicit setup
+        val fillerType = settings.fillerTtsType
+        if (fillerType != SettingsRepository.FILLER_TTS_TYPE_SAME) {
+            initializeIfNeeded(providers[fillerType])
+        }
+        return ready
+    }
+
+    private fun initializeIfNeeded(provider: TTSProvider?): Boolean {
         return if (BuildConfig.FLAVOR == "full" && provider is VoiceVoxProvider) {
             provider.initialize()
         } else {

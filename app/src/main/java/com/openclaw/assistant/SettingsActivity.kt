@@ -1414,8 +1414,17 @@ fun SettingsScreen(
                                         text = { Text(label) },
                                         onClick = {
                                             if (type != fillerTtsType) {
-                                                // Voice ids are provider-specific
-                                                fillerVoiceId = ""
+                                                // Voice ids are provider-specific; start from
+                                                // whatever that provider is already set to speak with
+                                                fillerVoiceId = when (type) {
+                                                    SettingsRepository.TTS_TYPE_ELEVENLABS ->
+                                                        elevenLabsVoiceId.takeIf { it.isNotBlank() }
+                                                            ?: ElevenLabsVoiceOptions.VOICES.first { it.id.isNotEmpty() }.id
+                                                    SettingsRepository.TTS_TYPE_OPENAI ->
+                                                        openAiVoice.takeIf { it.isNotBlank() }
+                                                            ?: OpenAIVoiceOptions.ALL.first()
+                                                    else -> ""
+                                                }
                                             }
                                             fillerTtsType = type
                                             showFillerProviderMenu = false
@@ -1430,17 +1439,14 @@ fun SettingsScreen(
                             }
                         }
 
-                        // Voice picker for the provider that actually voices fillers
-                        val effectiveFillerProvider =
-                            if (fillerTtsType == SettingsRepository.FILLER_TTS_TYPE_SAME) ttsType else fillerTtsType
-                        val sameVoiceLabel = stringResource(R.string.filler_voice_same)
-                        val fillerVoiceOptions: List<Pair<String, String>> = when (effectiveFillerProvider) {
+                        // Voice picker: only for an explicitly chosen provider that can switch
+                        // voices. "Same as main" lives in the provider selector alone, so the
+                        // voice list never mixes voices from a provider that will not speak.
+                        val fillerVoiceOptions: List<Pair<String, String>> = when (fillerTtsType) {
                             SettingsRepository.TTS_TYPE_ELEVENLABS ->
-                                listOf("" to sameVoiceLabel) +
-                                    ElevenLabsVoiceOptions.VOICES.filter { it.id.isNotEmpty() }.map { it.id to it.name }
+                                ElevenLabsVoiceOptions.VOICES.filter { it.id.isNotEmpty() }.map { it.id to it.name }
                             SettingsRepository.TTS_TYPE_OPENAI ->
-                                listOf("" to sameVoiceLabel) +
-                                    OpenAIVoiceOptions.ALL.map { it to it.replaceFirstChar { c -> c.uppercase() } }
+                                OpenAIVoiceOptions.ALL.map { it to it.replaceFirstChar { c -> c.uppercase() } }
                             else -> emptyList()
                         }
 
@@ -1452,7 +1458,7 @@ fun SettingsScreen(
                             ) {
                                 OutlinedTextField(
                                     value = fillerVoiceOptions.firstOrNull { it.first == fillerVoiceId }?.second
-                                        ?: sameVoiceLabel,
+                                        ?: fillerVoiceId.ifBlank { fillerVoiceOptions.first().second },
                                     onValueChange = {},
                                     readOnly = true,
                                     label = { Text(stringResource(R.string.filler_voice_label)) },
@@ -1481,10 +1487,22 @@ fun SettingsScreen(
                             }
                         }
 
+                        // A filler-only provider has no settings card here, so a missing key
+                        // would otherwise silently fall back to the answer provider
+                        val fillerProviderUnconfigured = when (fillerTtsType) {
+                            SettingsRepository.TTS_TYPE_ELEVENLABS -> elevenLabsApiKey.isBlank()
+                            SettingsRepository.TTS_TYPE_OPENAI -> openAiApiKey.isBlank()
+                            SettingsRepository.TTS_TYPE_VOICEVOX -> !voiceVoxTermsAccepted
+                            else -> false
+                        }
+
                         Text(
-                            stringResource(R.string.filler_provider_hint),
+                            stringResource(
+                                if (fillerProviderUnconfigured) R.string.filler_provider_unconfigured
+                                else R.string.filler_provider_hint
+                            ),
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color.Gray,
+                            color = if (fillerProviderUnconfigured) MaterialTheme.colorScheme.error else Color.Gray,
                             modifier = Modifier.padding(top = 8.dp)
                         )
                     }

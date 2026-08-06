@@ -240,7 +240,7 @@
     <string name="filler_provider_label">फिलर आवाज़ प्रदाता</string>
     <string name="filler_provider_same">मुख्य जैसा</string>
     <string name="filler_voice_label">फिलर आवाज़</string>
-    <string name="filler_voice_same">मुख्य आवाज़ जैसी</string>
+    <string name="filler_provider_unconfigured">यह प्रदाता सेट अप नहीं है, इसलिए फिलर उत्तर वाली आवाज़ का उपयोग करेंगे। इसे मुख्य प्रदाता चुनकर सेट करें।</string>
     <string name="filler_provider_hint">फिलर वाक्य उत्तर से तेज़ या बेहतर आवाज़ का उपयोग कर सकते हैं।</string>
     <string name="wait_phrase_let_me_think">मुझे सोचने दो…</string>
     <string name="wait_phrase_one_moment">एक पल…</string>

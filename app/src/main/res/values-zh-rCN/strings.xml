@@ -240,7 +240,7 @@
     <string name="filler_provider_label">填充语音提供方</string>
     <string name="filler_provider_same">与主语音相同</string>
     <string name="filler_voice_label">填充语音</string>
-    <string name="filler_voice_same">与主语音相同</string>
+    <string name="filler_provider_unconfigured">该提供方尚未配置，填充语将使用回答的语音。将其选为主提供方即可配置。</string>
     <string name="filler_provider_hint">填充语可以使用比回答更快或音质更好的语音。</string>
     <string name="wait_phrase_let_me_think">让我想想…</string>
     <string name="wait_phrase_one_moment">稍等一下…</string>
