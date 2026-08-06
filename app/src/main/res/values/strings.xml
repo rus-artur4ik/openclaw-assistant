@@ -288,6 +288,7 @@
     <string name="error_speech_input_timeout">No speech input</string>
     <string name="error_speech_unknown">Unknown error (%d)</string>
     <string name="error_no_response">No response</string>
+    <string name="error_processing_stuck">Speech recognition stalled</string>
     <string name="error_network">Network error</string>
     <string name="error_speech_general">Speech error</string>
     <string name="error_no_recognition_result">No recognition result</string>
@@ -397,6 +398,7 @@
     <string name="elevenlabs_voice_id_label">Voice ID</string>
     <string name="elevenlabs_model_label">Model</string>
     <string name="elevenlabs_custom_voice_help">You can also use the ID of a voice you created in the ElevenLabs dashboard</string>
+    <string name="elevenlabs_speed_unsupported">This model does not support speed adjustment</string>
     <string name="openai_api_key_label">OpenAI API Key</string>
     <string name="openai_voice_label">Voice</string>
     <string name="openai_model_label">Model</string>

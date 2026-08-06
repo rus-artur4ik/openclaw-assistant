@@ -219,21 +219,25 @@ class OpenClawSession(
                         finish()
                     },
                     onRetry = { startListening() },
-                    onInterrupt = { interruptAndListen() }
+                    onInterrupt = { interruptAndListen() },
+                    onProcessingStuck = { recoverFromStalledProcessing() }
                 )
             }
         }
         return composeView
     }
 
+    private fun ensureScopeAlive() {
+        if (!scope.isActive) {
+            scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+        }
+    }
+
     override fun onShow(args: Bundle?, showFlags: Int) {
         super.onShow(args, showFlags)
         sessionArgs = args
 
-        // Recreate scope if it was cancelled by a previous onHide()
-        if (!scope.isActive) {
-            scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-        }
+        ensureScopeAlive()
 
         // Ensure any existing SpeechRecognizerManager is cleaned up before creating a new one
         if (this::speechManager.isInitialized) {
@@ -261,8 +265,12 @@ class OpenClawSession(
             // Gateway mode: manage session on the gateway side, not in local DB
             val nodeRuntime = (context.applicationContext as OpenClawApplication).nodeRuntime
             if (!settings.resumeLatestSession) {
-                // Start a fresh gateway session with a human-readable label
-                val newKey = java.util.UUID.randomUUID().toString()
+                // Start a fresh gateway session with a human-readable label.
+                // An agent-scoped key routes the session to the configured voice
+                // agent; a bare key would land on the gateway's default agent.
+                val voiceAgentId = settings.defaultAgentId.trim().takeIf { it.isNotEmpty() && it != "main" }
+                val sessionUuid = java.util.UUID.randomUUID().toString()
+                val newKey = if (voiceAgentId != null) "agent:$voiceAgentId:$sessionUuid" else sessionUuid
                 val timeStr = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date())
                 val label = String.format(context.getString(R.string.default_session_title_format), timeStr)
                 nodeRuntime.switchChatSession(newKey)
@@ -403,9 +411,23 @@ class OpenClawSession(
     private var listeningJob: Job? = null
     private var speakingJob: Job? = null
     private var isUserDismissed = false
+    private var turnTimings = VoiceTurnTimings()
+
+    private fun reportVoiceTurn() {
+        if (!isOpenClawVoiceTarget()) return
+        val nodeRuntime = (context.applicationContext as OpenClawApplication).nodeRuntime
+        val reportJson = turnTimings.buildReportJson(
+            sessionKey = nodeRuntime.chatSessionKey.value,
+            sttProvider = "android",
+            ttsProvider = settings.ttsEngine.takeIf { it.isNotBlank() },
+        ) ?: return
+        Log.i(TAG, "voicetraces.report dispatching: $reportJson")
+        nodeRuntime.reportVoiceTimings(reportJson)
+    }
 
     private fun startListening(initialDelayMs: Long = 50L) {
         Log.d(TAG, "startListening() called, currentState=${currentState.value}, listeningJob=${listeningJob}, speakingJob=${speakingJob}")
+        ensureScopeAlive()
         listeningJob?.cancel()
         acquireWakeLock()
         sendPauseBroadcast()
@@ -416,6 +438,7 @@ class OpenClawSession(
         partialText.value = ""
         errorMessage.value = null
         audioLevel.value = 0f
+        turnTimings = VoiceTurnTimings()
 
         // Fallback: if SpeechResult.Ready doesn't arrive within 2s, force LISTENING
         // so users don't see "Processing" indefinitely while the recognizer warms up
@@ -459,6 +482,7 @@ class OpenClawSession(
                             }
                             is SpeechResult.Processing -> {
                                 // No sound here - thinking ACK sound will play when AI starts processing
+                                turnTimings.onSpeechEnd()
                             }
                             is SpeechResult.Listening -> {
                                 if (currentState.value != AssistantState.LISTENING) {
@@ -478,6 +502,7 @@ class OpenClawSession(
                             is SpeechResult.Result -> {
                                 Log.d(TAG, "SpeechResult.Result received: text='${result.text}'")
                                 hasActuallySpoken = true
+                                turnTimings.onTranscript(result.text.length)
                                 userQuery.value = result.text
                                 sendToOpenClaw(result.text)
                             }
@@ -580,6 +605,7 @@ class OpenClawSession(
             }
             val primaryReply = try {
                 if (voiceBackendId != null) {
+                    turnTimings.onSend()
                     com.openclaw.assistant.backend.PrimaryBackendDispatcher.send(
                         context = context,
                         userText = message,
@@ -601,6 +627,7 @@ class OpenClawSession(
             if (primaryReply != null) {
                 val text = primaryReply.text
                 if (text.isNotBlank()) {
+                    turnTimings.onReply(text.length)
                     displayText.value = text
                     handleResponseReceived(text)
                 } else {
@@ -769,6 +796,7 @@ class OpenClawSession(
 
             startWaitPhraseTimer()
 
+            turnTimings.onSend()
             nodeRuntime.sendChat(
                 message = message,
                 thinking = "low",
@@ -790,6 +818,7 @@ class OpenClawSession(
             cancelWaitPhraseTimer()
 
             if (responseText != null) {
+                turnTimings.onReply(responseText.length)
                 displayText.value = responseText
                 handleResponseReceived(responseText)
             } else {
@@ -812,6 +841,7 @@ class OpenClawSession(
         val agentId = settings.defaultAgentId.takeIf { it.isNotBlank() && it != "main" }
 
         startWaitPhraseTimer()
+        turnTimings.onSend()
 
         // Route through the configured Primary backend first. Older installs
         // without migrated backend records fall through to the legacy HTTP path.
@@ -832,6 +862,7 @@ class OpenClawSession(
             cancelWaitPhraseTimer()
             val text = primaryReply.text
             if (text.isNotBlank()) {
+                turnTimings.onReply(text.length)
                 displayText.value = text
                 handleResponseReceived(text)
             } else {
@@ -842,6 +873,7 @@ class OpenClawSession(
             return
         }
 
+        turnTimings.onSend()
         val result = apiClient.sendMessage(
             httpUrl = settings.getChatCompletionsUrl(),
             message = message,
@@ -857,6 +889,7 @@ class OpenClawSession(
             onSuccess = { response ->
                 val responseText = response.getResponseText()
                 if (responseText != null) {
+                    turnTimings.onReply(responseText.length)
                     displayText.value = responseText
                     handleResponseReceived(responseText)
                 } else if (response.error != null) {
@@ -898,17 +931,30 @@ class OpenClawSession(
             speakResponse(responseText)
         } else if (settings.continuousMode) {
             stopThinkingSound()
+            reportVoiceTurn()
             delay(500)
             startListening()
         } else {
             stopThinkingSound()
+            reportVoiceTurn()
             // TTS disabled & continuous conversation OFF: Return to IDLE
             currentState.value = AssistantState.IDLE
             SessionForegroundService.stop(context)
         }
     }
 
+    private fun recoverFromStalledProcessing() {
+        Log.w(TAG, "PROCESSING stalled past watchdog, recovering to ERROR")
+        listeningJob?.cancel()
+        stopThinkingSound()
+        speechManager.destroy()
+        abandonAudioFocus()
+        currentState.value = AssistantState.ERROR
+        errorMessage.value = context.getString(R.string.error_processing_stuck)
+    }
+
     private fun interruptAndListen() {
+        ensureScopeAlive()
         cancelInitialFillerPhrase()
         cancelWaitPhraseTimer()
         stopThinkingSound()
@@ -932,6 +978,7 @@ class OpenClawSession(
 
     private fun speakResponse(text: String) {
         Log.d(TAG, "speakResponse() called, text length=${text.length}")
+        turnTimings.onTtsStart()
         // Thinking sound continues until TTSState.Speaking is received
         currentState.value = AssistantState.PREPARING_SPEECH
         val cleanText = TTSUtils.stripMarkdownForSpeech(text)
@@ -953,6 +1000,7 @@ class OpenClawSession(
                             }
                             is TTSState.Speaking -> {
                                 Log.d(TAG, "TTS Speaking")
+                                turnTimings.onFirstAudio()
                                 stopThinkingSound()
                                 currentState.value = AssistantState.SPEAKING
                                 // Barge-in keeps the HotwordService listening while TTS speaks
@@ -991,6 +1039,11 @@ class OpenClawSession(
                 if (ignoreNextTtsStop) {
                     return@launch
                 }
+
+                if (success) {
+                    turnTimings.onTtsDone()
+                }
+                reportVoiceTurn()
 
                 if (success) {
                     // After speech completion, if continuous conversation mode is enabled, start listening again
@@ -1090,6 +1143,8 @@ enum class AssistantState {
 /**
  * Assistant UI (Compose)
  */
+private const val PROCESSING_STUCK_WATCHDOG_MS = 8_000L
+
 @Composable
 fun AssistantUI(
     state: AssistantState,
@@ -1100,8 +1155,16 @@ fun AssistantUI(
     audioLevel: Float,
     onClose: () -> Unit,
     onRetry: () -> Unit,
-    onInterrupt: () -> Unit = {}
+    onInterrupt: () -> Unit = {},
+    onProcessingStuck: () -> Unit = {}
 ) {
+    // Lives in the dialog's composition, so it fires even when the session scope is dead.
+    LaunchedEffect(state) {
+        if (state == AssistantState.PROCESSING) {
+            delay(PROCESSING_STUCK_WATCHDOG_MS)
+            onProcessingStuck()
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()

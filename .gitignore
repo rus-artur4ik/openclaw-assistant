@@ -24,3 +24,5 @@ AGENTS.md
 artifacts/
 artifacts-current.png
 __pycache__/
+scratchpad/
+.DS_Store
