@@ -473,6 +473,9 @@ See the official VOICEVOX website for details.</string>
     <string name="filler_provider_label">Filler voice provider</string>
     <string name="filler_provider_same">Same as main</string>
     <string name="filler_voice_label">Filler voice</string>
+    <string name="filler_model_label">Filler model</string>
+    <string name="filler_engine_label">Filler engine</string>
+    <string name="filler_speed_label">Filler speed</string>
     <string name="filler_provider_unconfigured">This provider is not set up, so fillers will use the answer voice. Configure it by selecting it as the main provider.</string>
     <string name="filler_provider_hint">Fillers can use a faster or better-sounding voice than the answer.</string>
     <string name="wait_phrase_let_me_think">Let me think…</string>

@@ -66,17 +66,17 @@ class OpenAIProvider(private val context: Context) : TTSProvider {
         }
     }
     
-    private suspend fun synthesizeSpeech(text: String, voiceOverride: String? = null): ByteArray? = withContext(Dispatchers.IO) {
+    private suspend fun synthesizeSpeech(text: String, overrides: TTSOverrides? = null): ByteArray? = withContext(Dispatchers.IO) {
         val apiKey = settings.openAiApiKey
-        val voice = voiceOverride?.takeIf { it.isNotBlank() } ?: settings.openAiVoice
-        val model = settings.openAiModel
-        
+        val voice = overrides?.voiceOrNull() ?: settings.openAiVoice
+        val model = overrides?.modelOrNull() ?: settings.openAiModel
+
         val requestBody = JSONObject().apply {
             put("model", model)
             put("input", text)
             put("voice", voice)
             put("response_format", "mp3")
-            put("speed", settings.ttsSpeed.toDouble())
+            put("speed", (overrides?.speedOrNull() ?: settings.ttsSpeed).coerceIn(0.25f, 4.0f).toDouble())
         }.toString()
         
         val request = Request.Builder()
@@ -168,7 +168,7 @@ class OpenAIProvider(private val context: Context) : TTSProvider {
     
     override fun speakWithProgress(text: String): Flow<TTSState> = speakWithProgress(text, null)
 
-    override fun speakWithProgress(text: String, voiceOverride: String?): Flow<TTSState> = channelFlow {
+    override fun speakWithProgress(text: String, overrides: TTSOverrides?): Flow<TTSState> = channelFlow {
         send(TTSState.Preparing)
 
         if (!isConfigured()) {
@@ -178,7 +178,7 @@ class OpenAIProvider(private val context: Context) : TTSProvider {
 
         // Synthesize speech (API call)
         val audioData = try {
-            synthesizeSpeech(text, voiceOverride)
+            synthesizeSpeech(text, overrides)
         } catch (e: Exception) {
             Log.e(TAG, "Synthesis error", e)
             null

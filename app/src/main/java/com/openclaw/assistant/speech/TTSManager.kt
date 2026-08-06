@@ -118,6 +118,20 @@ class TTSManager(private val context: Context) {
         return provider.speakWithProgress(processedText)
     }
 
+    // A filler-specific local engine needs its own instance: TextToSpeech binds its engine
+    // at construction, so it cannot be switched per utterance like a voice or model.
+    private var fillerLocalProvider: AndroidTTSProvider? = null
+    private var fillerLocalEngine: String? = null
+
+    private fun localProviderForEngine(engine: String): AndroidTTSProvider {
+        fillerLocalProvider?.let { if (fillerLocalEngine == engine) return it }
+        fillerLocalProvider?.shutdown()
+        return AndroidTTSProvider(context, engine).also {
+            fillerLocalProvider = it
+            fillerLocalEngine = engine
+        }
+    }
+
     /**
      * Resolve which provider voices filler/wait phrases. Falls back to the answer provider
      * when the configured filler provider is unusable (missing key, engine not initialized).
@@ -125,10 +139,32 @@ class TTSManager(private val context: Context) {
     private fun getFillerProvider(): TTSProvider? {
         val type = settings.fillerTtsType
         if (type == SettingsRepository.FILLER_TTS_TYPE_SAME) return getCurrentProvider()
+        if (type == TTSProviderType.LOCAL) {
+            val engine = settings.fillerTtsEngine
+            // A shared instance already speaks with the configured engine
+            if (engine.isNotBlank() && engine != settings.ttsEngine) {
+                val dedicated = localProviderForEngine(engine)
+                if (dedicated.isAvailable()) return dedicated
+                Log.w(TAG, "filler engine '$engine' not initialized yet, using the shared local provider")
+            }
+        }
         val provider = providers[type]
         if (provider != null && provider.isAvailable() && provider.isConfigured()) return provider
         Log.w(TAG, "filler provider '$type' unusable, falling back to '${settings.ttsType}'")
         return getCurrentProvider()
+    }
+
+    /**
+     * Filler settings only apply to the provider they were chosen for: after a fallback (or
+     * with "same as main") the provider speaks with its own configured voice, model and speed.
+     */
+    private fun fillerOverridesFor(provider: TTSProvider): TTSOverrides? {
+        if (provider.getType() != settings.fillerTtsType) return null
+        return TTSOverrides(
+            voice = settings.fillerVoiceId,
+            model = settings.fillerModel,
+            speed = settings.fillerSpeed
+        )
     }
 
     /**
@@ -141,11 +177,10 @@ class TTSManager(private val context: Context) {
                 trySend(TTSState.Error("No provider found"))
                 close()
             }
-        // Voice ids only mean something to the provider they were picked for: after a
-        // fallback (or with "same as main") the provider speaks with its own voice.
-        val voiceOverride = settings.fillerVoiceId
-            .takeIf { it.isNotBlank() && provider.getType() == settings.fillerTtsType }
-        return provider.speakWithProgress(TTSUtils.stripMarkdownForSpeech(text), voiceOverride)
+        return provider.speakWithProgress(
+            TTSUtils.stripMarkdownForSpeech(text),
+            fillerOverridesFor(provider)
+        )
     }
 
     /**
@@ -160,6 +195,7 @@ class TTSManager(private val context: Context) {
      */
     fun stopAll() {
         providers.values.forEach { it.stop() }
+        fillerLocalProvider?.stop()
     }
     
     /**
@@ -168,6 +204,9 @@ class TTSManager(private val context: Context) {
     fun shutdown() {
         providers.values.forEach { it.shutdown() }
         providers.clear()
+        fillerLocalProvider?.shutdown()
+        fillerLocalProvider = null
+        fillerLocalEngine = null
     }
     
     /**
@@ -193,6 +232,12 @@ class TTSManager(private val context: Context) {
         val fillerType = settings.fillerTtsType
         if (fillerType != SettingsRepository.FILLER_TTS_TYPE_SAME) {
             initializeIfNeeded(providers[fillerType])
+            // Binding the engine now means the first filler does not fall back while
+            // this instance is still connecting to the engine service
+            if (fillerType == TTSProviderType.LOCAL) {
+                val engine = settings.fillerTtsEngine
+                if (engine.isNotBlank() && engine != settings.ttsEngine) localProviderForEngine(engine)
+            }
         }
         return ready
     }

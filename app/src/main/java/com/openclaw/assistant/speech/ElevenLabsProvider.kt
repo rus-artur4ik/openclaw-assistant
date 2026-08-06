@@ -68,10 +68,10 @@ class ElevenLabsProvider(private val context: Context) : TTSProvider {
         }
     }
     
-    private suspend fun synthesizeSpeech(text: String, voiceOverride: String? = null): ByteArray? = withContext(Dispatchers.IO) {
+    private suspend fun synthesizeSpeech(text: String, overrides: TTSOverrides? = null): ByteArray? = withContext(Dispatchers.IO) {
         val apiKey = settings.elevenLabsApiKey
-        val voiceId = voiceOverride?.takeIf { it.isNotBlank() } ?: settings.elevenLabsVoiceId
-        val modelId = settings.elevenLabsModel
+        val voiceId = overrides?.voiceOrNull() ?: settings.elevenLabsVoiceId
+        val modelId = overrides?.modelOrNull() ?: settings.elevenLabsModel
         
         val url = "$API_BASE_URL/text-to-speech/$voiceId"
 
@@ -80,7 +80,8 @@ class ElevenLabsProvider(private val context: Context) : TTSProvider {
         val supportsVoiceTuning = model?.supportsVoiceTuning ?: true
 
         // String.format avoids float precision artifacts the API rejects
-        val speed = String.format(Locale.US, "%.2f", settings.elevenLabsSpeed.coerceIn(0.7f, 1.2f)).toDouble()
+        val requestedSpeed = overrides?.speedOrNull() ?: settings.elevenLabsSpeed
+        val speed = String.format(Locale.US, "%.2f", requestedSpeed.coerceIn(0.7f, 1.2f)).toDouble()
 
         val requestBody = JSONObject().apply {
             put("text", text)
@@ -200,7 +201,7 @@ class ElevenLabsProvider(private val context: Context) : TTSProvider {
     
     override fun speakWithProgress(text: String): Flow<TTSState> = speakWithProgress(text, null)
 
-    override fun speakWithProgress(text: String, voiceOverride: String?): Flow<TTSState> = channelFlow {
+    override fun speakWithProgress(text: String, overrides: TTSOverrides?): Flow<TTSState> = channelFlow {
         send(TTSState.Preparing)
 
         if (!isConfigured()) {
@@ -210,7 +211,7 @@ class ElevenLabsProvider(private val context: Context) : TTSProvider {
 
         // Synthesize speech (API call)
         val audioData = try {
-            synthesizeSpeech(text, voiceOverride)
+            synthesizeSpeech(text, overrides)
         } catch (e: Exception) {
             lastFailureReason = "Synthesis error: ${e.message}"
             Log.e(TAG, "Synthesis error", e)

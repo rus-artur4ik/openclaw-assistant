@@ -23,19 +23,23 @@ private val COMMA_ENDERS = listOf("。", "，", ", ")
 /**
  * Android native TTS provider (wrapper around TextToSpeech)
  */
-class AndroidTTSProvider(private val context: Context) : TTSProvider {
-    
+class AndroidTTSProvider(
+    private val context: Context,
+    /** Engine package to bind instead of the configured one; TextToSpeech fixes it at construction. */
+    private val engineOverride: String? = null
+) : TTSProvider {
+
     private var tts: TextToSpeech? = null
     private var isInitialized = false
     private var pendingSpeak: (() -> Unit)? = null
     private val settings = SettingsRepository.getInstance(context)
-    
+
     init {
         initialize()
     }
-    
+
     private fun initialize() {
-        val preferredEngine = settings.ttsEngine
+        val preferredEngine = engineOverride?.takeIf { it.isNotBlank() } ?: settings.ttsEngine
         
         if (preferredEngine.isNotEmpty()) {
             Log.d(TAG, "Initializing with preferred engine: $preferredEngine")
@@ -71,7 +75,7 @@ class AndroidTTSProvider(private val context: Context) : TTSProvider {
         pendingSpeak = null
     }
     
-    private fun setupVoice() {
+    private fun setupVoice(speedOverride: Float? = null) {
         val tts = this.tts ?: return
         
         val languageTag = settings.speechLanguage
@@ -87,7 +91,7 @@ class AndroidTTSProvider(private val context: Context) : TTSProvider {
         }
         
         // Set speed
-        tts.setSpeechRate(settings.ttsSpeed)
+        tts.setSpeechRate(speedOverride?.takeIf { it > 0f } ?: settings.ttsSpeed)
         tts.setPitch(1.0f)
         
         // Try to select high-quality voice
@@ -187,7 +191,9 @@ class AndroidTTSProvider(private val context: Context) : TTSProvider {
     
     override fun getConfigurationError(): String? = null
     
-    override fun speakWithProgress(text: String): Flow<TTSState> = callbackFlow {
+    override fun speakWithProgress(text: String): Flow<TTSState> = speakWithProgress(text, null)
+
+    override fun speakWithProgress(text: String, overrides: TTSOverrides?): Flow<TTSState> = callbackFlow {
         val utteranceId = UUID.randomUUID().toString()
         
         val listener = object : UtteranceProgressListener() {
@@ -209,7 +215,7 @@ class AndroidTTSProvider(private val context: Context) : TTSProvider {
         }
 
         if (isInitialized) {
-            setupVoice()
+            setupVoice(overrides?.speedOrNull())
             trySend(TTSState.Preparing)
             tts?.setOnUtteranceProgressListener(listener)
             tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId)

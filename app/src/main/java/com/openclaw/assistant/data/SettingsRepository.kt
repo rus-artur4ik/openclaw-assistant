@@ -287,6 +287,21 @@ class SettingsRepository(context: Context) {
         get() = prefs.getString(KEY_FILLER_VOICE_ID, "") ?: ""
         set(value) = prefs.edit().putString(KEY_FILLER_VOICE_ID, value).apply()
 
+    // Synthesis model for filler phrases (ElevenLabs/OpenAI); blank keeps the provider's model
+    var fillerModel: String
+        get() = prefs.getString(KEY_FILLER_MODEL, "") ?: ""
+        set(value) = prefs.edit().putString(KEY_FILLER_MODEL, value).apply()
+
+    // System TTS engine for filler phrases; blank keeps the engine the answers use
+    var fillerTtsEngine: String
+        get() = prefs.getString(KEY_FILLER_TTS_ENGINE, "") ?: ""
+        set(value) = prefs.edit().putString(KEY_FILLER_TTS_ENGINE, value).apply()
+
+    // Speech rate for filler phrases; 0 keeps the filler provider's configured rate
+    var fillerSpeed: Float
+        get() = prefs.getFloat(KEY_FILLER_SPEED, 0f)
+        set(value) = prefs.edit().putFloat(KEY_FILLER_SPEED, value).apply()
+
     // Barge-in during TTS (WakeWord interruption while speaking)
     var ttsBargeInEnabled: Boolean
         get() = prefs.getBoolean(KEY_TTS_BARGE_IN_ENABLED, true)
@@ -407,6 +422,9 @@ class SettingsRepository(context: Context) {
         private const val KEY_FILLER_PHRASES_ENABLED = "filler_phrases_enabled"
         private const val KEY_FILLER_TTS_TYPE = "filler_tts_type"
         private const val KEY_FILLER_VOICE_ID = "filler_voice_id"
+        private const val KEY_FILLER_MODEL = "filler_model"
+        private const val KEY_FILLER_TTS_ENGINE = "filler_tts_engine"
+        private const val KEY_FILLER_SPEED = "filler_speed"
         private const val KEY_TTS_BARGE_IN_ENABLED = "tts_barge_in_enabled"
         private const val KEY_WAKE_WORD_DEBUG_ENABLED = "wake_word_debug_enabled"
         private const val KEY_MEDIA_BUTTON_ENABLED = "media_button_enabled"

@@ -241,6 +241,9 @@
     <string name="filler_provider_label">Провайдер голоса филлеров</string>
     <string name="filler_provider_same">Как основной</string>
     <string name="filler_voice_label">Голос филлеров</string>
+    <string name="filler_model_label">Модель филлеров</string>
+    <string name="filler_engine_label">Движок филлеров</string>
+    <string name="filler_speed_label">Скорость филлеров</string>
     <string name="filler_provider_unconfigured">Провайдер не настроен — филлеры будут звучать основным голосом. Настройте его, выбрав основным провайдером.</string>
     <string name="filler_provider_hint">Филлеры могут звучать более быстрым или качественным голосом, чем ответ.</string>
     <string name="wait_phrase_let_me_think">Дай подумать…</string>
