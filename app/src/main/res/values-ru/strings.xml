@@ -28,6 +28,7 @@
 <string name="error_speech_input_timeout">Нет речевого ввода</string>
 <string name="error_speech_unknown">Неизвестная ошибка (%d)</string>
 <string name="error_no_response">Нет ответа</string>
+<string name="error_processing_stuck">Распознавание речи зависло</string>
 <string name="error_network">Ошибка сети</string>
 <string name="error_speech_general">Ошибка речи</string>
 <string name="error_no_recognition_result">Нет результата распознавания</string>

@@ -49,6 +49,7 @@ import com.openclaw.assistant.backend.BackendType
 
 import com.openclaw.assistant.data.SettingsRepository
 import com.openclaw.assistant.service.NodeForegroundService
+import com.openclaw.assistant.speech.ElevenLabsModels
 import com.openclaw.assistant.service.HotwordService
 import com.openclaw.assistant.ui.components.CollapsibleSection
 import com.openclaw.assistant.ui.components.CredentialHintCard
@@ -310,6 +311,7 @@ fun SettingsScreen(
     // ElevenLabs
     var elevenLabsApiKey by rememberSaveable { mutableStateOf(settings.elevenLabsApiKey) }
     var elevenLabsVoiceId by rememberSaveable { mutableStateOf(settings.elevenLabsVoiceId) }
+    var elevenLabsModel by rememberSaveable { mutableStateOf(settings.elevenLabsModel) }
     var elevenLabsSpeed by rememberSaveable { mutableStateOf(settings.elevenLabsSpeed) }
     var showElevenLabsApiKey by rememberSaveable { mutableStateOf(false) }
     
@@ -500,6 +502,7 @@ fun SettingsScreen(
                                 settings.ttsType = ttsType
                                 settings.elevenLabsApiKey = elevenLabsApiKey
                                 settings.elevenLabsVoiceId = elevenLabsVoiceId
+                                settings.elevenLabsModel = elevenLabsModel
                                 settings.elevenLabsSpeed = elevenLabsSpeed
                                 settings.openAiApiKey = openAiApiKey
                                 settings.openAiVoice = openAiVoice
@@ -1219,6 +1222,8 @@ fun SettingsScreen(
                                     onShowApiKeyChange = { showElevenLabsApiKey = it },
                                     voiceId = elevenLabsVoiceId,
                                     onVoiceIdChange = { elevenLabsVoiceId = it },
+                                    model = elevenLabsModel,
+                                    onModelChange = { elevenLabsModel = it },
                                     speed = elevenLabsSpeed,
                                     onSpeedChange = { elevenLabsSpeed = it }
                                 )
@@ -2248,29 +2253,33 @@ fun ElevenLabsSettingsCard(
     onApiKeyChange: (String) -> Unit,
     voiceId: String,
     onVoiceIdChange: (String) -> Unit,
+    model: String,
+    onModelChange: (String) -> Unit,
     showApiKey: Boolean,
     onShowApiKeyChange: (Boolean) -> Unit,
     speed: Float,
     onSpeedChange: (Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Ensure voiceId is never null
     val safeVoiceId = voiceId ?: ""
-    
+
     var usePresetVoice by rememberSaveable { mutableStateOf(safeVoiceId.isEmpty() || ElevenLabsVoiceOptions.VOICES.any { it.id == safeVoiceId }) }
     var customVoiceId by rememberSaveable { mutableStateOf(if (usePresetVoice) "" else safeVoiceId) }
     var showVoiceDropdown by rememberSaveable { mutableStateOf(false) }
-    
+    var showModelDropdown by rememberSaveable { mutableStateOf(false) }
+
+    val selectedModel = remember(model) {
+        ElevenLabsModels.find(model) ?: ElevenLabsModels.ALL.first()
+    }
+
     val context = LocalContext.current
     
-    // Find selected voice name (safely)
     val selectedVoice: ElevenLabsVoiceOptions.VoiceOption = remember(safeVoiceId) {
-        ElevenLabsVoiceOptions.VOICES.find { it.id == safeVoiceId } 
+        ElevenLabsVoiceOptions.VOICES.find { it.id == safeVoiceId }
             ?: ElevenLabsVoiceOptions.VOICES.firstOrNull()
             ?: ElevenLabsVoiceOptions.VoiceOption("", "Default", "")
     }
-    
-    // Ensure we have a valid voice name for display
+
     val selectedVoiceName = selectedVoice.name
     val selectedVoiceDescription = selectedVoice.description
     
@@ -2287,7 +2296,6 @@ fun ElevenLabsSettingsCard(
             )
             Spacer(modifier = Modifier.height(12.dp))
             
-            // API Key input with show/hide toggle
             OutlinedTextField(
                 value = apiKey,
                 onValueChange = onApiKeyChange,
@@ -2306,7 +2314,6 @@ fun ElevenLabsSettingsCard(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
             
-            // API Key link button
             TextButton(
                 onClick = {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://elevenlabs.io/app/developers/api-keys"))
@@ -2323,7 +2330,6 @@ fun ElevenLabsSettingsCard(
             
             Spacer(modifier = Modifier.height(8.dp))
             
-            // Filter chips to toggle between preset and custom voice
             Text(
                 stringResource(R.string.select_voice),
                 style = MaterialTheme.typography.bodyMedium,
@@ -2359,7 +2365,6 @@ fun ElevenLabsSettingsCard(
             Spacer(modifier = Modifier.height(8.dp))
             
             if (usePresetVoice) {
-                // Preset voice dropdown
                 ExposedDropdownMenuBox(
                     expanded = showVoiceDropdown,
                     onExpandedChange = { showVoiceDropdown = it }
@@ -2410,7 +2415,6 @@ fun ElevenLabsSettingsCard(
                     }
                 }
             } else {
-                // Custom Voice ID input
                 OutlinedTextField(
                     value = customVoiceId,
                     onValueChange = { 
@@ -2425,33 +2429,88 @@ fun ElevenLabsSettingsCard(
             }
             
             Spacer(modifier = Modifier.height(16.dp))
-            
-            // Speed setting (ElevenLabs API limitation: 0.7 to 1.2)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+
+            ExposedDropdownMenuBox(
+                expanded = showModelDropdown,
+                onExpandedChange = { showModelDropdown = it }
             ) {
-                Text(stringResource(R.string.voice_speed), style = MaterialTheme.typography.bodyMedium)
+                OutlinedTextField(
+                    value = selectedModel.displayName,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text(stringResource(R.string.elevenlabs_model_label)) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showModelDropdown) },
+                    supportingText = {
+                        Text(selectedModel.description, style = MaterialTheme.typography.bodySmall)
+                    },
+                    modifier = Modifier.fillMaxWidth().menuAnchor()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = showModelDropdown,
+                    onDismissRequest = { showModelDropdown = false }
+                ) {
+                    ElevenLabsModels.ALL.forEach { option ->
+                        DropdownMenuItem(
+                            text = {
+                                Column {
+                                    Text(option.displayName, style = MaterialTheme.typography.bodyMedium)
+                                    Text(
+                                        option.description,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            },
+                            onClick = {
+                                onModelChange(option.id)
+                                showModelDropdown = false
+                            },
+                            leadingIcon = {
+                                if (selectedModel.id == option.id) {
+                                    Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (selectedModel.supportsVoiceTuning) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(stringResource(R.string.voice_speed), style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        text = "%.2fx".format(speed),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
                 Text(
-                    text = "%.2fx".format(speed),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary
+                    text = stringResource(R.string.voice_speed_range, "0.70", "1.20"),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Slider(
+                    value = speed,
+                    onValueChange = onSpeedChange,
+                    valueRange = 0.7f..1.2f,
+                    steps = 4,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else {
+                Text(
+                    text = stringResource(R.string.elevenlabs_speed_unsupported),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            Text(
-                text = stringResource(R.string.voice_speed_range, "0.70", "1.20"),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Slider(
-                value = speed,
-                onValueChange = onSpeedChange,
-                valueRange = 0.7f..1.2f,
-                steps = 4, // 0.7, 0.8, 0.9, 1.0, 1.1, 1.2
-                modifier = Modifier.fillMaxWidth()
-            )
         }
     }
 }
