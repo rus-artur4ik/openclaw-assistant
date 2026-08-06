@@ -1155,6 +1155,18 @@ class NodeRuntime(context: Context) {
     return operatorSession.request(method, paramsJson, timeoutMs)
   }
 
+  /** Fire-and-forget on the app-lifetime scope, so it survives the voice dialog closing mid-send. */
+  fun reportVoiceTimings(reportJson: String) {
+    scope.launch {
+      try {
+        val result = operatorSession.request("voicetraces.report", reportJson)
+        android.util.Log.i("NodeRuntime", "voicetraces.report sent: $reportJson -> $result")
+      } catch (e: Throwable) {
+        android.util.Log.w("NodeRuntime", "voicetraces.report failed: ${e.message}")
+      }
+    }
+  }
+
   /** Push current gateway + agent state into the home canvas so it survives reconnects and restarts. */
   private fun updateHomeCanvasState() {
     val connected = _isConnected.value
