@@ -137,21 +137,32 @@ class TTSManager(private val context: Context) {
      * when the configured filler provider is unusable (missing key, engine not initialized).
      */
     private fun getFillerProvider(): TTSProvider? {
-        val type = settings.fillerTtsType
-        if (type == SettingsRepository.FILLER_TTS_TYPE_SAME) return getCurrentProvider()
-        if (type == TTSProviderType.LOCAL) {
-            val engine = settings.fillerTtsEngine
-            // A shared instance already speaks with the configured engine
-            if (engine.isNotBlank() && engine != settings.ttsEngine) {
-                val dedicated = localProviderForEngine(engine)
-                if (dedicated.isAvailable()) return dedicated
-                Log.w(TAG, "filler engine '$engine' not initialized yet, using the shared local provider")
+        val fillerType = settings.fillerTtsType
+        val route = FillerRouting.route(
+            fillerType = fillerType,
+            fillerEngine = settings.fillerTtsEngine,
+            mainEngine = settings.ttsEngine,
+            isDedicatedLocalReady = { engine ->
+                // Binding here is deliberate: an engine that is still connecting now
+                // becomes ready for the next filler.
+                val ready = localProviderForEngine(engine).isAvailable()
+                if (!ready) Log.w(TAG, "filler engine '$engine' not initialized yet, using the shared local provider")
+                ready
+            },
+            isProviderUsable = { type ->
+                providers[type]?.let { it.isAvailable() && it.isConfigured() } == true
+            }
+        )
+        return when (route) {
+            is FillerRouting.Route.DedicatedLocal -> localProviderForEngine(route.engine)
+            is FillerRouting.Route.Shared -> providers[route.type]
+            is FillerRouting.Route.Main -> {
+                if (fillerType != SettingsRepository.FILLER_TTS_TYPE_SAME) {
+                    Log.w(TAG, "filler provider '$fillerType' unusable, falling back to '${settings.ttsType}'")
+                }
+                getCurrentProvider()
             }
         }
-        val provider = providers[type]
-        if (provider != null && provider.isAvailable() && provider.isConfigured()) return provider
-        Log.w(TAG, "filler provider '$type' unusable, falling back to '${settings.ttsType}'")
-        return getCurrentProvider()
     }
 
     /**
@@ -159,7 +170,7 @@ class TTSManager(private val context: Context) {
      * with "same as main") the provider speaks with its own configured voice, model and speed.
      */
     private fun fillerOverridesFor(provider: TTSProvider): TTSOverrides? {
-        if (provider.getType() != settings.fillerTtsType) return null
+        if (!FillerRouting.overridesApply(provider.getType(), settings.fillerTtsType)) return null
         return TTSOverrides(
             voice = settings.fillerVoiceId,
             model = settings.fillerModel,
