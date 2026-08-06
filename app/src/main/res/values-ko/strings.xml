@@ -458,7 +458,9 @@
     <string name="tts_barge_in_desc">음성 출력 중 Wake Word를 말하면 중단하고 말하기</string>
 
     <!-- Filler phrase content (spoken by TTS) -->
-    <string name="filler_ok">네</string>
+    <string name="filler_checking_1">잠깐 확인해 볼게요.</string>
+    <string name="filler_checking_2">한번 볼게요.</string>
+    <string name="filler_checking_3">바로 찾아볼게요.</string>
     <string name="wait_phrase_let_me_think">잠시 생각해볼게요…</string>
     <string name="wait_phrase_one_moment">잠시만요…</string>
     <string name="wait_phrase_checking">확인해볼게요…</string>

@@ -234,7 +234,9 @@
     <string name="tts_barge_in_desc">हस्तक्षेप करने के लिए बोलते समय सक्रियण शब्द कहें</string>
 
     <!-- Filler phrase content (spoken by TTS) -->
-    <string name="filler_ok">OK</string>
+    <string name="filler_checking_1">एक सेकंड, देखता हूँ।</string>
+    <string name="filler_checking_2">मैं देखता हूँ।</string>
+    <string name="filler_checking_3">अभी देखता हूँ।</string>
     <string name="wait_phrase_let_me_think">मुझे सोचने दो…</string>
     <string name="wait_phrase_one_moment">एक पल…</string>
     <string name="wait_phrase_checking">मैं जाँचता हूँ…</string>

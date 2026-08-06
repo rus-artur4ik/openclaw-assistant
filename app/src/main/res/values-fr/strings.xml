@@ -234,7 +234,9 @@ Pour plus de détails, consultez le site officiel de VOICEVOX.</string>
     <string name="tts_barge_in_desc">Dites le mot d\'activation pendant la lecture pour interrompre</string>
 
     <!-- Filler phrase content (spoken by TTS) -->
-    <string name="filler_ok">OK</string>
+    <string name="filler_checking_1">Une seconde, je regarde.</string>
+    <string name="filler_checking_2">Je vais voir ça.</string>
+    <string name="filler_checking_3">Je vérifie.</string>
     <string name="wait_phrase_let_me_think">Laissez-moi réfléchir…</string>
     <string name="wait_phrase_one_moment">Un instant…</string>
     <string name="wait_phrase_checking">Je vérifie…</string>

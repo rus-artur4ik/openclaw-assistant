@@ -256,7 +256,9 @@
     <string name="tts_barge_in_desc">読み上げ中にウェイクワードで中断して発話</string>
 
     <!-- Filler phrase content (spoken by TTS) -->
-    <string name="filler_ok">OK</string>
+    <string name="filler_checking_1">ちょっと確認しますね。</string>
+    <string name="filler_checking_2">見てみますね。</string>
+    <string name="filler_checking_3">少々お待ちください。</string>
     <string name="wait_phrase_let_me_think">ちょっと考えるね</string>
     <string name="wait_phrase_one_moment">少し待ってね</string>
     <string name="wait_phrase_checking">確認するね</string>

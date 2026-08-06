@@ -274,7 +274,7 @@ class SettingsRepository(context: Context) {
         set(value) = prefs.edit().putBoolean(KEY_THINKING_SOUND_ENABLED, value).apply()
 
     var fillerPhrasesEnabled: Boolean
-        get() = prefs.getBoolean(KEY_FILLER_PHRASES_ENABLED, false)
+        get() = prefs.getBoolean(KEY_FILLER_PHRASES_ENABLED, true)
         set(value) = prefs.edit().putBoolean(KEY_FILLER_PHRASES_ENABLED, value).apply()
 
     // Barge-in during TTS (WakeWord interruption while speaking)

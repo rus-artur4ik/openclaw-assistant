@@ -117,7 +117,20 @@ class TTSManager(private val context: Context) {
         val processedText = TTSUtils.stripMarkdownForSpeech(text)
         return provider.speakWithProgress(processedText)
     }
-    
+
+    /**
+     * Speak a short filler/wait phrase. Prefers the local Android engine so the phrase
+     * starts instantly even when the answer voice is a network provider; falls back to
+     * the current provider while local TTS is still initializing.
+     */
+    fun speakFillerWithProgress(text: String): Flow<TTSState> {
+        val local = providers[TTSProviderType.LOCAL]
+        if (local != null && local.isAvailable() && local.isConfigured()) {
+            return local.speakWithProgress(TTSUtils.stripMarkdownForSpeech(text))
+        }
+        return speakWithProgress(text)
+    }
+
     /**
      * Stop current speech
      */

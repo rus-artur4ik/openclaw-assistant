@@ -76,6 +76,8 @@ class OpenClawSession(
     companion object {
         private const val TAG = "OpenClawSession"
         private const val INITIAL_FILLER_DELAY_MS = 750L
+        private const val FIRST_WAIT_PHRASE_DELAY_MS = 5000L
+        private const val REPEAT_WAIT_PHRASE_DELAY_MS = 9000L
         private const val INTERRUPT_LISTEN_DELAY_MS = 350L
     }
 
@@ -687,10 +689,11 @@ class OpenClawSession(
         waitPhraseJob?.cancel()
         if (!settings.fillerPhrasesEnabled || !settings.ttsEnabled) return
         waitPhraseJob = scope.launch {
-            delay(5000)
-            if (currentState.value == AssistantState.THINKING && isActive) {
-                Log.d(TAG, "Wait phrase timer triggered (> 5s). Playing wait phrase.")
+            delay(FIRST_WAIT_PHRASE_DELAY_MS)
+            while (currentState.value == AssistantState.THINKING && isActive) {
+                Log.d(TAG, "Wait phrase timer triggered. Playing wait phrase.")
                 playWaitPhrase()
+                delay(REPEAT_WAIT_PHRASE_DELAY_MS)
             }
         }
     }
@@ -701,14 +704,19 @@ class OpenClawSession(
     }
 
     private fun playFillerPhrase() {
-        val phrase = context.getString(R.string.filler_ok)
-        
+        val fillerPhrases = listOf(
+            context.getString(R.string.filler_checking_1),
+            context.getString(R.string.filler_checking_2),
+            context.getString(R.string.filler_checking_3)
+        )
+        val phrase = fillerPhrases.random()
+
         stopAuxiliarySpeech()
         var playbackJob: Job? = null
         playbackJob = scope.launch {
             try {
                 // Fire-and-forget: playback completion is not awaited
-                ttsManager.speakWithProgress(phrase).collect {} 
+                ttsManager.speakFillerWithProgress(phrase).collect {}
             } catch (_: CancellationException) {
             } catch (e: Exception) {
                 Log.w(TAG, "Failed to play filler phrase", e)
@@ -728,12 +736,12 @@ class OpenClawSession(
             context.getString(R.string.wait_phrase_checking)
         )
         val phrase = waitPhrases.random()
-        
+
         stopAuxiliarySpeech()
         var playbackJob: Job? = null
         playbackJob = scope.launch {
             try {
-                ttsManager.speakWithProgress(phrase).collect {}
+                ttsManager.speakFillerWithProgress(phrase).collect {}
             } catch (_: CancellationException) {
             } catch (e: Exception) {
                 Log.w(TAG, "Failed to play wait phrase", e)
@@ -1024,7 +1032,9 @@ class OpenClawSession(
         auxiliarySpeechJob?.cancel()
         auxiliarySpeechJob = null
         if (hadActiveAuxSpeech) {
-            ttsManager.stop()
+            // Fillers may play on the local engine while the answer voice is a network
+            // provider — stop() only reaches the current provider, so stop them all.
+            ttsManager.stopAll()
         }
     }
 

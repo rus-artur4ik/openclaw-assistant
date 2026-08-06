@@ -29,6 +29,8 @@ import java.util.UUID
 
 private const val TAG = "ChatViewModel"
 private const val INITIAL_FILLER_DELAY_MS = 750L
+private const val FIRST_WAIT_PHRASE_DELAY_MS = 5000L
+private const val REPEAT_WAIT_PHRASE_DELAY_MS = 9000L
 private const val INTERRUPT_LISTEN_DELAY_MS = 350L
 
 data class PendingFileAttachment(
@@ -1092,7 +1094,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         auxiliarySpeechJob?.cancel()
         auxiliarySpeechJob = null
         if (hadActiveAuxSpeech) {
-            ttsManager?.stop()
+            // Fillers may play on the local engine while the answer voice is a network
+            // provider — stop() only reaches the current provider, so stop them all.
+            ttsManager?.stopAll()
         }
     }
 
@@ -1100,10 +1104,11 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         waitPhraseJob?.cancel()
         if (!settings.fillerPhrasesEnabled || !settings.ttsEnabled) return
         waitPhraseJob = viewModelScope.launch {
-            delay(5000)
-            if (_uiState.value.isThinking && isActive) {
-                Log.d(TAG, "Wait phrase timer triggered (> 5s). Playing wait phrase.")
+            delay(FIRST_WAIT_PHRASE_DELAY_MS)
+            while (_uiState.value.isThinking && isActive) {
+                Log.d(TAG, "Wait phrase timer triggered. Playing wait phrase.")
                 playWaitPhrase()
+                delay(REPEAT_WAIT_PHRASE_DELAY_MS)
             }
         }
     }
@@ -1115,13 +1120,18 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun playFillerPhrase() {
         val app = getApplication<Application>()
-        val phrase = app.getString(R.string.filler_ok)
+        val fillerPhrases = listOf(
+            app.getString(R.string.filler_checking_1),
+            app.getString(R.string.filler_checking_2),
+            app.getString(R.string.filler_checking_3)
+        )
+        val phrase = fillerPhrases.random()
 
         stopAuxiliarySpeech()
         var playbackJob: Job? = null
         playbackJob = viewModelScope.launch {
             try {
-                ttsManager?.speakWithProgress(phrase)?.collect {} // Fire-and-forget: playback completion is not awaited
+                ttsManager?.speakFillerWithProgress(phrase)?.collect {} // Fire-and-forget: playback completion is not awaited
             } catch (_: kotlinx.coroutines.CancellationException) {
             } catch (e: Exception) {
                 Log.w(TAG, "Failed to play filler phrase", e)
@@ -1147,7 +1157,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         var playbackJob: Job? = null
         playbackJob = viewModelScope.launch {
             try {
-                ttsManager?.speakWithProgress(phrase)?.collect {}
+                ttsManager?.speakFillerWithProgress(phrase)?.collect {}
             } catch (_: kotlinx.coroutines.CancellationException) {
             } catch (e: Exception) {
                 Log.w(TAG, "Failed to play wait phrase", e)

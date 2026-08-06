@@ -234,7 +234,9 @@ Para más detalles, consulta el sitio oficial de VOICEVOX.</string>
     <string name="tts_barge_in_desc">Decir la palabra de activación durante el habla para interrumpir</string>
 
     <!-- Filler phrase content (spoken by TTS) -->
-    <string name="filler_ok">OK</string>
+    <string name="filler_checking_1">Un segundo, voy a ver.</string>
+    <string name="filler_checking_2">Déjame mirarlo.</string>
+    <string name="filler_checking_3">Ya lo estoy viendo.</string>
     <string name="wait_phrase_let_me_think">Déjame pensar…</string>
     <string name="wait_phrase_one_moment">Un momento…</string>
     <string name="wait_phrase_checking">Déjame verificar…</string>
