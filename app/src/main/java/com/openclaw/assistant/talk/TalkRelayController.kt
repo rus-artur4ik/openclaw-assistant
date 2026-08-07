@@ -524,8 +524,16 @@ class TalkRelayController(
             }
           val result =
             when (outcome) {
-              is TalkRelayProtocol.ChatRunOutcome.Final ->
-                JSONObject().put("result", outcome.text.ifBlank { "OpenClaw finished with no text." })
+              is TalkRelayProtocol.ChatRunOutcome.Final -> {
+                // The gateway speaks the submitted text verbatim, so reduce the reply to its
+                // speakable part first — otherwise the assistant reads its reasoning, the markdown
+                // and then the [[tts:...]] directive on top. The full reply stays in chat history.
+                val spoken =
+                  com.openclaw.assistant.speech.TTSUtils
+                    .stripMarkdownForSpeech(TalkRelayProtocol.extractSpokenText(outcome.text))
+                    .trim()
+                JSONObject().put("result", spoken.ifBlank { "OpenClaw finished with no text." })
+              }
               is TalkRelayProtocol.ChatRunOutcome.Failed -> JSONObject().put("error", outcome.message)
               TalkRelayProtocol.ChatRunOutcome.Aborted -> JSONObject().put("error", "Cancelled")
               null -> {

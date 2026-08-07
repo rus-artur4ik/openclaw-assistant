@@ -193,4 +193,62 @@ class TalkRelayProtocolTest {
 
     assertEquals(TalkRelayProtocol.ChatRunOutcome.Final(""), outcome)
   }
+
+  // --- extractSpokenText: what actually gets synthesized -------------------------------------
+
+  @Test
+  fun `an inline tts directive with prose wins over the surrounding reasoning`() {
+    // The reply that produced the double-speech bug, verbatim from the device.
+    val reply =
+      """
+      В Берлине сейчас **06:34** утра.
+
+      Берлин на час впереди Бангкока (UTC+2 летом, а Бангкок UTC+7, разница −5
+      часов... погодите). На самом деле, Берлин на 5 часов позади Бангкока. 11:34 − 5 = 06:34.
+
+      [[tts:В Берлине сейчас 6 часов 34 минуты утра.]]
+      """.trimIndent()
+
+    assertEquals("В Берлине сейчас 6 часов 34 минуты утра.", TalkRelayProtocol.extractSpokenText(reply))
+  }
+
+  @Test
+  fun `a hidden tts text block wins over everything else`() {
+    val reply = "Развёрнутый ответ.\n[[tts:text]]Короткий устный ответ.[[/tts:text]]\n[[tts:Другое.]]"
+
+    assertEquals("Короткий устный ответ.", TalkRelayProtocol.extractSpokenText(reply))
+  }
+
+  @Test
+  fun `a visible tts block is spoken`() {
+    val reply = "Вступление. [[tts]]Это и произносим.[[/tts]] Хвост."
+
+    assertEquals("Это и произносим.", TalkRelayProtocol.extractSpokenText(reply))
+  }
+
+  @Test
+  fun `parameter-only tts tags are stripped, not spoken`() {
+    val reply = "Ответ голосом по умолчанию. [[tts:provider=elevenlabs speakerVoice=anna]]"
+
+    assertEquals("Ответ голосом по умолчанию.", TalkRelayProtocol.extractSpokenText(reply))
+  }
+
+  @Test
+  fun `a reply without directives is spoken as-is`() {
+    assertEquals("Просто ответ.", TalkRelayProtocol.extractSpokenText("Просто ответ."))
+  }
+
+  @Test
+  fun `prose containing an equals sign is still prose`() {
+    val reply = "Пояснение. [[tts:Одиннадцать минус пять = шесть часов утра.]]"
+
+    assertEquals("Одиннадцать минус пять = шесть часов утра.", TalkRelayProtocol.extractSpokenText(reply))
+  }
+
+  @Test
+  fun `multiple inline directives are joined in order`() {
+    val reply = "[[tts:Первое.]] шум [[tts:Второе.]]"
+
+    assertEquals("Первое. Второе.", TalkRelayProtocol.extractSpokenText(reply))
+  }
 }

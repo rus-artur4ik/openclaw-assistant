@@ -199,6 +199,46 @@ object TalkRelayProtocol {
     data class Failed(val message: String) : ChatRunOutcome
   }
 
+  private val TTS_HIDDEN_BLOCK = Regex("""\[\[\s*tts\s*:\s*text\s*]]([\s\S]*?)\[\[\s*/\s*tts\s*:\s*text\s*]]""", RegexOption.IGNORE_CASE)
+  private val TTS_VISIBLE_BLOCK = Regex("""\[\[\s*tts\s*]]([\s\S]*?)\[\[\s*/\s*tts\s*]]""", RegexOption.IGNORE_CASE)
+  private val TTS_INLINE_TAG = Regex("""\[\[\s*tts\s*:\s*([^\]]+)]]""", RegexOption.IGNORE_CASE)
+
+  /**
+   * Reduce a full agent reply to the text that should be spoken.
+   *
+   * openclaw agents mark the speakable part of a verbose answer with TTS directives; the normal
+   * chat pipeline strips them, but the Talk relay's `speakText` synthesizes its input verbatim.
+   * Submitting the raw reply makes the assistant read out its reasoning, the markdown asterisks and
+   * then the directive itself — so the reduction happens here, before `submitToolResult`.
+   *
+   * Directive forms, matching the gateway's own parser:
+   * - `[[tts:text]]…[[/tts:text]]` — hidden speakable block; its content wins.
+   * - `[[tts]]…[[/tts]]` — visible speakable block; same, and the text stays in the reply.
+   * - `[[tts:…]]` — key=value parameter tags are dropped; a body that reads as prose (any token
+   *   without `=`, the form this deployment's agent actually emits) is treated as the speakable text.
+   */
+  fun extractSpokenText(text: String): String {
+    val hidden = TTS_HIDDEN_BLOCK.findAll(text).mapNotNull { it.groupValues[1].trim().ifEmpty { null } }.toList()
+    if (hidden.isNotEmpty()) return hidden.joinToString(" ")
+
+    val visible = TTS_VISIBLE_BLOCK.findAll(text).mapNotNull { it.groupValues[1].trim().ifEmpty { null } }.toList()
+    if (visible.isNotEmpty()) return visible.joinToString(" ")
+
+    val proseTags =
+      TTS_INLINE_TAG.findAll(text)
+        .mapNotNull { match ->
+          val body = match.groupValues[1].trim()
+          val tokens = body.split(Regex("""\s+""")).filter { it.isNotEmpty() }
+          // All-key=value bodies are parameter directives (voice/provider), not speech.
+          if (tokens.isNotEmpty() && tokens.any { !it.contains('=') }) body else null
+        }
+        .toList()
+    if (proseTags.isNotEmpty()) return proseTags.joinToString(" ")
+
+    // No speakable directive: speak the reply itself, minus any parameter tags.
+    return TTS_INLINE_TAG.replace(text, "").trim()
+  }
+
   private fun extractMessageText(message: JSONObject?): String {
     if (message == null) return ""
     message.optString("text").takeIf { it.isNotBlank() }?.let { return it }
