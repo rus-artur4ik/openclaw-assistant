@@ -153,6 +153,33 @@
 <string name="voice">Голос</string>
 <string name="wake_word">Слово пробуждения</string>
 <string name="voice_output">Голосовой вывод</string>
+
+<string name="voice_engine_section">Движок разговора</string>
+<string name="voice_engine_desc">Где происходит распознавание речи, ответ и синтез голоса.</string>
+<string name="voice_engine_device">На устройстве</string>
+<string name="voice_engine_device_desc">Телефон распознаёт речь и озвучивает ответ. Работает без gateway; настройки ниже действуют.</string>
+<string name="voice_engine_openclaw_talk">OpenClaw Talk (на сервере)</string>
+<string name="voice_engine_openclaw_talk_desc">Телефон только передаёт звук: openclaw распознаёт речь, запускает агента и синтезирует голос. Нужно подключение к openclaw gateway.</string>
+<string name="voice_engine_managed_by_openclaw">Не используется в режиме OpenClaw Talk — управляется openclaw</string>
+<string name="voice_engine_available">Доступно: openclaw gateway подключён</string>
+<string name="voice_engine_unavailable_target">Слово пробуждения для этой голосовой сессии ведёт на Hermes, у которого нет Talk-relay</string>
+<string name="voice_engine_unavailable_no_gateway">Не настроено включённое подключение к openclaw gateway</string>
+<string name="voice_engine_unavailable_offline">Сейчас openclaw gateway недоступен</string>
+<string name="voice_engine_fallback_notice">Работаю на устройстве: %1$s</string>
+<string name="voice_engine_openclaw_settings">Настройки openclaw для этого режима</string>
+<string name="voice_engine_openclaw_settings_desc">Только для чтения, получено с gateway. Менять их нужно в самом openclaw.</string>
+<string name="voice_engine_openclaw_settings_refresh">Обновить</string>
+<string name="voice_engine_openclaw_settings_unavailable">Не удалось прочитать настройки Talk с gateway.</string>
+<string name="voice_engine_field_provider">Провайдер голоса</string>
+<string name="voice_engine_field_voice">Голос</string>
+<string name="voice_engine_field_model">Модель</string>
+<string name="voice_engine_field_language">Язык</string>
+<string name="voice_engine_field_transport">Режим / транспорт</string>
+<string name="voice_engine_field_agent">Голосовой агент</string>
+<string name="voice_engine_field_thinking">Уровень размышления при консультации</string>
+<string name="voice_engine_wake_word_hint">Движок разговора: %1$s. Изменить — в «Настройки → Голос».</string>
+<string name="voice_engine_data_warning">Передаёт несжатый звук (~3 МБ в минуту). Лучше по Wi-Fi.</string>
+
 <string name="voice_speed">Скорость голоса</string>
 <string name="voice_speed_range">Диапазон: %1$s - %2$s</string>
 <string name="tts_engine_label">Двигатель ТТС</string>

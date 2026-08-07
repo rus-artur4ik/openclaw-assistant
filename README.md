@@ -137,6 +137,7 @@ Need the server first? Start with [OpenClaw](https://github.com/openclaw/opencla
 ### ✨ Features
 
 #### Voice & Speech
+- 🔀 **Conversation Engine** - Run the voice overlay either **on device** (Android STT + local TTS, the default) or on **OpenClaw Talk**, where the gateway does recognition, runs the agent and synthesizes the voice while the phone just streams audio. See [OpenClaw Talk mode](docs/openclaw-talk-mode.md)
 - 🎤 **Customizable Wake Word** - Choose from "OpenClaw", "Hey Assistant", "Jarvis", "Computer", or set your own custom phrase
 - 📴 **Offline Wake Word Detection** - Always-on local processing powered by [Vosk](https://alphacephei.com/vosk/), no internet required
 - 🗣️ **Speech Recognition** - Real-time speech-to-text with partial results display and configurable silence timeout
@@ -282,6 +283,7 @@ ngrok http 18789
 
 #### 6. Voice & Node Settings (Optional)
 
+- **Conversation Engine**: `On device` (default) or `OpenClaw Talk (server)` — see [docs/openclaw-talk-mode.md](docs/openclaw-talk-mode.md)
 - **Speech Speed**: Adjust TTS playback rate (default 1.2x)
 - **TTS Engine**: Select from available engines on your device
 - **Continuous Mode**: Enable auto-resume listening after response

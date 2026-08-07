@@ -354,6 +354,16 @@ class SettingsRepository(context: Context) {
         set(value) = prefs.edit().putString(KEY_WAKEWORD_CONNECTION_TYPE, value).apply()
 
     /**
+     * Which engine runs a voice conversation: on-device STT+TTS, or openclaw's Talk relay.
+     *
+     * A wish, not a guarantee — [com.openclaw.assistant.backend.VoiceEngineSelector] resolves it
+     * against the actual backend and gateway health for each turn.
+     */
+    var voiceEngine: String
+        get() = prefs.getString(KEY_VOICE_ENGINE, VOICE_ENGINE_DEVICE) ?: VOICE_ENGINE_DEVICE
+        set(value) = prefs.edit().putString(KEY_VOICE_ENGINE, value).apply()
+
+    /**
      * Get the chat completions URL.
      * Supports both base URL (http://server) and full path (http://server/v1/chat/completions).
      */
@@ -417,6 +427,7 @@ class SettingsRepository(context: Context) {
         private const val KEY_USE_NODE_CHAT = "use_node_chat"
         private const val KEY_CONNECTION_TYPE = "connection_type"
         private const val KEY_WAKEWORD_CONNECTION_TYPE = "wakeword_connection_type"
+        private const val KEY_VOICE_ENGINE = "voice_engine"
         private const val KEY_SPEECH_SILENCE_TIMEOUT = "speech_silence_timeout"
         private const val KEY_THINKING_SOUND_ENABLED = "thinking_sound_enabled"
         private const val KEY_FILLER_PHRASES_ENABLED = "filler_phrases_enabled"
@@ -464,6 +475,12 @@ class SettingsRepository(context: Context) {
         
         const val CONNECTION_TYPE_GATEWAY = "gateway"
         const val CONNECTION_TYPE_HTTP = "http"
+
+        /** On-device recognition and synthesis; the historical behaviour and the default. */
+        const val VOICE_ENGINE_DEVICE = "device"
+
+        /** Recognition, agent and voice all run on the openclaw gateway (Talk relay). */
+        const val VOICE_ENGINE_OPENCLAW_TALK = "openclaw_talk"
         
         const val GOOGLE_TTS_PACKAGE = "com.google.android.tts"
         
