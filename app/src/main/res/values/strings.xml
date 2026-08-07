@@ -385,6 +385,34 @@
     <string name="voice">Voice</string>
     <string name="wake_word">Wake Word</string>
     <string name="voice_output">Voice Output</string>
+
+    <!-- Voice engine (on-device vs OpenClaw Talk relay) -->
+    <string name="voice_engine_section">Conversation engine</string>
+    <string name="voice_engine_desc">Where speech recognition, the reply and the voice are produced.</string>
+    <string name="voice_engine_device">On device</string>
+    <string name="voice_engine_device_desc">The phone recognizes speech and speaks the answer. Works without a gateway; the settings below apply.</string>
+    <string name="voice_engine_openclaw_talk">OpenClaw Talk (server)</string>
+    <string name="voice_engine_openclaw_talk_desc">The phone only streams audio: openclaw does recognition, runs the agent and synthesizes the voice. Needs a connected openclaw gateway.</string>
+    <string name="voice_engine_managed_by_openclaw">Not used with OpenClaw Talk — managed by openclaw</string>
+    <string name="voice_engine_available">Available: openclaw gateway is connected</string>
+    <string name="voice_engine_unavailable_target">The wake word for this voice session is routed to Hermes, which has no Talk relay</string>
+    <string name="voice_engine_unavailable_no_gateway">No enabled openclaw gateway connection is configured</string>
+    <string name="voice_engine_unavailable_offline">The openclaw gateway is not reachable right now</string>
+    <string name="voice_engine_fallback_notice">Running on device: %1$s</string>
+    <string name="voice_engine_openclaw_settings">openclaw settings for this mode</string>
+    <string name="voice_engine_openclaw_settings_desc">Read-only, taken from the gateway. Change them in openclaw itself.</string>
+    <string name="voice_engine_openclaw_settings_refresh">Refresh</string>
+    <string name="voice_engine_openclaw_settings_unavailable">Could not read the Talk configuration from the gateway.</string>
+    <string name="voice_engine_field_provider">Voice provider</string>
+    <string name="voice_engine_field_voice">Voice</string>
+    <string name="voice_engine_field_model">Model</string>
+    <string name="voice_engine_field_language">Language</string>
+    <string name="voice_engine_field_transport">Mode / transport</string>
+    <string name="voice_engine_field_agent">Voice agent</string>
+    <string name="voice_engine_field_thinking">Consult thinking level</string>
+    <string name="voice_engine_wake_word_hint">Conversation engine: %1$s. Change it in Settings → Voice.</string>
+    <string name="voice_engine_data_warning">Streams uncompressed audio (~3 MB per minute). Prefer Wi-Fi.</string>
+
     <string name="voice_speed">Voice Speed</string>
     <string name="voice_speed_range">Range: %1$s - %2$s</string>
     <string name="tts_engine_label">TTS Engine</string>

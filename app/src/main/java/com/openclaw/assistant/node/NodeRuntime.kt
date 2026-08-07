@@ -250,6 +250,16 @@ class NodeRuntime(context: Context) {
   private val _isOperatorOffline = MutableStateFlow(false)
   val isOperatorOffline: StateFlow<Boolean> = _isOperatorOffline.asStateFlow()
 
+  /**
+   * Bumped every time the operator socket connects or drops.
+   *
+   * Gateway-relay Talk sessions are owned by a single connId, so a reconnect silently invalidates
+   * an open relay session. Consumers compare the generation they started with against the current
+   * value to notice that, since the connId itself is never surfaced by [GatewaySession].
+   */
+  private val _operatorConnectionGeneration = MutableStateFlow(0)
+  val operatorConnectionGeneration: StateFlow<Int> = _operatorConnectionGeneration.asStateFlow()
+
   private val _statusText = MutableStateFlow("Offline")
   val statusText: StateFlow<String> = _statusText.asStateFlow()
 
@@ -320,6 +330,7 @@ class NodeRuntime(context: Context) {
       onConnected = { name, remote, version, mainSessionKey ->
         operatorConnected = true
         operatorStatusText = "Connected"
+        _operatorConnectionGeneration.value += 1
         _serverName.value = name
         _remoteAddress.value = remote
         _serverVersion.value = version
@@ -333,8 +344,10 @@ class NodeRuntime(context: Context) {
         }
       },
       onDisconnected = { message ->
+        val wasConnected = operatorConnected
         operatorConnected = false
         operatorStatusText = message
+        if (wasConnected) _operatorConnectionGeneration.value += 1
         _serverName.value = null
         _remoteAddress.value = null
         _serverVersion.value = null
@@ -1109,12 +1122,32 @@ class NodeRuntime(context: Context) {
   }
 
   private fun handleGatewayEvent(event: String, payloadJson: String?) {
+    // Extra subscribers run first and never consume the event: the Talk relay needs both
+    // `talk.event` (its own stream) and `chat` (agent-consult run results), and `chat` must still
+    // reach ChatController. Keep these handlers non-blocking — they run on the frame pump, which
+    // is serialized so relay audio stays in order.
+    for (listener in gatewayEventListeners) {
+      try {
+        listener(event, payloadJson)
+      } catch (err: Throwable) {
+        android.util.Log.w("NodeRuntime", "gateway event listener failed: ${err.message}")
+      }
+    }
+
     if (event == "voicewake.changed") {
       gatewayEventHandler.handleVoiceWakeChangedEvent(payloadJson)
       return
     }
 
     chat.handleGatewayEvent(event, payloadJson)
+  }
+
+  private val gatewayEventListeners = java.util.concurrent.CopyOnWriteArrayList<(String, String?) -> Unit>()
+
+  /** Subscribe to raw gateway events on the operator socket. Returns a handle that unsubscribes. */
+  fun addGatewayEventListener(listener: (event: String, payloadJson: String?) -> Unit): AutoCloseable {
+    gatewayEventListeners.add(listener)
+    return AutoCloseable { gatewayEventListeners.remove(listener) }
   }
 
   private suspend fun fetchAgentList() {
@@ -1153,6 +1186,25 @@ class NodeRuntime(context: Context) {
 
   suspend fun requestGateway(method: String, paramsJson: String = "{}", timeoutMs: Long = 15_000): String {
     return operatorSession.request(method, paramsJson, timeoutMs)
+  }
+
+  /** Fire-and-forget operator RPC. See [GatewaySession.sendNoWait]; used for the Talk audio uplink. */
+  suspend fun sendGatewayNoWait(method: String, paramsJson: String): Boolean {
+    return operatorSession.sendNoWait(method, paramsJson)
+  }
+
+  /**
+   * Run [block] on the app-lifetime scope, so teardown work (closing a Talk relay session, sending
+   * telemetry) still completes after the caller's own scope is cancelled.
+   */
+  fun launchDetached(block: suspend () -> Unit) {
+    scope.launch {
+      try {
+        block()
+      } catch (err: Throwable) {
+        android.util.Log.w("NodeRuntime", "detached task failed: ${err.message}")
+      }
+    }
   }
 
   /** Fire-and-forget on the app-lifetime scope, so it survives the voice dialog closing mid-send. */

@@ -279,6 +279,10 @@ fun SettingsScreen(
     var showLanguageMenu by rememberSaveable { mutableStateOf(false) }
     var showDisplayLanguageMenu by rememberSaveable { mutableStateOf(false) }
     var wakewordConnectionType by rememberSaveable { mutableStateOf(settings.wakewordConnectionType) }
+    var voiceEngine by rememberSaveable { mutableStateOf(settings.voiceEngine) }
+    var talkConfig by remember { mutableStateOf<com.openclaw.assistant.talk.TalkConfigSummary?>(null) }
+    var talkConfigLoading by remember { mutableStateOf(false) }
+    var talkConfigFetched by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -516,6 +520,7 @@ fun SettingsScreen(
                                 settings.hermesWakeSound = hermesWakeSound
                                 settings.wakeWordSensitivity = wakeWordSensitivity
                                 settings.wakewordConnectionType = wakewordConnectionType
+                                settings.voiceEngine = voiceEngine
                                 settings.speechSilenceTimeout = speechSilenceTimeout.toLong()
                                 settings.speechLanguage = speechLanguage
                                 settings.appLanguage = appLanguage
@@ -1103,6 +1108,123 @@ fun SettingsScreen(
             if (selectedSettingsCategory == SettingsCategory.Voice) {
             CollapsibleSection(title = stringResource(R.string.voice), collapsible = false) {
 
+            // --- Conversation engine ---
+            // First in the section on purpose: choosing OpenClaw Talk moves recognition, the reply
+            // and the voice to the server, which makes every card below it inert.
+            val chatHealthOk by runtime.chatHealthOk.collectAsState()
+            val relayAvailability = remember(configuredBackends, chatHealthOk, wakewordConnectionType) {
+                com.openclaw.assistant.backend.VoiceEngineSelector.resolve(
+                    requestedEngine = SettingsRepository.VOICE_ENGINE_OPENCLAW_TALK,
+                    voiceTarget = if (wakewordConnectionType == SettingsRepository.CONNECTION_TYPE_GATEWAY) {
+                        SettingsRepository.VOICE_TARGET_OPENCLAW
+                    } else {
+                        SettingsRepository.VOICE_TARGET_HERMES
+                    },
+                    backends = configuredBackends,
+                    gatewayHealthy = chatHealthOk,
+                )
+            }
+            val relayUsable = relayAvailability.isRelay
+            val relaySelected = voiceEngine == SettingsRepository.VOICE_ENGINE_OPENCLAW_TALK
+
+            LaunchedEffect(relaySelected, relayUsable, talkConfigFetched) {
+                if (relaySelected && relayUsable && !talkConfigFetched) {
+                    talkConfigLoading = true
+                    talkConfig = com.openclaw.assistant.talk.TalkRelayClient(runtime).fetchConfig()
+                    talkConfigFetched = true
+                    talkConfigLoading = false
+                }
+            }
+
+            Text(
+                text = stringResource(R.string.voice_engine_section),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                )
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        stringResource(R.string.voice_engine_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        FilterChip(
+                            selected = !relaySelected,
+                            onClick = { voiceEngine = SettingsRepository.VOICE_ENGINE_DEVICE },
+                            label = { Text(stringResource(R.string.voice_engine_device)) }
+                        )
+                        FilterChip(
+                            selected = relaySelected,
+                            onClick = { voiceEngine = SettingsRepository.VOICE_ENGINE_OPENCLAW_TALK },
+                            label = { Text(stringResource(R.string.voice_engine_openclaw_talk)) }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = if (relaySelected) {
+                            stringResource(R.string.voice_engine_openclaw_talk_desc)
+                        } else {
+                            stringResource(R.string.voice_engine_device_desc)
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+
+                    // The mode stays selectable when the gateway is down — it is a preference, and
+                    // the session falls back on device — but say so plainly instead of silently
+                    // behaving like the other engine.
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = when (relayAvailability.unavailable) {
+                            com.openclaw.assistant.backend.VoiceEngineSelector.Unavailable.NOT_OPENCLAW_TARGET ->
+                                stringResource(R.string.voice_engine_unavailable_target)
+                            com.openclaw.assistant.backend.VoiceEngineSelector.Unavailable.NO_GATEWAY_BACKEND ->
+                                stringResource(R.string.voice_engine_unavailable_no_gateway)
+                            com.openclaw.assistant.backend.VoiceEngineSelector.Unavailable.GATEWAY_OFFLINE ->
+                                stringResource(R.string.voice_engine_unavailable_offline)
+                            null -> stringResource(R.string.voice_engine_available)
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (relayUsable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                    )
+
+                    if (relaySelected) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            stringResource(R.string.voice_engine_data_warning),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.Gray
+                        )
+                    }
+                }
+            }
+
+            if (relaySelected) {
+                Spacer(modifier = Modifier.height(16.dp))
+                TalkConfigCard(
+                    summary = talkConfig,
+                    loading = talkConfigLoading,
+                    fetched = talkConfigFetched,
+                    onRefresh = { talkConfigFetched = false }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             // --- Voice Output card ---
             Text(
                 text = stringResource(R.string.voice_output),
@@ -1118,6 +1240,14 @@ fun SettingsScreen(
                 )
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
+                    if (relaySelected) {
+                        Text(
+                            stringResource(R.string.voice_engine_managed_by_openclaw),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -1394,6 +1524,16 @@ fun SettingsScreen(
                 )
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
+                    // Continuous mode, barge-in and the silence timeout all describe the on-device
+                    // turn loop; OpenClaw Talk is full-duplex and does its own VAD.
+                    if (voiceEngine == SettingsRepository.VOICE_ENGINE_OPENCLAW_TALK) {
+                        Text(
+                            stringResource(R.string.voice_engine_managed_by_openclaw),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -1567,6 +1707,20 @@ fun SettingsScreen(
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Text(stringResource(R.string.wakeword_connection_type), style = MaterialTheme.typography.bodyLarge)
                             Text(stringResource(R.string.wakeword_connection_type_desc), style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                            // The engine lives in Settings → Voice, but it is decided per voice session,
+                            // so the routing choice right here is what makes it reachable or not.
+                            Text(
+                                stringResource(
+                                    R.string.voice_engine_wake_word_hint,
+                                    if (voiceEngine == SettingsRepository.VOICE_ENGINE_OPENCLAW_TALK) {
+                                        stringResource(R.string.voice_engine_openclaw_talk)
+                                    } else {
+                                        stringResource(R.string.voice_engine_device)
+                                    },
+                                ),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
                             Spacer(modifier = Modifier.height(8.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -1902,6 +2056,92 @@ private enum class SettingsCategory {
     Diagnostics,
     Language,
     Support,
+}
+
+/**
+ * Read-only view of the openclaw-side Talk settings this mode obeys.
+ *
+ * Answers "what does this switch actually hand over to the server" without pretending the app can
+ * change any of it — these live in openclaw's own config.
+ */
+@Composable
+private fun TalkConfigCard(
+    summary: com.openclaw.assistant.talk.TalkConfigSummary?,
+    loading: Boolean,
+    fetched: Boolean,
+    onRefresh: () -> Unit,
+) {
+    Text(
+        text = stringResource(R.string.voice_engine_openclaw_settings),
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(bottom = 4.dp)
+    )
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        )
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                stringResource(R.string.voice_engine_openclaw_settings_desc),
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+
+            when {
+                loading || !fetched -> {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                }
+                summary == null -> {
+                    Text(
+                        stringResource(R.string.voice_engine_openclaw_settings_unavailable),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+                else -> {
+                    val rows = buildList {
+                        summary.provider?.let { add(stringResource(R.string.voice_engine_field_provider) to it) }
+                        summary.voiceId?.let { add(stringResource(R.string.voice_engine_field_voice) to it) }
+                        summary.modelId?.let { add(stringResource(R.string.voice_engine_field_model) to it) }
+                        summary.languageCode?.let { add(stringResource(R.string.voice_engine_field_language) to it) }
+                        val transport = listOfNotNull(summary.realtimeMode, summary.realtimeTransport)
+                        if (transport.isNotEmpty()) {
+                            add(stringResource(R.string.voice_engine_field_transport) to transport.joinToString(" / "))
+                        }
+                        summary.agentId?.let { add(stringResource(R.string.voice_engine_field_agent) to it) }
+                        summary.consultThinkingLevel?.let {
+                            add(stringResource(R.string.voice_engine_field_thinking) to it)
+                        }
+                        // talk.interruptOnSpeech is deliberately not shown: the STT-TTS cascade never
+                        // reads it. Barge-in comes from the STT provider's own server VAD, so listing
+                        // it here would point the user at a control that does nothing.
+                    }
+                    rows.forEach { (label, value) ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(label, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                            Text(
+                                value,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+            OutlinedButton(onClick = onRefresh, enabled = !loading) {
+                Text(stringResource(R.string.voice_engine_openclaw_settings_refresh))
+            }
+        }
+    }
 }
 
 @Composable

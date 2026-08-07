@@ -4,6 +4,9 @@
 
     <!-- Voice recognition -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Full-duplex OpenClaw Talk needs AudioManager.MODE_IN_COMMUNICATION so the platform echo
+         canceller has a playback reference; without this the mode change is silently ignored. -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <!-- Network communication -->
     <uses-permission android:name="android.permission.INTERNET" />

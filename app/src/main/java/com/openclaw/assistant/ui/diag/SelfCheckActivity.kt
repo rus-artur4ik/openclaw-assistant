@@ -89,6 +89,9 @@ private fun SelfCheckScreen() {
     val openAccessibilitySettings = stringResource(R.string.av_selfcheck_open_accessibility_settings)
     val sideloadDistribution = stringResource(R.string.av_selfcheck_sideload_distribution)
     val playDistribution = stringResource(R.string.av_selfcheck_play_distribution)
+    val voiceEngineLabel = stringResource(R.string.voice_engine_section)
+    val voiceEngineDeviceLabel = stringResource(R.string.voice_engine_device)
+    val voiceEngineRelayLabel = stringResource(R.string.voice_engine_openclaw_talk)
 
     suspend fun runChecks() {
         val list = mutableListOf<CheckRow>()
@@ -113,6 +116,34 @@ private fun SelfCheckScreen() {
                 if (r.ok) "${r.message}${r.latencyMs?.let { " · ${it}ms" } ?: ""}" else r.message,
             )
         }
+
+        // Conversation engine: report the RESOLVED engine, not the stored preference — they differ
+        // whenever OpenClaw Talk is selected but the routing or the gateway makes it unusable.
+        val settings = com.openclaw.assistant.data.SettingsRepository.getInstance(context)
+        val runtime = (context.applicationContext as com.openclaw.assistant.OpenClawApplication).nodeRuntime
+        val voiceTarget =
+            if (settings.wakewordConnectionType == com.openclaw.assistant.data.SettingsRepository.CONNECTION_TYPE_GATEWAY) {
+                com.openclaw.assistant.data.SettingsRepository.VOICE_TARGET_OPENCLAW
+            } else {
+                com.openclaw.assistant.data.SettingsRepository.VOICE_TARGET_HERMES
+            }
+        val engine = com.openclaw.assistant.backend.VoiceEngineSelector.resolve(
+            requestedEngine = settings.voiceEngine,
+            voiceTarget = voiceTarget,
+            backends = backends,
+            gatewayHealthy = runtime.chatHealthOk.value,
+        )
+        val relayRequested =
+            settings.voiceEngine == com.openclaw.assistant.data.SettingsRepository.VOICE_ENGINE_OPENCLAW_TALK
+        list += CheckRow(
+            voiceEngineLabel,
+            ok = !relayRequested || engine.isRelay,
+            detail = when {
+                !relayRequested -> voiceEngineDeviceLabel
+                engine.isRelay -> voiceEngineRelayLabel
+                else -> "$voiceEngineDeviceLabel — ${engine.unavailable}"
+            },
+        )
 
         // Bridge
         list += CheckRow(bridgeEnabledLabel, cfg.enabled.value, if (cfg.enabled.value) context.getString(R.string.av_selfcheck_on_port, cfg.port.value) else off)

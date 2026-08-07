@@ -77,6 +77,9 @@ class OpenClawSession(
         private const val TAG = "OpenClawSession"
         private const val INITIAL_FILLER_DELAY_MS = 750L
         private const val INTERRUPT_LISTEN_DELAY_MS = 350L
+
+        /** Comfortably inside the 10-minute wake-lock timeout taken by [acquireWakeLock]. */
+        private const val WAKE_LOCK_RENEW_INTERVAL_MS = 8 * 60 * 1000L
     }
 
     private val settings = SettingsRepository.getInstance(context)
@@ -84,6 +87,11 @@ class OpenClawSession(
     private val apiClient = OpenClawClient()
     private lateinit var speechManager: SpeechRecognizerManager
     private lateinit var ttsManager: TTSManager
+
+    // OpenClaw Talk relay ("server" voice engine). Null whenever the on-device engine is running.
+    private var talkRelay: com.openclaw.assistant.talk.TalkRelayController? = null
+    private var talkRelayStarting = false
+    private var wakeLockRenewalJob: Job? = null
     
     // Repository
     private val chatRepository = com.openclaw.assistant.data.repository.ChatRepository.getInstance(context)
@@ -110,6 +118,11 @@ class OpenClawSession(
     private var partialText = mutableStateOf("")
     private var errorMessage = mutableStateOf<String?>(null)
     private var audioLevel = mutableStateOf(0f) // Audio level for visualization
+
+    // Set when OpenClaw Talk was requested but the turn is running on-device instead.
+    private var relayFallbackReason = mutableStateOf<String?>(null)
+
+    private val mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
 
     private fun effectiveVoiceTarget(): String {
         return sessionArgs?.getString(OpenClawAssistantService.EXTRA_VOICE_TARGET)
@@ -212,11 +225,12 @@ class OpenClawSession(
                     partialText = partialText.value,
                     errorMessage = errorMessage.value,
                     audioLevel = audioLevel.value,
+                    noticeMessage = relayFallbackReason.value,
                     onClose = {
                         isUserDismissed = true
                         finish()
                     },
-                    onRetry = { startListening() },
+                    onRetry = { startConversation() },
                     onInterrupt = { interruptAndListen() },
                     onProcessingStuck = { recoverFromStalledProcessing() }
                 )
@@ -317,8 +331,220 @@ class OpenClawSession(
             }
         }
 
-        // Start speech recognition
-        startListening()
+        // Start the conversation on the configured engine
+        startConversation()
+    }
+
+    /**
+     * Entry point for a turn: OpenClaw Talk when it is selected and actually usable, otherwise the
+     * on-device recognizer. The relay never blocks a conversation — if it cannot start, the turn
+     * silently continues on-device with a one-line notice.
+     */
+    private fun startConversation() {
+        relayFallbackReason.value = null
+        if (settings.voiceEngine != SettingsRepository.VOICE_ENGINE_OPENCLAW_TALK) {
+            startListening()
+            return
+        }
+        ensureScopeAlive()
+        // Set before the first suspension point: the composition's 8s PROCESSING watchdog is already
+        // ticking and must not fire while the relay is being negotiated.
+        talkRelayStarting = true
+        currentState.value = AssistantState.PROCESSING
+        scope.launch {
+            val resolution = resolveVoiceEngine()
+            if (!resolution.isRelay) {
+                talkRelayStarting = false
+                relayFallbackReason.value = describeEngineUnavailable(resolution.unavailable)
+                startListening()
+                return@launch
+            }
+            startTalkRelay()
+        }
+    }
+
+    private suspend fun resolveVoiceEngine(): com.openclaw.assistant.backend.VoiceEngineSelector.Resolution {
+        val backends = com.openclaw.assistant.backend.BackendRepository.getInstance(context).backends.first()
+        return com.openclaw.assistant.backend.VoiceEngineSelector.resolve(
+            requestedEngine = settings.voiceEngine,
+            voiceTarget = effectiveVoiceTarget(),
+            backends = backends,
+            gatewayHealthy = (context.applicationContext as OpenClawApplication).nodeRuntime.chatHealthOk.value,
+        )
+    }
+
+    private fun describeEngineUnavailable(
+        reason: com.openclaw.assistant.backend.VoiceEngineSelector.Unavailable?,
+    ): String? = when (reason) {
+        com.openclaw.assistant.backend.VoiceEngineSelector.Unavailable.NOT_OPENCLAW_TARGET ->
+            context.getString(R.string.voice_engine_unavailable_target)
+        com.openclaw.assistant.backend.VoiceEngineSelector.Unavailable.NO_GATEWAY_BACKEND ->
+            context.getString(R.string.voice_engine_unavailable_no_gateway)
+        com.openclaw.assistant.backend.VoiceEngineSelector.Unavailable.GATEWAY_OFFLINE ->
+            context.getString(R.string.voice_engine_unavailable_offline)
+        null -> null
+    }
+
+    private fun startTalkRelay() {
+        if (talkRelay != null) return
+        talkRelayStarting = true
+        acquireWakeLock()
+        sendPauseBroadcast()
+        // The host owns audio focus for the whole turn regardless of engine, exactly as the
+        // on-device path does; TalkRelayController only owns the capture/playback it opens itself.
+        requestVoiceAudioFocus()
+        listeningJob?.cancel()
+        speakingJob?.cancel()
+        stopThinkingSound()
+        displayText.value = ""
+        userQuery.value = ""
+        partialText.value = ""
+        errorMessage.value = null
+        audioLevel.value = 0f
+
+        val nodeRuntime = (context.applicationContext as OpenClawApplication).nodeRuntime
+        val controller = com.openclaw.assistant.talk.TalkRelayController(
+            context = context,
+            runtime = nodeRuntime,
+            callbacks = talkRelayCallbacks,
+        )
+        talkRelay = controller
+        scope.launch {
+            try {
+                controller.start(sessionKey = nodeRuntime.chatSessionKey.value)
+                startWakeLockRenewal()
+                Log.i(TAG, "Talk relay started (AEC=${controller.echoCancellationEnabled})")
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w(TAG, "Talk relay failed to start", e)
+                stopTalkRelay()
+                relayFallbackReason.value = e.message?.takeIf { it.isNotBlank() }
+                    ?: context.getString(R.string.voice_engine_unavailable_offline)
+                startListening()
+            } finally {
+                talkRelayStarting = false
+            }
+        }
+    }
+
+    private val talkRelayCallbacks = object : com.openclaw.assistant.talk.TalkRelayController.Callbacks {
+        override fun onPhase(phase: com.openclaw.assistant.talk.TalkRelayController.Phase) {
+            postToMain {
+                currentState.value = when (phase) {
+                    com.openclaw.assistant.talk.TalkRelayController.Phase.CONNECTING -> AssistantState.PROCESSING
+                    com.openclaw.assistant.talk.TalkRelayController.Phase.LISTENING -> AssistantState.LISTENING
+                    com.openclaw.assistant.talk.TalkRelayController.Phase.THINKING -> AssistantState.THINKING
+                    com.openclaw.assistant.talk.TalkRelayController.Phase.SPEAKING -> AssistantState.SPEAKING
+                    com.openclaw.assistant.talk.TalkRelayController.Phase.CLOSED -> return@postToMain
+                }
+            }
+        }
+
+        override fun onTranscript(role: String, text: String, final: Boolean) {
+            postToMain {
+                if (role == "user") {
+                    if (final) {
+                        userQuery.value = text
+                        partialText.value = ""
+                    } else {
+                        partialText.value = text
+                    }
+                } else if (final) {
+                    displayText.value = text
+                }
+            }
+        }
+
+        override fun onAudioLevel(level: Float) {
+            // MorphingSphere expects the RMS dB scale the Android recognizer emits, not 0..1.
+            postToMain { audioLevel.value = level * 10f - 2f }
+        }
+
+        override fun onFailure(message: String, recoverable: Boolean) {
+            postToMain {
+                stopTalkRelay()
+                if (recoverable) {
+                    // Nothing was spoken or transcribed yet, so switching engines is invisible.
+                    Log.w(TAG, "Talk relay unusable, falling back on-device: $message")
+                    relayFallbackReason.value = message
+                    startListening()
+                } else {
+                    // Mid-answer: never finish someone else's sentence in a different voice.
+                    currentState.value = AssistantState.ERROR
+                    errorMessage.value = message
+                }
+            }
+        }
+
+        override fun onClosed() {
+            postToMain {
+                // stopTalkRelay() clears the field before stopping, so a non-null value here means
+                // the relay ended on its own — the gateway closed it or the 30-minute TTL expired.
+                if (talkRelay == null) return@postToMain
+                talkRelay = null
+                abandonAudioFocus()
+                currentState.value = AssistantState.IDLE
+                releaseWakeLock()
+                SessionForegroundService.stop(context)
+                sendResumeBroadcast()
+            }
+        }
+    }
+
+    private fun postToMain(block: () -> Unit) {
+        mainHandler.post {
+            if (!isUserDismissed) block()
+        }
+    }
+
+    private fun stopTalkRelay() {
+        val active = talkRelay
+        talkRelay = null
+        talkRelayStarting = false
+        wakeLockRenewalJob?.cancel()
+        wakeLockRenewalJob = null
+        if (active != null) {
+            active.stop()
+            abandonAudioFocus()
+        }
+    }
+
+    private fun requestVoiceAudioFocus() {
+        val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            audioFocusRequest = android.media.AudioFocusRequest.Builder(
+                android.media.AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE
+            )
+                // Must match the relay's playback attributes, or the focus request describes a
+                // different stream than the one that actually makes sound.
+                .setAudioAttributes(
+                    android.media.AudioAttributes.Builder()
+                        .setUsage(android.media.AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                        .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SPEECH)
+                        .build()
+                )
+                .setOnAudioFocusChangeListener { change ->
+                    // A permanent loss means something else took the microphone or the speaker;
+                    // continuing would stream silence to the gateway for the rest of the TTL.
+                    if (change == android.media.AudioManager.AUDIOFOCUS_LOSS && talkRelay != null) {
+                        Log.i(TAG, "Audio focus lost permanently, ending the Talk relay session")
+                        stopTalkRelay()
+                        currentState.value = AssistantState.IDLE
+                        SessionForegroundService.stop(context)
+                        sendResumeBroadcast()
+                    }
+                }
+                .build()
+            audioManager.requestAudioFocus(audioFocusRequest!!)
+        } else {
+            @Suppress("DEPRECATION")
+            audioManager.requestAudioFocus(
+                null,
+                android.media.AudioManager.STREAM_VOICE_CALL,
+                android.media.AudioManager.AUDIOFOCUS_GAIN_TRANSIENT
+            )
+        }
     }
     
     override fun onHide() {
@@ -354,6 +580,7 @@ class OpenClawSession(
         lifecycleRegistry.handleLifecycleEvent(androidx.lifecycle.Lifecycle.Event.ON_STOP)
 
         // Clean up audio resources
+        stopTalkRelay()
         cancelInitialFillerPhrase()
         cancelWaitPhraseTimer()
         stopThinkingSound()
@@ -372,6 +599,7 @@ class OpenClawSession(
     override fun onDestroy() {
         super.onDestroy()
         lifecycleRegistry.handleLifecycleEvent(androidx.lifecycle.Lifecycle.Event.ON_DESTROY)
+        stopTalkRelay()
         cancelInitialFillerPhrase()
         cancelWaitPhraseTimer()
         stopThinkingSound()
@@ -936,6 +1164,12 @@ class OpenClawSession(
     }
 
     private fun recoverFromStalledProcessing() {
+        // Bringing up a relay session (create + STT connect) legitimately outlives the 8s watchdog,
+        // and the relay has its own readiness timeout, so let it finish.
+        if (talkRelayStarting || talkRelay != null) {
+            Log.d(TAG, "PROCESSING watchdog ignored — Talk relay is starting")
+            return
+        }
         Log.w(TAG, "PROCESSING stalled past watchdog, recovering to ERROR")
         listeningJob?.cancel()
         stopThinkingSound()
@@ -947,6 +1181,17 @@ class OpenClawSession(
 
     private fun interruptAndListen() {
         ensureScopeAlive()
+        // In relay mode the microphone never closes and the server owns playback, so an interrupt is
+        // just "stop talking" — tearing down and restarting the local recognizer would end the call.
+        talkRelay?.let { relay ->
+            // Claim the interrupt: HotwordService launches a second assistant session if nothing
+            // broadcasts ACTION_PAUSE_HOTWORD within 350 ms of its ACTION_INTERRUPT_TTS.
+            sendPauseBroadcast()
+            relay.cancelSpeech()
+            partialText.value = ""
+            errorMessage.value = null
+            return
+        }
         cancelInitialFillerPhrase()
         cancelWaitPhraseTimer()
         stopThinkingSound()
@@ -1094,6 +1339,24 @@ class OpenClawSession(
         audioFocusRequest = null
     }
 
+    /**
+     * Re-arms the 10-minute wake lock for the duration of a relay conversation.
+     *
+     * The on-device engine takes a fresh lock on every turn, but a Talk relay session is one
+     * continuous turn that may run to the gateway's 30-minute limit, so it has to renew its own.
+     */
+    private fun startWakeLockRenewal() {
+        wakeLockRenewalJob?.cancel()
+        wakeLockRenewalJob = scope.launch {
+            while (isActive && talkRelay != null) {
+                delay(WAKE_LOCK_RENEW_INTERVAL_MS)
+                if (talkRelay == null) break
+                releaseWakeLock()
+                acquireWakeLock()
+            }
+        }
+    }
+
     private fun acquireWakeLock() {
         if (wakeLock?.isHeld == true) return
         val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
@@ -1143,6 +1406,7 @@ fun AssistantUI(
     partialText: String,
     errorMessage: String?,
     audioLevel: Float,
+    noticeMessage: String? = null,
     onClose: () -> Unit,
     onRetry: () -> Unit,
     onInterrupt: () -> Unit = {},
@@ -1295,6 +1559,18 @@ fun AssistantUI(
                     text = displayText,
                     fontSize = 18.sp,
                     color = Color.Black,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+            }
+
+            // Why this turn is not running on OpenClaw Talk even though it is selected
+            if (noticeMessage != null && errorMessage == null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.voice_engine_fallback_notice, noticeMessage),
+                    fontSize = 12.sp,
+                    color = Color.Gray,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )

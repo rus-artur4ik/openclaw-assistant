@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -267,6 +268,21 @@ class GatewaySession(
     }
   }
 
+  /**
+   * Send an RPC without registering a response waiter.
+   *
+   * Intended for high-rate streams such as `talk.session.appendAudio`, where awaiting an ack per
+   * frame would pile up one coroutine (and one 15s timer) per 40-100ms of audio. The gateway still
+   * replies; [Connection.handleResponse] drops responses whose id is not pending.
+   *
+   * Returns false when the socket is gone, so the caller can stop the stream.
+   */
+  suspend fun sendNoWait(method: String, paramsJson: String?): Boolean {
+    val conn = currentConnection ?: return false
+    val params = if (paramsJson.isNullOrBlank()) null else json.parseToJsonElement(paramsJson)
+    return conn.sendRequestNoWait(method, params)
+  }
+
   suspend fun request(method: String, paramsJson: String?, timeoutMs: Long = 15_000): String {
     val conn = currentConnection ?: throw IllegalStateException("not connected")
     val params =
@@ -298,6 +314,8 @@ class GatewaySession(
     private val client: OkHttpClient = buildClient()
     private var socket: WebSocket? = null
     private val loggerTag = "OpenClawGateway"
+    private val inbound = Channel<String>(capacity = Channel.UNLIMITED)
+    private var inboundPump: Job? = null
 
     val remoteAddress: String =
       if (endpoint.host.contains(":")) {
@@ -307,6 +325,17 @@ class GatewaySession(
       }
 
     suspend fun connect() {
+      inboundPump = scope.launch {
+        for (text in inbound) {
+          try {
+            handleMessage(text)
+          } catch (err: kotlinx.coroutines.CancellationException) {
+            throw err
+          } catch (err: Throwable) {
+            Log.w(TAG, "Failed to handle gateway frame: ${err.message}")
+          }
+        }
+      }
       val scheme = if (tls != null) "wss" else "ws"
       val url = "$scheme://${endpoint.host}:${endpoint.port}"
       val httpScheme = if (tls != null) "https" else "http"
@@ -347,10 +376,22 @@ class GatewaySession(
       }
     }
 
-    suspend fun sendJson(obj: JsonObject) {
+    suspend fun sendRequestNoWait(method: String, params: JsonElement?): Boolean {
+      if (isClosed.get()) return false
+      val frame =
+        buildJsonObject {
+          put("type", JsonPrimitive("req"))
+          put("id", JsonPrimitive(UUID.randomUUID().toString()))
+          put("method", JsonPrimitive(method))
+          if (params != null) put("params", params)
+        }
+      return sendJson(frame)
+    }
+
+    suspend fun sendJson(obj: JsonObject): Boolean {
       val jsonString = obj.toString()
-      writeLock.withLock {
-        socket?.send(jsonString)
+      return writeLock.withLock {
+        socket?.send(jsonString) ?: false
       }
     }
 
@@ -360,8 +401,18 @@ class GatewaySession(
       if (isClosed.compareAndSet(false, true)) {
         socket?.close(1000, "bye")
         socket = null
+        // onClosed's CAS loses to this one, so fail waiters here or every in-flight request
+        // stalls for its full timeout after an explicit reconnect()/disconnect().
+        failPending()
+        shutdownInbound()
         closedDeferred.complete(Unit)
       }
+    }
+
+    private fun shutdownInbound() {
+      inbound.close()
+      inboundPump?.cancel()
+      inboundPump = null
     }
 
     private fun buildClient(): OkHttpClient {
@@ -393,7 +444,10 @@ class GatewaySession(
       }
 
       override fun onMessage(webSocket: WebSocket, text: String) {
-        scope.launch { handleMessage(text) }
+        // Frames must be handled in arrival order: talk-relay streams audio as a sequence of
+        // `talk.event` frames that carry no sequence number, so a concurrent launch per frame
+        // would scramble playback. The pump coroutine below drains this channel serially.
+        inbound.trySend(text)
       }
 
       override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
@@ -402,6 +456,7 @@ class GatewaySession(
         }
         if (isClosed.compareAndSet(false, true)) {
           failPending()
+          shutdownInbound()
           closedDeferred.complete(Unit)
           onDisconnected("Gateway error: ${t.message ?: t::class.java.simpleName}")
         }
@@ -413,6 +468,7 @@ class GatewaySession(
         }
         if (isClosed.compareAndSet(false, true)) {
           failPending()
+          shutdownInbound()
           closedDeferred.complete(Unit)
           onDisconnected("Gateway closed: $reason")
         }
