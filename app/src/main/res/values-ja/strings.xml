@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<string name="app_name">WakeHermesClaw</string>
+<string name="app_name">WakeClaw</string>
 <string name="notification_channel_name">ホットワードサービス</string>
 <string name="notification_channel_description">常時音声検知サービス</string>
-    <string name="notification_title">WakeHermesClaw</string>
+    <string name="notification_title">WakeClaw</string>
 <string name="notification_content">「%s」と話しかけてください</string>
 <string name="default_session_title_format">音声セッション %s</string>
 <string name="chat_session_title_format">チャット %s</string>
@@ -55,8 +55,8 @@
 <string name="bridge_token">ブリッジトークン</string>
 <string name="bridge_generate_token">新しいトークンを生成</string>
 <string name="bridge_warning_lan">LANバインドはこの端末をネットワーク上に公開します。Tailscaleまたは信頼できるWi-Fiでのみ使用してください。</string>
-<string name="bridge_approval_required">WakeHermesClaw 操作承認</string>
-<string name="accessibility_bridge_description">ペアリング済みのHermes Agentに代わって、WakeHermesClawが画面内容の読み取り、タップ、スワイプ、文字入力を行えるようにします。初期状態ではオフです。各操作には明示的な期限付き許可が必要です。</string>
+<string name="bridge_approval_required">WakeClaw 操作承認</string>
+<string name="accessibility_bridge_description">ペアリング済みのHermes Agentに代わって、WakeClawが画面内容の読み取り、タップ、スワイプ、文字入力を行えるようにします。初期状態ではオフです。各操作には明示的な期限付き許可が必要です。</string>
 <string name="webhook_url_label">サーバーURL</string>
 <string name="webhook_url_hint">https://your-server</string>
 <string name="auth_token_label">認証トークン（任意）</string>
@@ -125,7 +125,7 @@
 <string name="processing">処理中…</string>
 <string name="error_label">エラー</string>
 <string name="try_again_button">もう一度試す</string>
-<string name="ask_hint">WakeHermesClawに質問…</string>
+<string name="ask_hint">WakeClawに質問…</string>
 <string name="send_description">送信</string>
 <string name="stop_description">停止</string>
     <string name="start_listening_description">聴き始める</string>
@@ -169,7 +169,7 @@
 <string name="google_app_setting_title">Googleアプリの設定</string>
 <string name="google_app_setting_desc">Googleアプリを開く → プロフィールをタップ → 設定 → Googleアシスタント → 一般 → 干渉が続く場合は「Googleアシスタント」をオフにする</string>
 <string name="refresh_binding_title">バインドの更新</string>
-<string name="refresh_binding_desc">ステータスが「有効」なのに動作しない場合、「デジタルアシスタントアプリ」を「なし」に変更してから「WakeHermesClaw」に戻してみてください。</string>
+<string name="refresh_binding_desc">ステータスが「有効」なのに動作しない場合、「デジタルアシスタントアプリ」を「なし」に変更してから「WakeClaw」に戻してみてください。</string>
 <string name="debug_force_start">デバッグ: 強制セッション開始</string>
 <string name="connection">接続</string>
 <string name="voice">音声</string>
@@ -368,7 +368,7 @@
 <string name="fix_request_message">現在のAPIトークンに \'operator.read\' 権限を付与してください。</string>
 <string name="action_ask_ai">AIに修正を依頼</string>
 <string name="pairing_required_title">デバイスのペアリングが必要です</string>
-<string name="pairing_required_desc">このデバイスはまだサーバーで承認されていません。WakeHermesClaw はセットアップリンクのホストコマンド経由で自動承認を試みます。使えない場合はホスト側でコマンドを実行してください。</string>
+<string name="pairing_required_desc">このデバイスはまだサーバーで承認されていません。WakeClaw はセットアップリンクのホストコマンド経由で自動承認を試みます。使えない場合はホスト側でコマンドを実行してください。</string>
 <string name="pairing_requested_scopes">要求する OpenClaw 権限: operator.read, operator.write, operator.admin, operator.pairing, operator.talk.secrets, operator.approvals。</string>
 <string name="pairing_copy_command">コマンドをコピー</string>
 <string name="pairing_command_copied">コマンドをクリップボードにコピーしました</string>
@@ -513,7 +513,7 @@
 <string name="update_action">更新</string>
 <string name="update_dismiss_action">閉じる</string>
 <string name="setup_guide_first_run">初回起動</string>
-<string name="setup_guide_title">WakeHermesClaw\nfor Android</string>
+<string name="setup_guide_title">WakeClaw\nfor Android</string>
 <string name="setup_guide_step_format">ステップ %1$d / %2$d</string>
 <string name="setup_guide_welcome_title">できること</string>
 <string name="setup_guide_welcome_bullet_1">OpenClaw と Hermes Agent を同じネイティブ音声クライアントから使えます。</string>
@@ -542,10 +542,10 @@
 <string name="setup_guide_finish">完了</string>
 <string name="setup_guide_next">次へ</string>
 <string name="setup_guide_next_after_qr">先にQRを読み取ってください</string>
-<string name="setup_guide_connection_waiting">まだバックエンドが取り込まれていません。helperが表示するWakeHermesClaw QRを読み取ってください。</string>
+<string name="setup_guide_connection_waiting">まだバックエンドが取り込まれていません。helperが表示するWakeClaw QRを読み取ってください。</string>
 <string name="setup_guide_connection_ready">%1$d個のバックエンドを取り込みました。権限設定へ進めます。</string>
 <string name="setup_guide_configured_backends">%1$d件設定済み</string>
-<string name="setup_guide_no_backends_yet">バックエンドがまだ設定されていません。戻ってWakeHermesClaw QRを読み取ってください。</string>
+<string name="setup_guide_no_backends_yet">バックエンドがまだ設定されていません。戻ってWakeClaw QRを読み取ってください。</string>
 <string name="setup_guide_invalid_code">セットアップコードが無効です。</string>
 <string name="setup_guide_invalid_url">OpenClawのURLが無効です。</string>
 <string name="http_use_gateway_url">OpenClawのURLを使用</string>
@@ -735,9 +735,9 @@
     <string name="action_show_api_key">APIキーを表示</string>
     <string name="action_refresh_agents">エージェントを更新</string>
 
-    <!-- WakeHermesClaw setup wizard -->
-    <string name="av_setup_title">WakeHermesClaw のセットアップ</string>
-    <string name="av_setup_welcome_title">WakeHermesClaw へようこそ</string>
+    <!-- WakeClaw setup wizard -->
+    <string name="av_setup_title">WakeClaw のセットアップ</string>
+    <string name="av_setup_welcome_title">WakeClaw へようこそ</string>
     <string name="av_setup_welcome_body">Hermes Agent と OpenClaw に対応した Android ネイティブ音声クライアントです。PC側のペアリングhelperでHermes Agent、OpenClaw、Tailscaleを含めるか選び、最後に出る1つのQRをこのアプリ内で読み取れば完了します。</string>
     <string name="av_setup_choose_title">どの backend を使いますか?</string>
     <string name="av_setup_choose_hint">最低 1 つ選んでください。後から「設定 → Backends」で追加もできます。</string>
@@ -755,29 +755,29 @@
     <string name="av_backend_openclaw_subtitle">OpenClaw。同じhelperがOpenClawを検出し、setup codeを共通QRに含めます。</string>
     <string name="av_backend_open_openclaw_setup">OpenClaw のセットアップを開く</string>
 
-    <string name="av_pairing_card_title">1つのQRでWakeHermesClawをセットアップ</string>
+    <string name="av_pairing_card_title">1つのQRでWakeClawをセットアップ</string>
     <string name="av_setup_scope_both">Hermes Agent と OpenClaw を1つのQRにまとめます。</string>
     <string name="av_setup_scope_hermes">Hermes Agent だけをQRに含めます。</string>
     <string name="av_setup_scope_openclaw">OpenClaw だけをQRに含めます。</string>
-    <string name="av_pairing_card_step1">1. Hermes Agent または OpenClaw を動かしているPCで、WakeHermesClawのペアリングhelperをインストールします。</string>
+    <string name="av_pairing_card_step1">1. Hermes Agent または OpenClaw を動かしているPCで、WakeClawのペアリングhelperをインストールします。</string>
     <string name="av_pairing_card_step2">2. helperを実行します。ローカルのHermes Agent/OpenClaw設定を読み取り、Tailscaleを検出し、スマホが同じLAN/VPNにいない場合は一時公開トンネルも使います。</string>
-    <string name="av_pairing_card_step3">3. WakeHermesClaw内でQRを読み取ります。QRに含まれるbackendがまとめて保存されます。</string>
+    <string name="av_pairing_card_step3">3. WakeClaw内でQRを読み取ります。QRに含まれるbackendがまとめて保存されます。</string>
     <string name="av_pairing_card_note">公開トンネルはセットアップ用の一時URLです。普段使いはTailscale/VPNまたは信頼できるLANを推奨します。</string>
     <string name="av_pairing_scan_qr">ペアリングQRを読み取る</string>
     <string name="av_setup_copy_command">コマンドをコピー</string>
     <string name="av_setup_command_copied">コマンドをコピーしました</string>
 
-    <string name="av_hermes_card_title">WakeHermesClaw · 1つのQRでセットアップ</string>
-    <string name="av_hermes_card_step1">1. Hermes Agent/OpenClaw を動かしているマシンでWakeHermesClawのペアリングhelperをインストール:</string>
+    <string name="av_hermes_card_title">WakeClaw · 1つのQRでセットアップ</string>
+    <string name="av_hermes_card_step1">1. Hermes Agent/OpenClaw を動かしているマシンでWakeClawのペアリングhelperをインストール:</string>
     <string name="av_hermes_card_step2">2. helperを実行します。ローカルのHermes Agent/OpenClaw設定を読み取り、Tailscaleを検出して、1つのQRを表示します:</string>
-    <string name="av_hermes_card_step3">3. WakeHermesClaw内でQRを読み取ります。Hermes AgentとOpenClawを両方含めた場合は、両方の設定がまとめて適用されます。</string>
+    <string name="av_hermes_card_step3">3. WakeClaw内でQRを読み取ります。Hermes AgentとOpenClawを両方含めた場合は、両方の設定がまとめて適用されます。</string>
     <string name="av_hermes_card_note">外出先でも使う場合は、Tailscale/VPNを含める質問で「はい」を選んでください。LAN + Tailscale候補をQRに入れられます。</string>
     <string name="av_hermes_use_runs_api">Runs API を使う</string>
     <string name="av_hermes_stream_responses">レスポンスをストリーミングする</string>
 
     <string name="av_openclaw_card_title">OpenClaw · QRでペアリング</string>
     <string name="av_openclaw_card_step1">1. OpenClawサーバーでセットアップQRを表示します:</string>
-    <string name="av_openclaw_card_step2">2. WakeHermesClaw内でQRを読み取ります。ペアリング、TLS信頼、agent discovery はOpenClawが処理します。</string>
+    <string name="av_openclaw_card_step2">2. WakeClaw内でQRを読み取ります。ペアリング、TLS信頼、agent discovery はOpenClawが処理します。</string>
 
     <string name="av_backends_test">接続テスト</string>
     <string name="av_backends_edit">編集</string>
@@ -834,7 +834,7 @@
     <string name="av_bridge_api_stopped">ブリッジAPI停止中</string>
 
     <string name="av_selfcheck_title">セルフチェック</string>
-    <string name="av_selfcheck_intro">WakeHermesClaw の状態スナップショットです。問題を解消したら「再実行」を押してください。</string>
+    <string name="av_selfcheck_intro">WakeClaw の状態スナップショットです。問題を解消したら「再実行」を押してください。</string>
     <string name="av_selfcheck_rerun">再実行</string>
     <string name="av_selfcheck_backends_configured">接続先の設定</string>
     <string name="av_selfcheck_backends_none">未設定です。Backends から追加してください。</string>
@@ -894,11 +894,11 @@
     <string name="chat_settings_hermes_model">Hermes Agentモデル</string>
     <string name="chat_settings_hermes_model_help">通常は default のままで問題ありません。Hermes Agentのプロファイルやモデルを指定する場合だけ変更します。</string>
 
-    <string name="av_import_title">WakeHermesClaw の接続先を追加</string>
+    <string name="av_import_title">WakeClaw の接続先を追加</string>
     <string name="av_import_missing">このペアリングQRには必要な情報がありません。</string>
     <string name="av_import_close">閉じる</string>
     <string name="av_import_review">保存する前に、QRから読み取った設定を確認してください。</string>
-    <string name="av_import_add_open">追加してWakeHermesClawを開く</string>
+    <string name="av_import_add_open">追加してWakeClawを開く</string>
     <string name="av_import_no_hermes">このQRにHermes Agent接続先は含まれていません。</string>
     <string name="av_import_test_hermes">Hermes Agent接続をテスト</string>
     <string name="av_import_test_openclaw">OpenClaw接続をテスト</string>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<string name="app_name">WakeHermesClaw</string>
+<string name="app_name">WakeClaw</string>
 <string name="notification_channel_name">喚醒詞服務</string>
 <string name="notification_channel_description">始終在線的語音檢測服務</string>
-<string name="notification_title">WakeHermesClaw</string>
+<string name="notification_title">WakeClaw</string>
 <string name="notification_content">說「%s」即可激活</string>
 <string name="default_session_title_format">語音會話 %s</string>
 <string name="chat_session_title_format">聊天 %s</string>
@@ -102,7 +102,7 @@
 <string name="processing">加工…</string>
 <string name="error_label">錯誤</string>
 <string name="try_again_button">再試一次</string>
-<string name="ask_hint">詢問 WakeHermesClaw...</string>
+<string name="ask_hint">詢問 WakeClaw...</string>
 <string name="send_description">傳送</string>
 <string name="stop_description">停止</string>
     <string name="start_listening_description">開始聆聽</string>
@@ -146,7 +146,7 @@
 <string name="google_app_setting_title">谷歌應用程式設定</string>
 <string name="google_app_setting_desc">開啟 Google 應用程式 → 點擊個人資料 → 設定 → Google Assistant → 常規 → 如果「Google Assistant」仍然有乾擾，請關閉它。</string>
 <string name="refresh_binding_title">刷新綁定</string>
-<string name="refresh_binding_desc">如果狀態為“活動”但仍然無法運作，請嘗試將“數位助理應用程式”變更為“無”，然後返回“WakeHermesClaw”。</string>
+<string name="refresh_binding_desc">如果狀態為“活動”但仍然無法運作，請嘗試將“數位助理應用程式”變更為“無”，然後返回“WakeClaw”。</string>
 <string name="debug_force_start">調試：強制啟動會話</string>
 <string name="connection">聯繫</string>
 <string name="voice">嗓音</string>
@@ -336,7 +336,7 @@
 <string name="fix_request_message">請將“operator.read”範圍授予我目前的 API 令牌。</string>
 <string name="action_ask_ai">請求 AI 修復</string>
 <string name="pairing_required_title">需要設備配對</string>
-<string name="pairing_required_desc">此裝置尚未獲得伺服器批准。WakeHermesClaw 會嘗試透過設定連結中的主機命令端點自動批准它；如果不可用，請在主機上執行該命令。</string>
+<string name="pairing_required_desc">此裝置尚未獲得伺服器批准。WakeClaw 會嘗試透過設定連結中的主機命令端點自動批准它；如果不可用，請在主機上執行該命令。</string>
 <string name="pairing_requested_scopes">要求的 OpenClaw 權限：operator.read、operator.write、operator.admin、operator.pairing、operator.talk.secrets、operator.approvals。</string>
 <string name="pairing_copy_command">複製指令</string>
 <string name="pairing_command_copied">命令已複製到剪貼簿</string>
@@ -465,7 +465,7 @@
 <string name="update_action">更新</string>
 <string name="update_dismiss_action">關閉</string>
 <string name="setup_guide_first_run">第一次運行</string>
-    <string name="setup_guide_title">WakeHermesClaw\nfor Android</string>
+    <string name="setup_guide_title">WakeClaw\nfor Android</string>
 <string name="setup_guide_step_format">%2$d 的步驟 %1$d</string>
 <string name="setup_guide_welcome_title">你得到什麼</string>
 <string name="setup_guide_welcome_bullet_1">從一個移動表面控制網關和操作員聊天。</string>
@@ -677,9 +677,9 @@
     <string name="action_show_api_key">顯示 API 金鑰</string>
     <string name="action_refresh_agents">重新整理代理程式</string>
 
-    <!-- WakeHermesClaw setup wizard -->
-    <string name="av_setup_title">設定 WakeHermesClaw</string>
-    <string name="av_setup_welcome_title">歡迎使用 WakeHermesClaw</string>
+    <!-- WakeClaw setup wizard -->
+    <string name="av_setup_title">設定 WakeClaw</string>
+    <string name="av_setup_welcome_title">歡迎使用 WakeClaw</string>
     <string name="av_setup_welcome_body">支援 Hermes Agent 與 OpenClaw 的 Android 原生語音用戶端。在電腦上執行配對 helper，選擇是否包含 Hermes、OpenClaw 與 Tailscale，最後在本 App 內掃描一個 QR 即可完成。</string>
     <string name="av_setup_choose_title">使用哪些後端?</string>
     <string name="av_setup_choose_hint">至少選擇一個。稍後可從「設定 → Backends」新增。</string>
@@ -696,10 +696,10 @@
     <string name="av_backend_openclaw_subtitle">OpenClaw Gateway / HTTP。同一個 helper 會偵測 OpenClaw，並把 setup code 加入共用 QR。</string>
     <string name="av_backend_open_openclaw_setup">開啟 OpenClaw 設定</string>
 
-    <string name="av_hermes_card_title">WakeHermesClaw · 一個 QR 完成設定</string>
-    <string name="av_hermes_card_step1">1. 在執行 Hermes/OpenClaw 的機器上安裝 WakeHermesClaw 配對 helper:</string>
+    <string name="av_hermes_card_title">WakeClaw · 一個 QR 完成設定</string>
+    <string name="av_hermes_card_step1">1. 在執行 Hermes/OpenClaw 的機器上安裝 WakeClaw 配對 helper:</string>
     <string name="av_hermes_card_step2">2. 執行 helper。它會讀取本機 Hermes/OpenClaw 設定，偵測 Tailscale，然後顯示一個 QR:</string>
-    <string name="av_hermes_card_step3">3. 在 WakeHermesClaw 內掃描這個 QR。若同時包含 Hermes 與 OpenClaw，兩者設定會一起套用。</string>
+    <string name="av_hermes_card_step3">3. 在 WakeClaw 內掃描這個 QR。若同時包含 Hermes 與 OpenClaw，兩者設定會一起套用。</string>
     <string name="av_hermes_card_note">若要在外出時使用，請在 Tailscale/VPN 提問中選擇「是」，讓 QR 包含 LAN + Tailscale 候選位址。</string>
 
     <string name="av_openclaw_card_title">OpenClaw · 掃描伺服器上的 QR</string>
@@ -738,7 +738,7 @@
     <string name="av_bridge_play_warning">此版本為 Play 發行版,Accessibility Bridge 與 SMS 已隱藏。</string>
 
     <string name="av_selfcheck_title">自我檢查</string>
-    <string name="av_selfcheck_intro">WakeHermesClaw 的狀態快照。修正問題後請點「重新執行」。</string>
+    <string name="av_selfcheck_intro">WakeClaw 的狀態快照。修正問題後請點「重新執行」。</string>
     <string name="av_selfcheck_rerun">重新執行</string>
     <string name="av_selfcheck_backends_configured">已設定後端</string>
     <string name="av_selfcheck_backends_none">無。請在 Backends 中新增一個。</string>
@@ -789,11 +789,11 @@
     <string name="av_connection_testing">測試中...</string>
     <string name="av_chat_no_backend">無後端</string>
     <string name="av_chat_primary_target">主用：%1$s</string>
-    <string name="av_import_title">新增 WakeHermesClaw 後端</string>
+    <string name="av_import_title">新增 WakeClaw 後端</string>
     <string name="av_import_missing">此配對 QR 缺少必要資訊。</string>
     <string name="av_import_close">關閉</string>
     <string name="av_import_review">儲存前請檢查 QR 中讀取到的設定。</string>
-    <string name="av_import_add_open">新增並開啟 WakeHermesClaw</string>
+    <string name="av_import_add_open">新增並開啟 WakeClaw</string>
     <string name="av_import_no_hermes">此 QR 不包含 Hermes 後端。</string>
     <string name="av_import_test_hermes">測試 Hermes 連線</string>
     <string name="av_import_test_openclaw">測試 OpenClaw 連線</string>

@@ -6,7 +6,7 @@ import android.util.Log
 
 object WakeLockManager {
     private const val TAG = "BridgeWakeLock"
-    private const val LOCK_TAG = "WakeHermesClaw::BridgeAction"
+    private const val LOCK_TAG = "WakeClaw::BridgeAction"
     private const val TIMEOUT_MS = 10_000L
 
     private val lock = Any()

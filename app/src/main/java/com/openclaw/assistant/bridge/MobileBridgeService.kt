@@ -89,7 +89,7 @@ class MobileBridgeService : Service() {
             if (nm.getNotificationChannel(CHANNEL_ID) == null) {
                 nm.createNotificationChannel(
                     NotificationChannel(CHANNEL_ID, "Mobile Bridge", NotificationManager.IMPORTANCE_LOW).apply {
-                        description = "WakeHermesClaw Mobile Bridge is exposing local capabilities"
+                        description = "WakeClaw Mobile Bridge is exposing local capabilities"
                     }
                 )
             }
@@ -104,7 +104,7 @@ class MobileBridgeService : Service() {
             Notification.Builder(this)
         }
         return builder
-            .setContentTitle("WakeHermesClaw Bridge")
+            .setContentTitle("WakeClaw Bridge")
             .setContentText("Local bridge is running on port ${MobileBridgeConfig.getInstance(this).port.value}")
             .setSmallIcon(applicationInfo.icon)
             .setOngoing(true)

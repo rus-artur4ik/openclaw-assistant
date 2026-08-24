@@ -14,7 +14,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
 /**
- * Media / system capabilities that round out the WakeHermesClaw tool surface
+ * Media / system capabilities that round out the WakeClaw tool surface
  * count to ~18. Each one is risk-tiered and reports `isAvailable` honestly
  * based on the runtime permissions it actually holds.
  */

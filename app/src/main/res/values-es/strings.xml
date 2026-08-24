@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<string name="app_name">WakeHermesClaw</string>
+<string name="app_name">WakeClaw</string>
 <string name="notification_channel_name">Servicio Wake Word</string>
 <string name="notification_channel_description">Servicio de detección de voz siempre activo</string>
-<string name="notification_title">WakeHermesClaw</string>
+<string name="notification_title">WakeClaw</string>
 <string name="notification_content">Di \"%s\" para activar</string>
 <string name="default_session_title_format">Sesión de voz %s</string>
 <string name="chat_session_title_format">Chat %s</string>
@@ -102,7 +102,7 @@
 <string name="processing">Procesando…</string>
 <string name="error_label">Error</string>
 <string name="try_again_button">Inténtalo de nuevo</string>
-<string name="ask_hint">Pregunte a WakeHermesClaw…</string>
+<string name="ask_hint">Pregunte a WakeClaw…</string>
 <string name="send_description">Enviar</string>
 <string name="stop_description">Detener</string>
     <string name="start_listening_description">Empezar a escuchar</string>
@@ -146,7 +146,7 @@
 <string name="google_app_setting_title">Configuración de la aplicación Google</string>
 <string name="google_app_setting_desc">Abre la aplicación de Google → Toca Perfil → Configuración → Asistente de Google → General → Desactiva el \'Asistente de Google\' si aún interfiere.</string>
 <string name="refresh_binding_title">Actualizar enlace</string>
-<string name="refresh_binding_desc">Si el estado es \'Activo\' pero aún así no funciona, intente cambiar \'Aplicación de asistente digital\' a \'Ninguno\' y luego vuelva a \'WakeHermesClaw\'.</string>
+<string name="refresh_binding_desc">Si el estado es \'Activo\' pero aún así no funciona, intente cambiar \'Aplicación de asistente digital\' a \'Ninguno\' y luego vuelva a \'WakeClaw\'.</string>
 <string name="debug_force_start">Depuración: Forzar inicio de sesión</string>
 <string name="connection">Conexión</string>
 <string name="voice">Voz</string>
@@ -337,7 +337,7 @@ Para más detalles, consulta el sitio oficial de VOICEVOX.</string>
 <string name="fix_request_message">Por favor, otorgue alcance \'operator.read\' a mi token API actual.</string>
 <string name="action_ask_ai">Pídale a AI que lo arregle</string>
 <string name="pairing_required_title">Se requiere emparejamiento de dispositivos</string>
-<string name="pairing_required_desc">Este dispositivo aún no ha sido aprobado por el servidor. WakeHermesClaw intentará aprobarlo automáticamente mediante el endpoint de comandos del host del enlace de configuración; si no está disponible, ejecuta el comando en el host.</string>
+<string name="pairing_required_desc">Este dispositivo aún no ha sido aprobado por el servidor. WakeClaw intentará aprobarlo automáticamente mediante el endpoint de comandos del host del enlace de configuración; si no está disponible, ejecuta el comando en el host.</string>
 <string name="pairing_requested_scopes">Permisos de OpenClaw solicitados: operator.read, operator.write, operator.admin, operator.pairing, operator.talk.secrets, operator.approvals.</string>
 <string name="pairing_copy_command">Copiar comando</string>
 <string name="pairing_command_copied">Comando copiado al portapapeles</string>
@@ -466,7 +466,7 @@ Para más detalles, consulta el sitio oficial de VOICEVOX.</string>
 <string name="update_action">Actualizar</string>
 <string name="update_dismiss_action">Cerrar</string>
 <string name="setup_guide_first_run">PRIMERA EJECUCIÓN</string>
-    <string name="setup_guide_title">WakeHermesClaw\nfor Android</string>
+    <string name="setup_guide_title">WakeClaw\nfor Android</string>
 <string name="setup_guide_step_format">Paso %1$d de %2$d</string>
 <string name="setup_guide_welcome_title">Lo que obtienes</string>
 <string name="setup_guide_welcome_bullet_1">Controle la puerta de enlace y el chat del operador desde una superficie móvil.</string>
@@ -678,9 +678,9 @@ Para más detalles, consulta el sitio oficial de VOICEVOX.</string>
     <string name="action_show_api_key">Mostrar clave API</string>
     <string name="action_refresh_agents">Actualizar agentes</string>
 
-    <!-- WakeHermesClaw setup wizard -->
-    <string name="av_setup_title">Configurar WakeHermesClaw</string>
-    <string name="av_setup_welcome_title">Bienvenido a WakeHermesClaw</string>
+    <!-- WakeClaw setup wizard -->
+    <string name="av_setup_title">Configurar WakeClaw</string>
+    <string name="av_setup_welcome_title">Bienvenido a WakeClaw</string>
     <string name="av_setup_welcome_body">Un cliente de voz Android nativo para Hermes Agent y OpenClaw. Ejecuta el helper de emparejamiento en tu equipo, elige si incluir Hermes, OpenClaw y Tailscale, y escanea un único QR dentro de esta app.</string>
     <string name="av_setup_choose_title">¿Qué backends vas a usar?</string>
     <string name="av_setup_choose_hint">Selecciona al menos uno. Puedes añadir más en Ajustes → Backends.</string>
@@ -697,10 +697,10 @@ Para más detalles, consulta el sitio oficial de VOICEVOX.</string>
     <string name="av_backend_openclaw_subtitle">OpenClaw Gateway / HTTP. El mismo helper detecta OpenClaw y añade su setup code al QR compartido.</string>
     <string name="av_backend_open_openclaw_setup">Abrir configuración de OpenClaw</string>
 
-    <string name="av_hermes_card_title">WakeHermesClaw · configuración con un QR</string>
-    <string name="av_hermes_card_step1">1. En la máquina que ejecuta Hermes/OpenClaw, instala el helper de WakeHermesClaw:</string>
+    <string name="av_hermes_card_title">WakeClaw · configuración con un QR</string>
+    <string name="av_hermes_card_step1">1. En la máquina que ejecuta Hermes/OpenClaw, instala el helper de WakeClaw:</string>
     <string name="av_hermes_card_step2">2. Ejecuta el helper. Lee la configuración local de Hermes/OpenClaw, detecta Tailscale y muestra un QR:</string>
-    <string name="av_hermes_card_step3">3. Escanea ese QR dentro de WakeHermesClaw. Si incluye Hermes y OpenClaw, ambas configuraciones se aplican juntas.</string>
+    <string name="av_hermes_card_step3">3. Escanea ese QR dentro de WakeClaw. Si incluye Hermes y OpenClaw, ambas configuraciones se aplican juntas.</string>
     <string name="av_hermes_card_note">Para usarlo fuera de casa, responde sí a la pregunta de Tailscale/VPN para incluir candidatos LAN + Tailscale en el QR.</string>
 
     <string name="av_openclaw_card_title">OpenClaw · escanea un QR desde tu servidor</string>
@@ -739,7 +739,7 @@ Para más detalles, consulta el sitio oficial de VOICEVOX.</string>
     <string name="av_bridge_play_warning">Esta build es para Play: el Puente de accesibilidad y SMS están ocultos.</string>
 
     <string name="av_selfcheck_title">Diagnóstico</string>
-    <string name="av_selfcheck_intro">Estado de WakeHermesClaw. Toca «Reintentar» tras corregir cualquier punto.</string>
+    <string name="av_selfcheck_intro">Estado de WakeClaw. Toca «Reintentar» tras corregir cualquier punto.</string>
     <string name="av_selfcheck_rerun">Reintentar</string>
     <string name="av_selfcheck_backends_configured">Backends configurados</string>
     <string name="av_selfcheck_backends_none">Ninguno. Añada uno en Backends.</string>
@@ -790,11 +790,11 @@ Para más detalles, consulta el sitio oficial de VOICEVOX.</string>
     <string name="av_connection_testing">Probando…</string>
     <string name="av_chat_no_backend">Sin backend</string>
     <string name="av_chat_primary_target">Principal: %1$s</string>
-    <string name="av_import_title">Añadir backends de WakeHermesClaw</string>
+    <string name="av_import_title">Añadir backends de WakeClaw</string>
     <string name="av_import_missing">Este QR de emparejamiento no incluye la información necesaria.</string>
     <string name="av_import_close">Cerrar</string>
     <string name="av_import_review">Revisa los ajustes encontrados en el QR antes de guardarlos.</string>
-    <string name="av_import_add_open">Añadir y abrir WakeHermesClaw</string>
+    <string name="av_import_add_open">Añadir y abrir WakeClaw</string>
     <string name="av_import_no_hermes">Este QR no incluye un backend de Hermes.</string>
     <string name="av_import_test_hermes">Probar conexión Hermes</string>
     <string name="av_import_test_openclaw">Probar conexión OpenClaw</string>

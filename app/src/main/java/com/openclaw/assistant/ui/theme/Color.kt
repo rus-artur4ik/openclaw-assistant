@@ -12,7 +12,7 @@ val OpenClawTextPrimary = Color(0xFFEEEEEE)
 val OpenClawTextSecondary = Color(0xFFB0B0B0)
 val OpenClawError = Color(0xFFD32F2F)
 
-// WakeHermesClaw onboarding tokens. Keep this flow calmer than the legacy lobster palette:
+// WakeClaw onboarding tokens. Keep this flow calmer than the legacy lobster palette:
 // it has to read like a setup tool for OpenClaw + Hermes, not a promo screen.
 val OnboardingGradientStart = Color(0xFFF8FAFC)
 val OnboardingGradientMid = Color(0xFF4F46E5)

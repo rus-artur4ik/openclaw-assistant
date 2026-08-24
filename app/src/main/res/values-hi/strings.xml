@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<string name="app_name">WakeHermesClaw</string>
+<string name="app_name">WakeClaw</string>
 <string name="notification_channel_name">जागो वर्ड सर्विस</string>
 <string name="notification_channel_description">हमेशा चालू रहने वाली ध्वनि पहचान सेवा</string>
-<string name="notification_title">WakeHermesClaw</string>
+<string name="notification_title">WakeClaw</string>
 <string name="notification_content">सक्रिय करने के लिए \"%s\" कहें</string>
 <string name="default_session_title_format">ध्वनि सत्र %s</string>
 <string name="chat_session_title_format">चैट %s</string>
@@ -102,7 +102,7 @@
 <string name="processing">प्रसंस्करण…</string>
 <string name="error_label">गलती</string>
 <string name="try_again_button">पुनः प्रयास करें</string>
-<string name="ask_hint">WakeHermesClaw से पूछें...</string>
+<string name="ask_hint">WakeClaw से पूछें...</string>
 <string name="send_description">भेजना</string>
 <string name="stop_description">रुकना</string>
     <string name="start_listening_description">सुनना शुरू करें</string>
@@ -146,7 +146,7 @@
 <string name="google_app_setting_title">Google ऐप सेटिंग</string>
 <string name="google_app_setting_desc">Google ऐप खोलें → प्रोफ़ाइल → सेटिंग्स → Google Assistant → सामान्य → अगर यह अभी भी हस्तक्षेप करता है तो \'Google Assistant\' को बंद कर दें।</string>
 <string name="refresh_binding_title">रिफ्रेश बाइंडिंग</string>
-<string name="refresh_binding_desc">यदि स्थिति \'सक्रिय\' है लेकिन यह अभी भी काम नहीं करेगा, तो \'डिजिटल असिस्टेंट ऐप\' को \'कोई नहीं\' में बदलने का प्रयास करें और फिर वापस \'WakeHermesClaw\' पर जाएं।</string>
+<string name="refresh_binding_desc">यदि स्थिति \'सक्रिय\' है लेकिन यह अभी भी काम नहीं करेगा, तो \'डिजिटल असिस्टेंट ऐप\' को \'कोई नहीं\' में बदलने का प्रयास करें और फिर वापस \'WakeClaw\' पर जाएं।</string>
 <string name="debug_force_start">डीबग: बलपूर्वक प्रारंभ सत्र</string>
 <string name="connection">संबंध</string>
 <string name="voice">आवाज़</string>
@@ -337,7 +337,7 @@
 <string name="fix_request_message">कृपया मेरे वर्तमान एपीआई टोकन को \'operator.read\' का दायरा प्रदान करें।</string>
 <string name="action_ask_ai">एआई को ठीक करने के लिए कहें</string>
 <string name="pairing_required_title">डिवाइस पेयरिंग आवश्यक है</string>
-<string name="pairing_required_desc">यह डिवाइस अभी तक सर्वर द्वारा स्वीकृत नहीं है. WakeHermesClaw setup link के host command endpoint से इसे अपने आप approve करने की कोशिश करेगा; अगर वह उपलब्ध न हो, तो host पर command चलाएँ.</string>
+<string name="pairing_required_desc">यह डिवाइस अभी तक सर्वर द्वारा स्वीकृत नहीं है. WakeClaw setup link के host command endpoint से इसे अपने आप approve करने की कोशिश करेगा; अगर वह उपलब्ध न हो, तो host पर command चलाएँ.</string>
 <string name="pairing_requested_scopes">Requested OpenClaw scopes: operator.read, operator.write, operator.admin, operator.pairing, operator.talk.secrets, operator.approvals.</string>
 <string name="pairing_copy_command">कमांड कॉपी करें</string>
 <string name="pairing_command_copied">कमांड को क्लिपबोर्ड पर कॉपी किया गया</string>
@@ -466,7 +466,7 @@
 <string name="update_action">अद्यतन</string>
 <string name="update_dismiss_action">बंद करें</string>
 <string name="setup_guide_first_run">पहली दौड़</string>
-    <string name="setup_guide_title">WakeHermesClaw\nfor Android</string>
+    <string name="setup_guide_title">WakeClaw\nfor Android</string>
 <string name="setup_guide_step_format">%2$d का चरण %1$d</string>
 <string name="setup_guide_welcome_title">आपको क्या मिलता है</string>
 <string name="setup_guide_welcome_bullet_1">एक मोबाइल सतह से गेटवे और ऑपरेटर चैट को नियंत्रित करें।</string>
@@ -678,9 +678,9 @@
     <string name="action_show_api_key">API कुंजी दिखाएं</string>
     <string name="action_refresh_agents">एजेंट अपडेट करें</string>
 
-    <!-- WakeHermesClaw setup wizard -->
-    <string name="av_setup_title">WakeHermesClaw सेट करें</string>
-    <string name="av_setup_welcome_title">WakeHermesClaw में आपका स्वागत है</string>
+    <!-- WakeClaw setup wizard -->
+    <string name="av_setup_title">WakeClaw सेट करें</string>
+    <string name="av_setup_welcome_title">WakeClaw में आपका स्वागत है</string>
     <string name="av_setup_welcome_body">Hermes Agent और OpenClaw के लिए Android नेटिव वॉइस क्लाइंट। कंप्यूटर पर pairing helper चलाएँ, Hermes, OpenClaw और Tailscale को शामिल करना है या नहीं चुनें, फिर इस ऐप में एक QR स्कैन करें।</string>
     <string name="av_setup_choose_title">कौन-कौन से बैकएंड उपयोग करेंगे?</string>
     <string name="av_setup_choose_hint">कम से कम एक चुनें। बाद में «सेटिंग्स → Backends» से और जोड़ सकते हैं।</string>
@@ -697,10 +697,10 @@
     <string name="av_backend_openclaw_subtitle">OpenClaw Gateway / HTTP। वही helper OpenClaw को पहचानता है और उसके setup code को साझा QR में जोड़ता है।</string>
     <string name="av_backend_open_openclaw_setup">OpenClaw सेटअप खोलें</string>
 
-    <string name="av_hermes_card_title">WakeHermesClaw · एक QR से सेटअप</string>
-    <string name="av_hermes_card_step1">1. Hermes/OpenClaw चलाने वाली मशीन पर WakeHermesClaw pairing helper इंस्टॉल करें:</string>
+    <string name="av_hermes_card_title">WakeClaw · एक QR से सेटअप</string>
+    <string name="av_hermes_card_step1">1. Hermes/OpenClaw चलाने वाली मशीन पर WakeClaw pairing helper इंस्टॉल करें:</string>
     <string name="av_hermes_card_step2">2. helper चलाएँ। यह स्थानीय Hermes/OpenClaw सेटिंग पढ़ेगा, Tailscale का पता लगाएगा और एक QR दिखाएगा:</string>
-    <string name="av_hermes_card_step3">3. उस QR को WakeHermesClaw में स्कैन करें। यदि Hermes और OpenClaw दोनों शामिल हैं, तो दोनों सेटिंग एक साथ लागू होंगी।</string>
+    <string name="av_hermes_card_step3">3. उस QR को WakeClaw में स्कैन करें। यदि Hermes और OpenClaw दोनों शामिल हैं, तो दोनों सेटिंग एक साथ लागू होंगी।</string>
     <string name="av_hermes_card_note">घर से बाहर उपयोग के लिए Tailscale/VPN वाले सवाल में हाँ चुनें, ताकि QR में LAN + Tailscale endpoint candidates शामिल हों।</string>
 
     <string name="av_openclaw_card_title">OpenClaw · सर्वर से QR स्कैन करें</string>
@@ -739,7 +739,7 @@
     <string name="av_bridge_play_warning">यह बिल्ड Play वितरण के लिए कॉन्फ़िगर है: सुलभता ब्रिज और SMS छिपे हैं।</string>
 
     <string name="av_selfcheck_title">स्व-जाँच</string>
-    <string name="av_selfcheck_intro">WakeHermesClaw की स्थिति का स्नैपशॉट। नीचे के किसी मुद्दे को ठीक करने के बाद «पुनः चलाएँ» दबाएँ।</string>
+    <string name="av_selfcheck_intro">WakeClaw की स्थिति का स्नैपशॉट। नीचे के किसी मुद्दे को ठीक करने के बाद «पुनः चलाएँ» दबाएँ।</string>
     <string name="av_selfcheck_rerun">पुनः चलाएँ</string>
     <string name="av_selfcheck_backends_configured">बैकएंड कॉन्फ़िगर किए गए</string>
     <string name="av_selfcheck_backends_none">कोई नहीं। Backends में एक जोड़ें।</string>
@@ -790,11 +790,11 @@
     <string name="av_connection_testing">टेस्ट हो रहा है...</string>
     <string name="av_chat_no_backend">कोई बैकएंड नहीं</string>
     <string name="av_chat_primary_target">प्राथमिक: %1$s</string>
-    <string name="av_import_title">WakeHermesClaw बैकएंड जोड़ें</string>
+    <string name="av_import_title">WakeClaw बैकएंड जोड़ें</string>
     <string name="av_import_missing">इस pairing QR में जरूरी जानकारी नहीं है.</string>
     <string name="av_import_close">बंद करें</string>
     <string name="av_import_review">सेव करने से पहले QR से मिली सेटिंग्स देखें.</string>
-    <string name="av_import_add_open">जोड़ें और WakeHermesClaw खोलें</string>
+    <string name="av_import_add_open">जोड़ें और WakeClaw खोलें</string>
     <string name="av_import_no_hermes">इस QR में Hermes backend नहीं है.</string>
     <string name="av_import_test_hermes">Hermes कनेक्शन टेस्ट करें</string>
     <string name="av_import_test_openclaw">OpenClaw कनेक्शन टेस्ट करें</string>

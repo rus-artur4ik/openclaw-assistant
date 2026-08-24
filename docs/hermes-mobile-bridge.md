@@ -1,7 +1,7 @@
-# WakeHermesClaw Mobile Bridge for Hermes
+# WakeClaw Mobile Bridge for Hermes
 
 The **Mobile Bridge** is an optional, opt-in HTTP service exposed by the
-WakeHermesClaw for Android app. It lets Hermes Agent (or any other authenticated
+WakeClaw for Android app. It lets Hermes Agent (or any other authenticated
 caller) invoke a curated set of on-device Android capabilities — listing
 installed apps, reading the clipboard, getting device info, etc.
 
@@ -12,7 +12,7 @@ always in control of.
 ## Security model in one paragraph
 
 The bridge is **disabled by default**. The user must flip it on inside
-WakeHermesClaw settings. When enabled, the app generates a 256-bit random
+WakeClaw settings. When enabled, the app generates a 256-bit random
 **bridge token** that every request (except `/health`) must send as
 `Authorization: Bearer <token>`. By default the server binds to
 `127.0.0.1`, so only software running on the phone (an adb-forwarded
@@ -23,7 +23,7 @@ in `EncryptedSharedPreferences` and is **never written to logs**.
 
 ## Enabling the bridge
 
-1. Open WakeHermesClaw → **Settings → Mobile Bridge**.
+1. Open WakeClaw → **Settings → Mobile Bridge**.
 2. Toggle **Enable Mobile Bridge**.
 3. Pick a **bind mode**:
    - **Local only** (default, recommended) — phone software only.
@@ -84,7 +84,7 @@ the train, or via Tailscale without reconfiguration.
 ### Accessibility Bridge
 
 Sideload-only capability group `accessibility` (gated by
-`BuildConfig.IS_SIDELOAD`). The user must enable the WakeHermesClaw
+`BuildConfig.IS_SIDELOAD`). The user must enable the WakeClaw
 Accessibility service in **Settings → Accessibility** before any of
 `screen.tap`, `screen.swipe`, `screen.home`, `screen.back`, or
 `screen.window.describe` appear in `/manifest`. The service has no
@@ -95,7 +95,7 @@ to it.
 
 ```bash
 export BRIDGE=http://192.168.1.42:8787
-export TOKEN=...     # from the WakeHermesClaw UI
+export TOKEN=...     # from the WakeClaw UI
 
 # Liveness
 curl -s $BRIDGE/health

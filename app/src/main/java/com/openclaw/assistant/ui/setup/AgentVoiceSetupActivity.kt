@@ -57,7 +57,7 @@ import com.openclaw.assistant.backend.BackendRepository
  *   Step 1 — Welcome
  *   Step 2 — Tick the backends you want to set up (Hermes / OpenClaw)
  *   Step 3 — Per-backend setup, only for ticked options:
- *              • WakeHermesClaw helper: run `agentvoice-pair` on the host. It
+ *              • WakeClaw helper: run `agentvoice-pair` on the host. It
  *                auto-detects Hermes, OpenClaw, and Tailscale, then prints one
  *                QR for this app to scan.
  *   Step 4 — Done

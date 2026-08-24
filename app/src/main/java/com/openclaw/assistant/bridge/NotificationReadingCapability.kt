@@ -18,7 +18,7 @@ import kotlinx.serialization.json.put
  * Reads the current active
  * notifications via [OpenClawNotificationListenerService] (which Android
  * grants only after the user has explicitly enabled
- * "Notification access" for WakeHermesClaw).
+ * "Notification access" for WakeClaw).
  *
  * `isAvailable` checks the system-level grant via
  * [NotificationManagerCompat.getEnabledListenerPackages]; if the package is

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<string name="app_name">WakeHermesClaw</string>
+<string name="app_name">WakeClaw</string>
 <string name="notification_channel_name">Wake-Word-Dienst</string>
 <string name="notification_channel_description">Ständig verfügbarer Spracherkennungsdienst</string>
-<string name="notification_title">WakeHermesClaw</string>
+<string name="notification_title">WakeClaw</string>
 <string name="notification_content">Sagen Sie zum Aktivieren „%s“.</string>
 <string name="default_session_title_format">Sprachsitzung %s</string>
 <string name="chat_session_title_format">Chat %s</string>
@@ -102,7 +102,7 @@
 <string name="processing">Verarbeitung…</string>
 <string name="error_label">Fehler</string>
 <string name="try_again_button">Versuchen Sie es erneut</string>
-<string name="ask_hint">Fragen Sie WakeHermesClaw…</string>
+<string name="ask_hint">Fragen Sie WakeClaw…</string>
 <string name="send_description">Schicken</string>
 <string name="stop_description">Stoppen</string>
     <string name="start_listening_description">Zuhören starten</string>
@@ -146,7 +146,7 @@
 <string name="google_app_setting_title">Google App-Einstellung</string>
 <string name="google_app_setting_desc">Öffnen Sie die Google App → Tippen Sie auf „Profil“ → „Einstellungen“ → „Google Assistant“ → „Allgemein“ → Deaktivieren Sie „Google Assistant“, wenn es weiterhin stört.</string>
 <string name="refresh_binding_title">Bindung aktualisieren</string>
-<string name="refresh_binding_desc">Wenn der Status \'Aktiv\' lautet, es aber immer noch nicht funktioniert, versuchen Sie, die \'Digital Assistant-App\' auf \'Keine\' und dann zurück auf \'WakeHermesClaw\' zu ändern.</string>
+<string name="refresh_binding_desc">Wenn der Status \'Aktiv\' lautet, es aber immer noch nicht funktioniert, versuchen Sie, die \'Digital Assistant-App\' auf \'Keine\' und dann zurück auf \'WakeClaw\' zu ändern.</string>
 <string name="debug_force_start">Debug: Sitzungsstart erzwingen</string>
 <string name="connection">Verbindung</string>
 <string name="voice">Stimme</string>
@@ -336,7 +336,7 @@ Weitere Informationen finden Sie auf der offiziellen Website von VOICEVOX.</stri
 <string name="fix_request_message">Bitte gewähren Sie meinem aktuellen API-Token den Geltungsbereich „operator.read“.</string>
 <string name="action_ask_ai">Bitten Sie die KI, das Problem zu beheben</string>
 <string name="pairing_required_title">Gerätekopplung erforderlich</string>
-<string name="pairing_required_desc">Dieses Gerät ist noch nicht vom Server genehmigt. WakeHermesClaw versucht, es über den Host-Befehlsendpunkt des Setup-Links automatisch zu genehmigen. Wenn das nicht verfügbar ist, führe den Befehl auf dem Host aus.</string>
+<string name="pairing_required_desc">Dieses Gerät ist noch nicht vom Server genehmigt. WakeClaw versucht, es über den Host-Befehlsendpunkt des Setup-Links automatisch zu genehmigen. Wenn das nicht verfügbar ist, führe den Befehl auf dem Host aus.</string>
 <string name="pairing_requested_scopes">Angeforderte OpenClaw-Berechtigungen: operator.read, operator.write, operator.admin, operator.pairing, operator.talk.secrets, operator.approvals.</string>
 <string name="pairing_copy_command">Befehl kopieren</string>
 <string name="pairing_command_copied">Befehl in die Zwischenablage kopiert</string>
@@ -465,7 +465,7 @@ Weitere Informationen finden Sie auf der offiziellen Website von VOICEVOX.</stri
 <string name="update_action">Aktualisieren</string>
 <string name="update_dismiss_action">Schließen</string>
 <string name="setup_guide_first_run">ERSTER RUN</string>
-    <string name="setup_guide_title">WakeHermesClaw\nfor Android</string>
+    <string name="setup_guide_title">WakeClaw\nfor Android</string>
 <string name="setup_guide_step_format">Schritt %1$d von %2$d</string>
 <string name="setup_guide_welcome_title">Was Sie bekommen</string>
 <string name="setup_guide_welcome_bullet_1">Steuern Sie das Gateway und den Operator-Chat von einer mobilen Oberfläche aus.</string>
@@ -677,9 +677,9 @@ Weitere Informationen finden Sie auf der offiziellen Website von VOICEVOX.</stri
     <string name="action_show_api_key">API-Schlüssel anzeigen</string>
     <string name="action_refresh_agents">Agenten aktualisieren</string>
 
-    <!-- WakeHermesClaw setup wizard -->
-    <string name="av_setup_title">WakeHermesClaw einrichten</string>
-    <string name="av_setup_welcome_title">Willkommen bei WakeHermesClaw</string>
+    <!-- WakeClaw setup wizard -->
+    <string name="av_setup_title">WakeClaw einrichten</string>
+    <string name="av_setup_welcome_title">Willkommen bei WakeClaw</string>
     <string name="av_setup_welcome_body">Ein nativer Android-Sprachclient für Hermes Agent und OpenClaw. Führen Sie den Pairing-Helper auf dem Computer aus, wählen Sie Hermes, OpenClaw und Tailscale aus und scannen Sie einen einzigen QR in dieser App.</string>
     <string name="av_setup_choose_title">Welche Backends nutzt du?</string>
     <string name="av_setup_choose_hint">Mindestens eines auswählen. Weitere kannst du später unter Einstellungen → Backends hinzufügen.</string>
@@ -696,10 +696,10 @@ Weitere Informationen finden Sie auf der offiziellen Website von VOICEVOX.</stri
     <string name="av_backend_openclaw_subtitle">OpenClaw Gateway / HTTP. Derselbe Helper erkennt OpenClaw und fügt den Setup-Code zum gemeinsamen QR hinzu.</string>
     <string name="av_backend_open_openclaw_setup">OpenClaw-Einrichtung öffnen</string>
 
-    <string name="av_hermes_card_title">WakeHermesClaw · Einrichtung mit einem QR</string>
-    <string name="av_hermes_card_step1">1. Auf dem Computer mit Hermes/OpenClaw den WakeHermesClaw Pairing-Helper installieren:</string>
+    <string name="av_hermes_card_title">WakeClaw · Einrichtung mit einem QR</string>
+    <string name="av_hermes_card_step1">1. Auf dem Computer mit Hermes/OpenClaw den WakeClaw Pairing-Helper installieren:</string>
     <string name="av_hermes_card_step2">2. Starte den Helper. Er liest lokale Hermes/OpenClaw-Einstellungen, erkennt Tailscale und zeigt einen QR-Code:</string>
-    <string name="av_hermes_card_step3">3. Scannen Sie diesen QR in WakeHermesClaw. Wenn Hermes und OpenClaw enthalten sind, werden beide Einstellungen gemeinsam angewendet.</string>
+    <string name="av_hermes_card_step3">3. Scannen Sie diesen QR in WakeClaw. Wenn Hermes und OpenClaw enthalten sind, werden beide Einstellungen gemeinsam angewendet.</string>
     <string name="av_hermes_card_note">Für Nutzung unterwegs die Tailscale/VPN-Frage mit Ja beantworten, damit der QR LAN- und Tailscale-Endpunkte enthält.</string>
 
     <string name="av_openclaw_card_title">OpenClaw · QR vom Server scannen</string>
@@ -738,7 +738,7 @@ Weitere Informationen finden Sie auf der offiziellen Website von VOICEVOX.</stri
     <string name="av_bridge_play_warning">Dieser Build ist für Play konfiguriert: Accessibility-Bridge und SMS sind ausgeblendet.</string>
 
     <string name="av_selfcheck_title">Selbsttest</string>
-    <string name="av_selfcheck_intro">Zustands-Snapshot von WakeHermesClaw. Nach Behebung eines Punktes „Erneut ausführen“ antippen.</string>
+    <string name="av_selfcheck_intro">Zustands-Snapshot von WakeClaw. Nach Behebung eines Punktes „Erneut ausführen“ antippen.</string>
     <string name="av_selfcheck_rerun">Erneut ausführen</string>
     <string name="av_selfcheck_backends_configured">Backends konfiguriert</string>
     <string name="av_selfcheck_backends_none">Keine. Fügen Sie eines unter Backends hinzu.</string>
@@ -789,11 +789,11 @@ Weitere Informationen finden Sie auf der offiziellen Website von VOICEVOX.</stri
     <string name="av_connection_testing">Teste…</string>
     <string name="av_chat_no_backend">Kein Backend</string>
     <string name="av_chat_primary_target">Primär: %1$s</string>
-    <string name="av_import_title">WakeHermesClaw Backends hinzufügen</string>
+    <string name="av_import_title">WakeClaw Backends hinzufügen</string>
     <string name="av_import_missing">Dieser Pairing-QR enthält nicht alle erforderlichen Informationen.</string>
     <string name="av_import_close">Schließen</string>
     <string name="av_import_review">Prüfen Sie die im QR gefundenen Einstellungen vor dem Speichern.</string>
-    <string name="av_import_add_open">Hinzufügen und WakeHermesClaw öffnen</string>
+    <string name="av_import_add_open">Hinzufügen und WakeClaw öffnen</string>
     <string name="av_import_no_hermes">Dieser QR enthält kein Hermes-Backend.</string>
     <string name="av_import_test_hermes">Hermes-Verbindung testen</string>
     <string name="av_import_test_openclaw">OpenClaw-Verbindung testen</string>

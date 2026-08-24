@@ -194,7 +194,7 @@ object CameraCapturePhotoCapability : BridgeCapability {
     override fun isAvailable(context: Context) = false
     override suspend fun execute(context: Context, arguments: JsonObject): JsonObject = buildJsonObject {
         put("captured", false)
-        put("reason", "interactive capture must be triggered from the WakeHermesClaw UI")
+        put("reason", "interactive capture must be triggered from the WakeClaw UI")
     }
 }
 

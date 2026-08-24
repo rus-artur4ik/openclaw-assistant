@@ -47,7 +47,7 @@ class SystemHandler(private val appContext: Context) {
             }
         } ?: return GatewaySession.InvokeResult.error("INVALID_REQUEST", "Expected JSON object")
 
-        val title = (params["title"] as? JsonPrimitive)?.content ?: "WakeHermesClaw"
+        val title = (params["title"] as? JsonPrimitive)?.content ?: "WakeClaw"
         // Support both "body" (original spec) and "message" (legacy fallback)
         val body = (params["body"] as? JsonPrimitive)?.content
             ?: (params["message"] as? JsonPrimitive)?.content

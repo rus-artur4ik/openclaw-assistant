@@ -141,8 +141,8 @@ class PermissionRequester(private val activity: ComponentActivity) {
         AlertDialog.Builder(activity)
           .setTitle("Notification Access Required")
           .setMessage(
-            "WakeHermesClaw needs notification access to read and manage your notifications. " +
-              "Tap \"Open Settings\", enable WakeHermesClaw, then return to the app."
+            "WakeClaw needs notification access to read and manage your notifications. " +
+              "Tap \"Open Settings\", enable WakeClaw, then return to the app."
           )
           .setPositiveButton("Open Settings") { _, _ ->
             activity.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))

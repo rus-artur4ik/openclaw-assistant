@@ -64,7 +64,7 @@ import java.util.Base64
 import java.util.Locale
 
 /**
- * Deep-link target for external-camera WakeHermesClaw setup links. App-internal QR
+ * Deep-link target for external-camera WakeClaw setup links. App-internal QR
  * scanning uses the JSON form directly, while this Activity keeps deep-link
  * compatibility:
  *

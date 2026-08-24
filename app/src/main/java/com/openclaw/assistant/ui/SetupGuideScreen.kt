@@ -1632,7 +1632,7 @@ private suspend fun sendSetupProbeMessage(
     context: Context,
     target: AgentBackendConfig,
 ): String {
-    val prompt = "Setup check: reply with a short confirmation that WakeHermesClaw can reach you."
+    val prompt = "Setup check: reply with a short confirmation that WakeClaw can reach you."
     return when (target.type) {
         BackendType.OPENCLAW_GATEWAY -> {
             PrimaryBackendDispatcher.send(context, prompt, backendId = target.id, sessionId = "agent-voice-setup-check")?.text.orEmpty()

@@ -130,7 +130,7 @@ open class MobileBridgeServer(
         // /health is unauthenticated by design.
         if (req.method == "GET" && req.path == "/health") {
             return HttpResponse(200, buildJsonObject {
-                put("status", "ok"); put("app", "WakeHermesClaw"); put("bridge", true)
+                put("status", "ok"); put("app", "WakeClaw"); put("bridge", true)
             }.toString())
         }
         // /pair is the only OTHER unauthenticated endpoint — by definition,

@@ -13,7 +13,7 @@ import java.security.MessageDigest
  * Accessibility Bridge — the agent reads the visible screen and acts on it:
  * tap, type, swipe, screenshots, clipboard, media, notifications.
  *
- * The user must explicitly enable WakeHermesClaw in Android Settings →
+ * The user must explicitly enable WakeClaw in Android Settings →
  * Accessibility before any of the screen.* capabilities can run. The service
  * is intentionally a thin "remote control" — it has no auto-behaviour, no
  * background scraping, no event-stream broadcasting. It only acts when a

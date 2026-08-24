@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">OpenClaw</string>
+    <string name="app_name">WakeClaw</string>
 
     <!-- 設定画面 -->
-    <string name="settings_title">OpenClaw 設定</string>
+    <string name="settings_title">WakeClaw 設定</string>
     <string name="server_url_label">サーバーURL</string>
     <string name="auth_token_label">認証トークン（任意）</string>
     <string name="save_button">保存</string>
@@ -15,7 +15,7 @@
     <!-- セッション通知 -->
     <string name="notification_session_channel_name">音声セッション</string>
     <string name="notification_session_title">会話中</string>
-    <string name="notification_session_content">OpenClawが聞き取り中です</string>
+    <string name="notification_session_content">WakeClawが聞き取り中です</string>
 
     <!-- アシスタントの状態 -->
     <string name="state_listening">聞き取り中\u2026</string>

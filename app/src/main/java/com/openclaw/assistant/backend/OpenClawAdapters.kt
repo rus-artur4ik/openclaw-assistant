@@ -10,7 +10,7 @@ import com.openclaw.assistant.api.OpenClawClient
  * The existing OpenClaw Gateway and HTTP code paths are deeply integrated with the
  * UI, Voice Overlay, HotwordService, and node-capability stack, so they are NOT
  * routed through this interface today. These adapters exist so the rest of the
- * WakeHermesClaw surface (Settings UI, Backend list, connection test) can treat all
+ * WakeClaw surface (Settings UI, Backend list, connection test) can treat all
  * backends uniformly.
  *
  * OpenClaw HTTP can send directly through [OpenClawClient]. OpenClaw Gateway is

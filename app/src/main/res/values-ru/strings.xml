@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<string name="app_name">WakeHermesClaw</string>
+<string name="app_name">WakeClaw</string>
 <string name="notification_channel_name">Служба Wake Word</string>
 <string name="notification_channel_description">Постоянная служба распознавания голоса</string>
-<string name="notification_title">WakeHermesClaw</string>
+<string name="notification_title">WakeClaw</string>
 <string name="notification_content">Скажите «%s», чтобы активировать</string>
 <string name="default_session_title_format">Голосовая сессия %s</string>
 <string name="chat_session_title_format">Чат %s</string>
@@ -103,7 +103,7 @@
 <string name="processing">Обработка…</string>
 <string name="error_label">Ошибка</string>
 <string name="try_again_button">Попробуйте еще раз</string>
-<string name="ask_hint">Спросите WakeHermesClaw…</string>
+<string name="ask_hint">Спросите WakeClaw…</string>
 <string name="send_description">Отправить</string>
 <string name="stop_description">Стоп</string>
     <string name="start_listening_description">Начать прослушивание</string>
@@ -147,7 +147,7 @@
 <string name="google_app_setting_title">Настройка приложения Google</string>
 <string name="google_app_setting_desc">Откройте приложение Google → нажмите «Профиль» → «Настройки» → «Google Ассистент» → «Основные» → выключите «Google Ассистент», если он все еще мешает.</string>
 <string name="refresh_binding_title">Обновить привязку</string>
-<string name="refresh_binding_desc">Если статус «Активный», но он по-прежнему не работает, попробуйте изменить «Приложение цифрового помощника» на «Нет», а затем вернуться к «WakeHermesClaw».</string>
+<string name="refresh_binding_desc">Если статус «Активный», но он по-прежнему не работает, попробуйте изменить «Приложение цифрового помощника» на «Нет», а затем вернуться к «WakeClaw».</string>
 <string name="debug_force_start">Отладка: Принудительный запуск сеанса</string>
 <string name="connection">Связь</string>
 <string name="voice">Голос</string>
@@ -365,7 +365,7 @@
 <string name="fix_request_message">Пожалуйста, предоставьте область действия \'operator.read\' для моего текущего токена API.</string>
 <string name="action_ask_ai">Попросите ИИ исправить</string>
 <string name="pairing_required_title">Требуется сопряжение устройств</string>
-<string name="pairing_required_desc">Это устройство еще не одобрено сервером. WakeHermesClaw попробует автоматически одобрить его через хостовый командный endpoint из ссылки настройки; если это недоступно, выполните команду на хосте.</string>
+<string name="pairing_required_desc">Это устройство еще не одобрено сервером. WakeClaw попробует автоматически одобрить его через хостовый командный endpoint из ссылки настройки; если это недоступно, выполните команду на хосте.</string>
 <string name="pairing_requested_scopes">Запрашиваемые права OpenClaw: operator.read, operator.write, operator.admin, operator.pairing, operator.talk.secrets, operator.approvals.</string>
 <string name="pairing_copy_command">Команда копирования</string>
 <string name="pairing_command_copied">Команда скопирована в буфер обмена</string>
@@ -494,7 +494,7 @@
 <string name="update_action">Обновление</string>
 <string name="update_dismiss_action">Закрыть</string>
 <string name="setup_guide_first_run">ПЕРВЫЙ ЗАПУСК</string>
-    <string name="setup_guide_title">WakeHermesClaw\nfor Android</string>
+    <string name="setup_guide_title">WakeClaw\nfor Android</string>
 <string name="setup_guide_step_format">Шаг %1$d из %2$d</string>
 <string name="setup_guide_welcome_title">Что вы получаете</string>
 <string name="setup_guide_welcome_bullet_1">Управляйте шлюзом и чатом оператора с одной мобильной поверхности.</string>
@@ -706,9 +706,9 @@
     <string name="action_show_api_key">Показать ключ API</string>
     <string name="action_refresh_agents">Обновить агентов</string>
 
-    <!-- WakeHermesClaw setup wizard -->
-    <string name="av_setup_title">Настройка WakeHermesClaw</string>
-    <string name="av_setup_welcome_title">Добро пожаловать в WakeHermesClaw</string>
+    <!-- WakeClaw setup wizard -->
+    <string name="av_setup_title">Настройка WakeClaw</string>
+    <string name="av_setup_welcome_title">Добро пожаловать в WakeClaw</string>
     <string name="av_setup_welcome_body">Нативный голосовой клиент Android для Hermes Agent и OpenClaw. Запустите helper сопряжения на компьютере, выберите Hermes, OpenClaw и Tailscale, затем отсканируйте один QR в этом приложении.</string>
     <string name="av_setup_choose_title">Какие бэкенды вы будете использовать?</string>
     <string name="av_setup_choose_hint">Выберите хотя бы один. Позже можно добавить ещё в «Настройки → Backends».</string>
@@ -725,10 +725,10 @@
     <string name="av_backend_openclaw_subtitle">OpenClaw Gateway / HTTP. Тот же helper обнаруживает OpenClaw и добавляет setup code в общий QR.</string>
     <string name="av_backend_open_openclaw_setup">Открыть настройку OpenClaw</string>
 
-    <string name="av_hermes_card_title">WakeHermesClaw · настройка одним QR</string>
-    <string name="av_hermes_card_step1">1. На машине с Hermes/OpenClaw установите helper WakeHermesClaw:</string>
+    <string name="av_hermes_card_title">WakeClaw · настройка одним QR</string>
+    <string name="av_hermes_card_step1">1. На машине с Hermes/OpenClaw установите helper WakeClaw:</string>
     <string name="av_hermes_card_step2">2. Запустите helper. Он прочитает локальные настройки Hermes/OpenClaw, обнаружит Tailscale и покажет один QR:</string>
-    <string name="av_hermes_card_step3">3. Отсканируйте этот QR в WakeHermesClaw. Если включены Hermes и OpenClaw, обе настройки применяются вместе.</string>
+    <string name="av_hermes_card_step3">3. Отсканируйте этот QR в WakeClaw. Если включены Hermes и OpenClaw, обе настройки применяются вместе.</string>
     <string name="av_hermes_card_note">Для использования вне дома ответьте да на вопрос Tailscale/VPN, чтобы QR включал LAN + Tailscale endpoints.</string>
 
     <string name="av_openclaw_card_title">OpenClaw · отсканируйте QR с сервера</string>
@@ -767,7 +767,7 @@
     <string name="av_bridge_play_warning">Эта сборка предназначена для Play: мост спецвозможностей и SMS скрыты.</string>
 
     <string name="av_selfcheck_title">Самопроверка</string>
-    <string name="av_selfcheck_intro">Снимок состояния WakeHermesClaw. После исправления нажмите «Повторить».</string>
+    <string name="av_selfcheck_intro">Снимок состояния WakeClaw. После исправления нажмите «Повторить».</string>
     <string name="av_selfcheck_rerun">Повторить</string>
     <string name="av_selfcheck_backends_configured">Бэкенды настроены</string>
     <string name="av_selfcheck_backends_none">Нет. Добавьте один в Backends.</string>
@@ -818,11 +818,11 @@
     <string name="av_connection_testing">Проверка…</string>
     <string name="av_chat_no_backend">Нет бэкенда</string>
     <string name="av_chat_primary_target">Основной: %1$s</string>
-    <string name="av_import_title">Добавить backends WakeHermesClaw</string>
+    <string name="av_import_title">Добавить backends WakeClaw</string>
     <string name="av_import_missing">В этом QR для сопряжения нет обязательных данных.</string>
     <string name="av_import_close">Закрыть</string>
     <string name="av_import_review">Проверьте настройки из QR перед сохранением.</string>
-    <string name="av_import_add_open">Добавить и открыть WakeHermesClaw</string>
+    <string name="av_import_add_open">Добавить и открыть WakeClaw</string>
     <string name="av_import_no_hermes">В этом QR нет backend Hermes.</string>
     <string name="av_import_test_hermes">Проверить подключение Hermes</string>
     <string name="av_import_test_openclaw">Проверить подключение OpenClaw</string>

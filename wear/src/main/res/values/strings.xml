@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">OpenClaw</string>
+    <string name="app_name">WakeClaw</string>
 
     <!-- Settings screen -->
-    <string name="settings_title">OpenClaw Settings</string>
+    <string name="settings_title">WakeClaw Settings</string>
     <string name="server_url_label">Server URL</string>
     <string name="auth_token_label">Auth Token (optional)</string>
     <string name="save_button">Save</string>
@@ -15,7 +15,7 @@
     <!-- Session foreground service notification -->
     <string name="notification_session_channel_name">Voice Session</string>
     <string name="notification_session_title">Conversation active</string>
-    <string name="notification_session_content">OpenClaw is listening</string>
+    <string name="notification_session_content">WakeClaw is listening</string>
 
     <!-- Assistant states -->
     <string name="state_listening">Listening\u2026</string>
