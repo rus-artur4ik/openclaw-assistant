@@ -101,6 +101,10 @@ class SessionListActivity : ComponentActivity() {
                     defaultAgentId = defaultAgentId,
                     onBack = { finish() },
                     onSessionClick = { session ->
+                        // Reopening a conversation must restore where its
+                        // messages go, or the next reply comes from a
+                        // different agent with no sign anything switched.
+                        ChatBackendTarget.set(viewModel.chatTargetFor(session.id, session.isGateway))
                         viewModel.setUseNodeChat(session.isGateway)
                         startActivity(Intent(this, ChatActivity::class.java).apply {
                             putExtra(ChatActivity.EXTRA_SESSION_ID, session.id)
@@ -510,14 +514,14 @@ fun SessionListScreen(
     }
 }
 
-private fun List<AgentBackendConfig>.preferredOpenClawBackend(): AgentBackendConfig? {
+internal fun List<AgentBackendConfig>.preferredOpenClawBackend(): AgentBackendConfig? {
     return firstOrNull { it.isPrimary }
         ?: firstOrNull { it.type == BackendType.OPENCLAW_GATEWAY }
         ?: firstOrNull()
 }
 
 @Composable
-private fun SessionListItem(
+internal fun SessionListItem(
     session: SessionUiModel,
     onClick: () -> Unit,
     onLongClick: () -> Unit

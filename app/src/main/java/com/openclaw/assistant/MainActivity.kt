@@ -221,7 +221,7 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
         setContent {
             OpenClawAssistantTheme {
                 val hasCompletedSetup by remember { mutableStateOf(settings.hasCompletedSetup) }
-                // WakeHermesClaw users who already configured at least one backend
+                // WakeClaw users who already configured at least one backend
                 // (either via migration from a legacy OpenClaw install, or
                 // through the new BackendListActivity) should skip the legacy
                 // OpenClaw setup guide entirely.
@@ -545,6 +545,12 @@ fun MainNavHost(
                         defaultAgentId      = agentListResult?.defaultId ?: "main",
                         onBack              = { selectedTab = AppTab.Home },
                         onSessionClick      = { session ->
+                            // Same restore as the standalone session list: without
+                            // it the next reply comes from whichever backend the
+                            // chip happens to point at.
+                            com.openclaw.assistant.ui.backend.ChatBackendTarget.set(
+                                sessionListViewModel.chatTargetFor(session.id, session.isGateway),
+                            )
                             sessionListViewModel.setUseNodeChat(session.isGateway)
                             context.startActivity(
                                 Intent(context, ChatActivity::class.java).apply {

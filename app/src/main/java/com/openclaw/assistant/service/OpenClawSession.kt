@@ -80,6 +80,9 @@ class OpenClawSession(
         private const val REPEAT_WAIT_PHRASE_DELAY_MS = 9000L
         private const val INTERRUPT_LISTEN_DELAY_MS = 350L
 
+        /** Turns replayed to backends that do not keep their own transcript. */
+        private const val VOICE_HISTORY_MESSAGES = 20
+
         /** Comfortably inside the 10-minute wake-lock timeout taken by [acquireWakeLock]. */
         private const val WAKE_LOCK_RENEW_INTERVAL_MS = 8 * 60 * 1000L
     }
@@ -126,15 +129,12 @@ class OpenClawSession(
 
     private val mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
 
-    private fun effectiveVoiceTarget(): String {
-        return sessionArgs?.getString(OpenClawAssistantService.EXTRA_VOICE_TARGET)
-            ?.takeIf { it == SettingsRepository.VOICE_TARGET_OPENCLAW || it == SettingsRepository.VOICE_TARGET_HERMES }
-            ?: if (settings.wakewordConnectionType == SettingsRepository.CONNECTION_TYPE_GATEWAY) {
-                SettingsRepository.VOICE_TARGET_OPENCLAW
-            } else {
-                SettingsRepository.VOICE_TARGET_HERMES
-            }
-    }
+    private fun effectiveVoiceTarget(): String =
+        com.openclaw.assistant.backend.VoiceTargetResolver.resolve(
+            explicitTarget = sessionArgs?.getString(OpenClawAssistantService.EXTRA_VOICE_TARGET),
+            backends = com.openclaw.assistant.backend.BackendRepository.getInstance(context).backends.value,
+            legacyConnectionType = settings.wakewordConnectionType,
+        )
 
     private fun isOpenClawVoiceTarget(): Boolean {
         return effectiveVoiceTarget() == SettingsRepository.VOICE_TARGET_OPENCLAW
@@ -314,8 +314,11 @@ class OpenClawSession(
             }
         }
         
-        // Check settings
-        if (!settings.isConfigured()) {
+        // Check settings. A configured backend counts as configured even when the
+        // legacy OpenClaw HTTP URL was never filled in.
+        val hasConfiguredBackend = com.openclaw.assistant.backend.BackendRepository
+            .getInstance(context).backends.value.any { it.enabled }
+        if (!settings.isConfigured() && !hasConfiguredBackend) {
             currentState.value = AssistantState.ERROR
             errorMessage.value = context.getString(R.string.error_config_required)
             displayText.value = context.getString(R.string.config_required)
@@ -831,6 +834,16 @@ class OpenClawSession(
                 errorMessage.value = context.getString(R.string.av_settings_no_hermes)
                 return@launch
             }
+            // Persist the question before sending. This used to sit below an
+            // early return, so a voice session recorded answers with no questions.
+            val history = if (voiceBackendId != null) {
+                val prior = currentSessionId?.let { loadRecentHistory(it) }.orEmpty()
+                currentSessionId?.let { chatRepository.addMessage(it, message, isUser = true) }
+                prior
+            } else {
+                emptyList()
+            }
+
             val primaryReply = try {
                 if (voiceBackendId != null) {
                     turnTimings.onSend()
@@ -838,8 +851,9 @@ class OpenClawSession(
                         context = context,
                         userText = message,
                         backendId = voiceBackendId,
-                        sessionId = settings.sessionId,
+                        sessionId = currentSessionId ?: settings.sessionId,
                         agentId = agentId,
+                        history = history,
                     )
                 } else {
                     null
@@ -876,19 +890,34 @@ class OpenClawSession(
                 return@launch
             }
 
-            // Save user message to local DB only for HTTP mode
-            if (!isOpenClawVoiceTarget()) {
-                currentSessionId?.let { sessionId ->
-                    chatRepository.addMessage(sessionId, message, isUser = true)
-                }
-            }
-
             if (isOpenClawVoiceTarget()) {
                 sendViaGateway(message)
             } else {
                 sendViaHttp(message)
             }
         }
+    }
+
+    /**
+     * Recent turns of this session, so a voice conversation with a backend that
+     * does not keep its own transcript still has context.
+     */
+    private suspend fun loadRecentHistory(
+        sessionId: String,
+    ): List<com.openclaw.assistant.backend.AgentMessage> = try {
+        chatRepository.getMessages(sessionId).first()
+            .takeLast(VOICE_HISTORY_MESSAGES)
+            .filter { it.content.isNotBlank() }
+            .map {
+                if (it.isUser) {
+                    com.openclaw.assistant.backend.AgentMessage.user(it.content)
+                } else {
+                    com.openclaw.assistant.backend.AgentMessage.assistant(it.content)
+                }
+            }
+    } catch (e: Throwable) {
+        Log.w(TAG, "Could not load voice history for $sessionId: ${e.message}")
+        emptyList()
     }
 
     private suspend fun resolveVoiceSessionBackendId(): String? {

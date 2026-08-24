@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -65,6 +66,9 @@ class BackendListActivity : ComponentActivity() {
                 BackendListScreen(
                     onAdd = { startActivity(BackendEditorActivity.intent(this, null)) },
                     onEdit = { id -> startActivity(BackendEditorActivity.intent(this, id)) },
+                    onGuidedHermes = {
+                        startActivity(com.openclaw.assistant.ui.setup.HermesSetupActivity.intent(this))
+                    },
                 )
             }
         }
@@ -91,6 +95,7 @@ class BackendListViewModel(app: Application) : AndroidViewModel(app) {
 fun BackendListScreen(
     onAdd: () -> Unit,
     onEdit: (String) -> Unit,
+    onGuidedHermes: () -> Unit = {},
     viewModel: BackendListViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
 ) {
     val backends by viewModel.backends.collectAsState()
@@ -108,7 +113,7 @@ fun BackendListScreen(
         },
     ) { padding ->
         if (backends.isEmpty()) {
-            EmptyState(padding)
+            EmptyState(padding, onGuidedHermes)
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(16.dp)) {
                 items(backends, key = { it.id }) { backend ->
@@ -134,7 +139,7 @@ fun BackendListScreen(
 }
 
 @Composable
-private fun EmptyState(padding: PaddingValues) {
+private fun EmptyState(padding: PaddingValues, onGuidedHermes: () -> Unit = {}) {
     Column(
         modifier = Modifier.fillMaxSize().padding(padding).padding(32.dp),
         verticalArrangement = Arrangement.Center,
@@ -143,6 +148,11 @@ private fun EmptyState(padding: PaddingValues) {
         Spacer(Modifier.height(8.dp))
         Text(stringResource(R.string.backends_empty_desc),
             style = MaterialTheme.typography.bodyMedium)
+        Spacer(Modifier.height(16.dp))
+        // The guided flow only needs an address, so offer it before the form.
+        Button(onClick = onGuidedHermes, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(R.string.hermes_setup_title))
+        }
     }
 }
 

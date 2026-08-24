@@ -1,8 +1,8 @@
-# WakeHermesClaw for Android 🦞
+# WakeClaw for Android 🦞
 
 > **A native Android voice client for OpenClaw and Hermes Agent.**
 >
-> WakeHermesClaw is the successor to *OpenClaw Assistant*. It keeps every
+> WakeClaw is the successor to *OpenClaw Assistant*. It keeps every
 > OpenClaw feature you already have — wake word, Voice Overlay, Gateway
 > + HTTP backends, Wear OS, on-device node capabilities, continuous
 > conversation — and adds first-class support for **Hermes Agent** as a
@@ -13,7 +13,7 @@
 > - OpenClaw HTTP (OpenAI-compatible chat)
 > - Hermes API Server (`/v1/chat/completions` streaming + `/v1/runs` Runs API)
 >
-> **Mobile Bridge (optional, off by default).** WakeHermesClaw can expose a
+> **Mobile Bridge (optional, off by default).** WakeClaw can expose a
 > bearer-token-protected local HTTP service that lets Hermes reach a
 > curated set of Android capabilities. See
 > [`docs/hermes-mobile-bridge.md`](docs/hermes-mobile-bridge.md) and
@@ -27,14 +27,77 @@
 > Primary backend.
 >
 > **Hermes setup in 30 seconds.** Run `hermes gateway` with the API
-> server enabled (default port `8642`), bind it to your LAN/VPN,
-> generate an API key, and add it in **Settings → Backends → Add Hermes
-> API Server**. WakeHermesClaw accepts both `http://host:8642` and
-> `http://host:8642/v1`. Authentication uses `Authorization: Bearer
-> <key>`; the default model name is `hermes-agent`. Connection test
-> calls `GET /v1/models` and falls back to `/health`.
+> server enabled (default port `8642`) and bind it to your LAN or VPN —
+> it listens on `127.0.0.1` out of the box, which a phone cannot reach.
+> Then open **Settings → Connection Settings → Hermes Agent → Add Hermes
+> Agent** and give it an address; everything else is discovered:
 >
-> **WakeHermesClaw shared agent controls.** The app includes 6-character
+> - **Search local network** walks the phone's own /24 on port `8642` and
+>   lists what answers, with the model each server advertises. Hermes
+>   publishes no mDNS record, so there is nothing to browse for — a server
+>   that demands a key still shows up, because answering at all proves it
+>   is there.
+> - **Typing an address** is enough on its own. `192.168.1.50`,
+>   `hermes.local`, `https://host/hermes` and `http://host:8642/v1` all
+>   work: the app expands the address into the plausible scheme/port
+>   combinations, probes them in parallel and keeps the first that
+>   answers, cancelling the rest.
+> - **Scan QR** reads the code printed by
+>   `integrations/hermes-mobile-bridge/hermes_pair.py`, which can carry
+>   Hermes and OpenClaw in one payload.
+>
+> The result is a diagnosis rather than a boolean: *found it, it needs a
+> key* / *it rejected that key* / *something answered but it is not
+> Hermes* / *nothing answered, here is what I tried*. Once connected the
+> wizard shows what the server actually supports — server-side history,
+> tool approvals, stopping a run — and fills in the model and provider
+> from `/api/model/options`.
+>
+> The manual editor is still one tap away, and still the way to edit an
+> existing backend. Authentication is `Authorization: Bearer <key>`; the
+> connection test calls `GET /v1/models` and falls back to `/v1/health`
+> and `/health`.
+>
+> **How the Hermes conversation works.** On connect the app reads
+> `GET /v1/capabilities` and picks the richest transport your server
+> offers, so there is nothing to configure:
+>
+> | Transport | Endpoint | Why it is picked |
+> |---|---|---|
+> | Server-side sessions | `POST /api/sessions/{id}/chat/stream` | Hermes keeps the transcript, so history survives restarts and is never re-uploaded. Preferred. |
+> | Runs | `POST /v1/runs` + `/v1/runs/{id}/events` | The only transport that can ask you to approve a gated tool. History travels as `conversation_history`. |
+> | Chat completions | `POST /v1/chat/completions` | Stateless fallback that every Hermes build serves. |
+>
+> Override it under **Settings → Backends → Conversation transport** if
+> you need a specific one.
+>
+> **Tool approvals.** When Hermes asks permission to run a gated tool it
+> blocks until it gets an answer. In Chat you get a prompt offering
+> exactly the choices the server sent (*allow once / for this session /
+> always / deny*). Headless paths — wake word, Voice Overlay — decline
+> automatically rather than leaving the run wedged until the server's
+> five-minute timeout.
+>
+> **Picking a model.** **Load models** reads `GET /api/model/options`
+> from the API server itself using your bearer key, and records the
+> provider slug alongside the model id. Both are sent on every request,
+> because Hermes ignores a bare model name on its OpenAI-compatible
+> endpoints unless the operator has set
+> `gateway.platforms.api_server.direct_model_requests`. The app never
+> writes Hermes' global config — the server reports `admin_config_rw:
+> false` — so the choice lives on the backend entry and is applied
+> per request.
+>
+> **Long-term memory.** Set a **memory scope** on the backend to have the
+> app send `X-Hermes-Session-Key`, which lets Hermes accumulate memory
+> about you across conversations and devices.
+>
+> **Run control.** Chat can stop a run server-side
+> (`POST /v1/runs/{id}/stop`) rather than only abandoning the stream, and
+> streams token deltas, tool activity and subagent progress as they
+> arrive. Scheduled jobs support pause, resume and run-now.
+>
+> **WakeClaw shared agent controls.** The app includes 6-character
 > bridge pairing codes, deep-link setup payloads, multi-endpoint candidates
 > (LAN + VPN + public) raced in parallel on connect, per-capability TTL grants
 > ("approve · 10 min / 1 hour / until revoked") with a destructive-verb

@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material.icons.filled.Terminal
@@ -45,14 +46,8 @@ fun CronScreen(modifier: Modifier = Modifier) {
     val backends by backendRepository.backends.collectAsState()
     var selectedOwner by rememberSaveable { mutableStateOf(CronOwner.HermesAgent) }
 
-    val hermesBackend = remember(backends) {
-        backends.firstOrNull { it.enabled && it.type == BackendType.HERMES_API_SERVER }
-    }
-    val openClawBackends = remember(backends) {
-        backends.filter {
-            it.enabled && (it.type == BackendType.OPENCLAW_GATEWAY || it.type == BackendType.OPENCLAW_HTTP)
-        }
-    }
+    val hermesBackend = remember(backends) { CronOwners.hermesBackend(backends) }
+    val openClawBackends = remember(backends) { CronOwners.openClawBackends(backends) }
 
     Scaffold(
         topBar = {
@@ -99,6 +94,22 @@ fun CronScreen(modifier: Modifier = Modifier) {
             }
         }
     }
+}
+
+/**
+ * Which backend owns each half of the Cron tab.
+ *
+ * Both OpenClaw kinds run scheduled jobs, so counting only the gateway would
+ * hide them on an HTTP-only install; Hermes runs its own, unrelated scheduler.
+ */
+internal object CronOwners {
+    fun hermesBackend(backends: List<AgentBackendConfig>): AgentBackendConfig? =
+        backends.firstOrNull { it.enabled && it.type == BackendType.HERMES_API_SERVER }
+
+    fun openClawBackends(backends: List<AgentBackendConfig>): List<AgentBackendConfig> =
+        backends.filter {
+            it.enabled && (it.type == BackendType.OPENCLAW_GATEWAY || it.type == BackendType.OPENCLAW_HTTP)
+        }
 }
 
 @Composable
@@ -245,7 +256,19 @@ fun CronJobList(backend: AgentBackendConfig) {
                         onToggle = { enabled ->
                             scope.launch {
                                 try {
-                                    api.updateJob(backend, job.id, enabled = enabled)
+                                    // Pause/resume are their own endpoints; a plain
+                                    // enabled flag does not suspend the schedule.
+                                    if (enabled) api.resumeJob(backend, job.id) else api.pauseJob(backend, job.id)
+                                    refresh()
+                                } catch (e: Exception) {
+                                    errorMessage = e.message ?: context.getString(R.string.cron_error_save)
+                                }
+                            }
+                        },
+                        onRunNow = {
+                            scope.launch {
+                                try {
+                                    api.runJobNow(backend, job.id)
                                     refresh()
                                 } catch (e: Exception) {
                                     errorMessage = e.message ?: context.getString(R.string.cron_error_save)
@@ -296,7 +319,7 @@ fun CronJobList(backend: AgentBackendConfig) {
         JobEditDialog(
             title = stringResource(R.string.cron_edit_job),
             initialName = job.name,
-            initialSchedule = job.schedule.expr,
+            initialSchedule = job.scheduleLabel(),
             initialPrompt = job.prompt,
             initialRepeat = job.repeat?.times,
             onDismiss = { editingJob = null },
@@ -362,7 +385,8 @@ fun CronJobCard(
     job: HermesCronJob,
     onToggle: (Boolean) -> Unit,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onRunNow: () -> Unit = {},
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -385,17 +409,34 @@ fun CronJobCard(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = job.schedule.expr,
+                        text = job.scheduleLabel(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    if (job.paused) {
+                        Text(
+                            text = stringResource(R.string.cron_job_paused),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
+                    job.nextRun?.takeIf { it.isNotBlank() && !job.paused }?.let { next ->
+                        Text(
+                            text = stringResource(R.string.cron_job_next_run, next),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.secondary,
+                        )
+                    }
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Switch(
-                        checked = job.enabled,
+                        checked = !job.paused,
                         onCheckedChange = onToggle
                     )
                     Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(onClick = onRunNow) {
+                        Icon(Icons.Default.PlayArrow, contentDescription = stringResource(R.string.cron_run_now))
+                    }
                     IconButton(onClick = onEdit) {
                         Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.cron_edit_job))
                     }
@@ -676,7 +717,7 @@ private fun OpenClawCronJobList() {
 }
 
 @Composable
-private fun OpenClawCronJobCard(
+internal fun OpenClawCronJobCard(
     job: OpenClawCronJob,
     deliveryPreview: String,
     onToggle: (Boolean) -> Unit,
@@ -744,16 +785,16 @@ private fun OpenClawCronJobCard(
     }
 }
 
-private fun OpenClawCronJob.promptText(): String = payload.message ?: payload.text.orEmpty()
+internal fun OpenClawCronJob.promptText(): String = payload.message ?: payload.text.orEmpty()
 
-private fun OpenClawCronJob.deliveryLabel(): String {
+internal fun OpenClawCronJob.deliveryLabel(): String {
     val mode = delivery?.mode.orEmpty()
     val channel = delivery?.channel.orEmpty()
     val to = delivery?.to.orEmpty()
     return listOf(mode, channel, to).filter { it.isNotBlank() }.joinToString(" ")
 }
 
-private fun OpenClawCronJob.scheduleLabel(): String {
+internal fun OpenClawCronJob.scheduleLabel(): String {
     return when (schedule.kind) {
         "cron" -> listOfNotNull(schedule.expr, schedule.tz?.takeIf { it.isNotBlank() }).joinToString("  ")
         "every" -> schedule.everyMs?.let { "${it / 1000}s" } ?: schedule.kind

@@ -66,6 +66,12 @@ data class ChatUiState(
     val pendingGatewayTrust: com.openclaw.assistant.node.NodeRuntime.GatewayTrustPrompt? = null,
     val displayName: String = "",
     val attachments: List<PendingFileAttachment> = emptyList(),
+    /** Partial assistant text while a non-gateway backend streams its answer. */
+    val streamingAssistantText: String? = null,
+    /** Set while a backend run is cancellable, so the UI can offer Stop. */
+    val activeRunId: String? = null,
+    /** A tool the agent wants permission to run; blocks until answered. */
+    val pendingApproval: com.openclaw.assistant.backend.AgentEvent.ApprovalRequest? = null,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -175,6 +181,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             }
             viewModelScope.launch {
                 nodeRuntime.chatSessionKey.collect { key ->
+                    if (!shouldUseNodeChatForCurrentTarget()) return@collect
                     _currentSessionId.value = key
                     // Extract agentId from session key format: "agent:<agentId>:<sessionName>"
                     val agentId = if (key.startsWith("agent:")) {
@@ -186,6 +193,10 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             viewModelScope.launch {
                 var previousCount = 0
                 nodeRuntime.chatMessages.collect { messages ->
+                    // The gateway replaces the whole list on every emission. When
+                    // chat is pointed at another backend its transcript lives in
+                    // the local database, and letting this run would wipe it.
+                    if (!shouldUseNodeChatForCurrentTarget()) return@collect
                     val uiMessages = messages.map { it.toUiChatMessage() }
                     _uiState.update { state ->
                         state.copy(messages = uiMessages)
@@ -212,6 +223,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             // prevent TTS from firing in chatMessages.collect.
             viewModelScope.launch {
                 nodeRuntime.pendingRunCount.collect { count ->
+                    if (!shouldUseNodeChatForCurrentTarget()) return@collect
                     if (count == 0) {
                         // Run finished: clear thinking state only.
                         // pendingNodeChatTts is managed by chatMessages.collect.
@@ -227,6 +239,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             }
             viewModelScope.launch {
                 nodeRuntime.chatError.collect { error ->
+                    // A gateway error says nothing about a turn running on
+                    // another backend, and clearing isThinking would abandon it.
+                    if (!shouldUseNodeChatForCurrentTarget()) return@collect
                     if (!error.isNullOrBlank()) {
                         stopThinkingSound()
                     }
@@ -253,6 +268,30 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             viewModelScope.launch {
                 nodeRuntime.displayName.collect { name ->
                     _uiState.update { it.copy(displayName = name) }
+                }
+            }
+            // Backends other than the gateway keep their transcript in the local
+            // database; mirror it into the UI whenever one of them is selected.
+            viewModelScope.launch {
+                _messagesFlow.collect { messages ->
+                    if (shouldUseNodeChatForCurrentTarget()) return@collect
+                    _uiState.update { it.copy(messages = messages) }
+                }
+            }
+            viewModelScope.launch {
+                com.openclaw.assistant.ui.backend.ChatBackendTarget.selectedId.collect {
+                    if (shouldUseNodeChatForCurrentTarget()) {
+                        // The gateway flows are StateFlows that will not re-emit
+                        // just because the target changed, so restore from their
+                        // current values or the screen keeps the other backend's
+                        // transcript.
+                        _currentSessionId.value = nodeRuntime.chatSessionKey.value
+                        _uiState.update { state ->
+                            state.copy(messages = nodeRuntime.chatMessages.value.map { it.toUiChatMessage() })
+                        }
+                    } else {
+                        ensureLocalSession()
+                    }
                 }
             }
             viewModelScope.launch {
@@ -294,6 +333,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             if (useNodeChat) {
                 // Skip the initial disconnected state to avoid showing error on startup
                 nodeRuntime.isConnected.drop(1).collect { connected ->
+                    if (!shouldUseNodeChatForCurrentTarget()) return@collect
                     if (!connected) {
                         _uiState.update { it.copy(error = "Node gateway offline") }
                     } else {
@@ -351,6 +391,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             val app = getApplication<Application>()
             val newId = chatRepository.createSession(String.format(app.getString(com.openclaw.assistant.R.string.chat_session_title_format), simpleDateFormat.format(java.util.Date())))
             _currentSessionId.value = newId
+            lastLocalSessionId = newId
             settings.sessionId = newId // Sync for API use
         }
     }
@@ -490,16 +531,24 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         return if (default.isNotBlank() && default != "main") default else null
     }
 
-    private fun shouldUseNodeChatForCurrentTarget(): Boolean {
-        if (!useNodeChat) return false
-        val app = getApplication<Application>()
-        val backends = com.openclaw.assistant.backend.BackendRepository.getInstance(app).backends.value
-        if (backends.isEmpty()) return true
-        val selectedId = com.openclaw.assistant.ui.backend.ChatBackendTarget.selectedId.value
-        val target = selectedId?.let { id -> backends.firstOrNull { it.id == id && it.enabled } }
-            ?: backends.firstOrNull { it.isPrimary && it.enabled }
-        return target?.type == com.openclaw.assistant.backend.BackendType.OPENCLAW_GATEWAY
-    }
+    private fun shouldUseNodeChatForCurrentTarget(): Boolean =
+        com.openclaw.assistant.backend.ChatTargetResolver.isGatewayTarget(
+            useNodeChat = useNodeChat,
+            backends = com.openclaw.assistant.backend.BackendRepository
+                .getInstance(getApplication<Application>()).backends.value,
+            selectedId = com.openclaw.assistant.ui.backend.ChatBackendTarget.selectedId.value,
+        )
+
+    /**
+     * The backend this Chat turn is addressed to, resolved the same way for the
+     * routing decision, the model override and the dispatcher call.
+     */
+    private fun resolvedChatTarget(): com.openclaw.assistant.backend.AgentBackendConfig? =
+        com.openclaw.assistant.backend.ChatTargetResolver.resolveTarget(
+            backends = com.openclaw.assistant.backend.BackendRepository
+                .getInstance(getApplication<Application>()).backends.value,
+            selectedId = com.openclaw.assistant.ui.backend.ChatBackendTarget.selectedId.value,
+        )
 
     fun sendMessage(text: String) {
         if (text.isBlank() && _uiState.value.attachments.isEmpty()) return
@@ -570,9 +619,12 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     sendViaSelectedBackendInline(sessionId, text, httpAttachments)
                     return@launch
                 }
+                // Snapshot the transcript before this turn joins it, so the
+                // backend sees each message exactly once.
+                val history = conversationHistory()
                 // Save User Message
                 chatRepository.addMessage(sessionId, text, isUser = true)
-                sendViaHttp(sessionId, text, httpAttachments)
+                sendViaHttp(sessionId, text, httpAttachments, history)
             } catch (e: Exception) {
                 cancelInitialFillerPhrase()
                 cancelWaitPhraseTimer()
@@ -587,27 +639,157 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         text: String,
         attachments: List<PendingFileAttachment>,
     ) {
-        if (attachments.isNotEmpty()) {
-            throw IllegalStateException("Attachments are only supported with OpenClaw chat in this build.")
-        }
-        val userMessage = ChatMessage(text = text, isUser = true)
-        _uiState.update { state ->
-            state.copy(messages = state.messages + userMessage, error = null)
-        }
-        val effectiveAgentId = getEffectiveAgentId()
-        val backendText = trySendViaSelectedBackend(sessionId, text, effectiveAgentId)
-            ?: throw IllegalStateException("No backend selected")
+        // History is taken before the new turn is persisted, so the backend gets
+        // the conversation so far plus this message exactly once.
+        val history = conversationHistory()
+
+        chatRepository.addMessage(sessionId, text, isUser = true)
         _uiState.update { state ->
             state.copy(
-                messages = state.messages + ChatMessage(text = backendText, isUser = false),
+                messages = state.messages + ChatMessage(text = text, isUser = true),
+                error = null,
+                streamingAssistantText = "",
+            )
+        }
+
+        val effectiveAgentId = getEffectiveAgentId()
+        val backendText = try {
+            trySendViaSelectedBackend(
+                sessionId = sessionId,
+                text = text,
+                agentId = effectiveAgentId,
+                history = history,
+                attachments = attachments.map {
+                    com.openclaw.assistant.backend.AgentAttachment(it.mimeType, it.base64)
+                },
+            ) ?: throw IllegalStateException("No backend selected")
+        } catch (e: Throwable) {
+            // A user-initiated stop is not a failure: keep whatever streamed in
+            // rather than discarding it behind an error banner.
+            val partial = _uiState.value.streamingAssistantText?.takeIf { it.isNotBlank() }
+            if (stopRequested && partial != null) {
+                stopRequested = false
+                chatRepository.addMessage(sessionId, partial, isUser = false)
+                _uiState.update { state ->
+                    state.copy(
+                        messages = state.messages + ChatMessage(text = partial, isUser = false),
+                        isThinking = false,
+                        streamingAssistantText = null,
+                        activeRunId = null,
+                        pendingApproval = null,
+                    )
+                }
+                stopThinkingSound()
+                return
+            }
+            stopRequested = false
+            clearTurnState()
+            throw e
+        }
+
+        chatRepository.addMessage(sessionId, backendText, isUser = false)
+        _uiState.update { state ->
+            // The local-database collector re-emits the persisted pair; append here
+            // too so the answer appears immediately in gateway-mode installs where
+            // that collector is idle.
+            val alreadyShown = state.messages.lastOrNull()?.let { !it.isUser && it.text == backendText } == true
+            state.copy(
+                messages = if (alreadyShown) state.messages else state.messages + ChatMessage(text = backendText, isUser = false),
                 isThinking = false,
+                streamingAssistantText = null,
+                activeRunId = null,
+                pendingApproval = null,
             )
         }
         stopThinkingSound()
         afterResponseReceived(backendText)
     }
 
-    private fun sendViaHttp(sessionId: String, text: String, attachments: List<PendingFileAttachment> = emptyList()) {
+    /**
+     * Clears the state that only makes sense while a turn is in flight.
+     *
+     * Leaving [ChatUiState.streamingAssistantText] set renders the answer a
+     * second time next to its persisted bubble, and a stale
+     * [ChatUiState.activeRunId] keeps offering Stop for a run that has finished.
+     */
+    private fun clearTurnState(error: String? = null) {
+        _uiState.update {
+            it.copy(
+                isThinking = false,
+                streamingAssistantText = null,
+                activeRunId = null,
+                pendingApproval = null,
+                error = error ?: it.error,
+            )
+        }
+    }
+
+    /** The current transcript as backend messages, oldest first. */
+    private fun conversationHistory(): List<com.openclaw.assistant.backend.AgentMessage> =
+        com.openclaw.assistant.backend.ChatTargetResolver.trimHistory(
+            messages = _uiState.value.messages.map { it.isUser to it.text },
+            cap = MAX_HISTORY_MESSAGES,
+        )
+
+    /**
+     * Ensures a local-database session is selected for backends that are not the
+     * gateway.
+     *
+     * Switching away from the gateway leaves [_currentSessionId] holding a
+     * gateway session key, which is not a row in the local database — writing
+     * a transcript against it would create a phantom session.
+     */
+    private suspend fun ensureLocalSession() {
+        lastLocalSessionId?.let {
+            _currentSessionId.value = it
+            settings.sessionId = it
+            return
+        }
+        val latest = chatRepository.getLatestSession()
+        val id = latest?.id ?: chatRepository.createSession()
+        lastLocalSessionId = id
+        _currentSessionId.value = id
+        settings.sessionId = id
+    }
+
+    /** Last session id known to exist in the local database, as opposed to on the gateway. */
+    private var lastLocalSessionId: String? = null
+
+    /** True between a Stop tap and the resulting stream teardown. */
+    private var stopRequested = false
+
+    /** Cancels the in-flight backend run, if the backend supports it. */
+    fun stopGeneration() {
+        val runId = _uiState.value.activeRunId ?: return
+        stopRequested = true
+        viewModelScope.launch {
+            val ctx = getApplication<Application>().applicationContext
+            val manager = com.openclaw.assistant.backend.BackendManager.getInstance(ctx)
+            val client = resolvedChatTarget()?.let { manager.clientForId(it.id) } ?: manager.primaryClient()
+            runCatching { client?.stopRun(runId) }
+            // The stream teardown clears the rest and persists the partial answer.
+            _uiState.update { it.copy(activeRunId = null) }
+        }
+    }
+
+    /** Answers a pending tool-approval request with one of the choices it offered. */
+    fun respondToApproval(choice: String) {
+        val pending = _uiState.value.pendingApproval ?: return
+        viewModelScope.launch {
+            val ctx = getApplication<Application>().applicationContext
+            val manager = com.openclaw.assistant.backend.BackendManager.getInstance(ctx)
+            val client = resolvedChatTarget()?.let { manager.clientForId(it.id) } ?: manager.primaryClient()
+            runCatching { client?.respondToApproval(pending.runId, choice) }
+            _uiState.update { it.copy(pendingApproval = null) }
+        }
+    }
+
+    private fun sendViaHttp(
+        sessionId: String,
+        text: String,
+        attachments: List<PendingFileAttachment> = emptyList(),
+        history: List<com.openclaw.assistant.backend.AgentMessage> = emptyList(),
+    ) {
         val httpUrl = settings.getChatCompletionsUrl()
         val authToken = settings.authToken.takeIf { it.isNotBlank() }
         val effectiveAgentId = getEffectiveAgentId()
@@ -618,12 +800,20 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 // override, otherwise through the Primary backend. If no
                 // multi-backend config exists yet, fall back to the legacy
                 // OpenClaw HTTP settings below.
-                val backendText = trySendViaSelectedBackend(sessionId, text, effectiveAgentId)
+                val backendText = trySendViaSelectedBackend(
+                    sessionId = sessionId,
+                    text = text,
+                    agentId = effectiveAgentId,
+                    history = history,
+                    attachments = attachments.map {
+                        com.openclaw.assistant.backend.AgentAttachment(it.mimeType, it.base64)
+                    },
+                )
                 if (backendText != null) {
                     chatRepository.addMessage(sessionId, backendText, isUser = false)
                     viewModelScope.launch {
                         stopThinkingSound()
-                        _uiState.update { it.copy(isThinking = false) }
+                        clearTurnState()
                         afterResponseReceived(backendText)
                     }
                     return@launch
@@ -646,7 +836,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
                         viewModelScope.launch {
                             stopThinkingSound()
-                            _uiState.update { it.copy(isThinking = false) }
+                            clearTurnState()
                             afterResponseReceived(responseText)
                         }
                     },
@@ -654,7 +844,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         viewModelScope.launch {
                             cancelInitialFillerPhrase()
                             stopThinkingSound()
-                            _uiState.update { it.copy(isThinking = false, error = error.message) }
+                            clearTurnState(error = error.message)
                         }
                     }
                 )
@@ -662,7 +852,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 viewModelScope.launch {
                     cancelInitialFillerPhrase()
                     stopThinkingSound()
-                    _uiState.update { it.copy(isThinking = false, error = e.message) }
+                    clearTurnState(error = e.message)
                 }
             }
         }
@@ -1216,31 +1406,62 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
      * configured multi-backends yet, in which case callers use the legacy
      * OpenClaw HTTP settings.
      */
-    private suspend fun trySendViaSelectedBackend(sessionId: String, text: String, agentId: String?): String? {
+    private suspend fun trySendViaSelectedBackend(
+        sessionId: String,
+        text: String,
+        agentId: String?,
+        history: List<com.openclaw.assistant.backend.AgentMessage> = emptyList(),
+        attachments: List<com.openclaw.assistant.backend.AgentAttachment> = emptyList(),
+    ): String? {
         val ctx = getApplication<Application>().applicationContext
-        val overrideId = com.openclaw.assistant.ui.backend.ChatBackendTarget.selectedId.value
+        // Resolved rather than raw, so a selection left pointing at a deleted or
+        // disabled backend falls back to Primary here exactly as it does in the
+        // gateway-or-not decision, instead of failing with "no backend selected".
+        val overrideId = resolvedChatTarget()?.id
+        val streamed = StringBuilder()
         return com.openclaw.assistant.backend.PrimaryBackendDispatcher.send(
             context = ctx,
             userText = text,
             backendId = overrideId,
             sessionId = sessionId,
             agentId = agentId,
+            history = history,
+            attachments = attachments,
+            // Chat can show the prompt, so let the user decide rather than
+            // declining tool use on their behalf.
+            approvalPolicy = com.openclaw.assistant.backend.ApprovalPolicy.ASK,
+            onEvent = { event ->
+                when (event) {
+                    is com.openclaw.assistant.backend.AgentEvent.Started ->
+                        _uiState.update { it.copy(activeRunId = event.runId) }
+                    is com.openclaw.assistant.backend.AgentEvent.TokenDelta -> {
+                        streamed.append(event.text)
+                        _uiState.update { it.copy(streamingAssistantText = streamed.toString()) }
+                    }
+                    is com.openclaw.assistant.backend.AgentEvent.MessageDelta -> {
+                        streamed.append(event.text)
+                        _uiState.update { it.copy(streamingAssistantText = streamed.toString()) }
+                    }
+                    is com.openclaw.assistant.backend.AgentEvent.ApprovalRequest ->
+                        _uiState.update { it.copy(pendingApproval = event) }
+                    else -> Unit
+                }
+            },
         )?.text
     }
 
     private suspend fun resolveSelectedOpenClawModel(): String? {
         val ctx = getApplication<Application>().applicationContext
         val backends = com.openclaw.assistant.backend.BackendRepository.getInstance(ctx).backends.first()
-            .filter { it.enabled }
-        val overrideId = com.openclaw.assistant.ui.backend.ChatBackendTarget.selectedId.value
-        val target = if (overrideId != null) {
-            backends.firstOrNull { it.id == overrideId }
-        } else {
-            backends.firstOrNull { it.isPrimary }
-        }
-        return target?.takeIf {
-            it.type == com.openclaw.assistant.backend.BackendType.OPENCLAW_GATEWAY ||
-                it.type == com.openclaw.assistant.backend.BackendType.OPENCLAW_HTTP
-        }?.modelName?.takeIf { it.isNotBlank() }
+        return com.openclaw.assistant.backend.ChatTargetResolver.openClawModelOverride(
+            backends = backends,
+            selectedId = com.openclaw.assistant.ui.backend.ChatBackendTarget.selectedId.value,
+        )
     }
+
+    private companion object {
+        /** Turns of local transcript replayed to backends that do not keep one. */
+        const val MAX_HISTORY_MESSAGES = 40
+    }
+
 }

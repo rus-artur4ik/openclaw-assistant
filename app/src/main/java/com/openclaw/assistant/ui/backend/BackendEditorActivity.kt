@@ -84,6 +84,11 @@ fun BackendEditorScreen(existingId: String?, onDone: () -> Unit) {
     var port by remember { mutableStateOf(existing?.port?.toString().orEmpty()) }
     var useTls by remember { mutableStateOf(existing?.useTls ?: true) }
     var modelName by remember { mutableStateOf(existing?.modelName ?: "default") }
+    var providerName by remember { mutableStateOf(existing?.providerName.orEmpty()) }
+    var transport by remember {
+        mutableStateOf(existing?.effectiveTransport ?: com.openclaw.assistant.backend.HermesTransportPreference.AUTO)
+    }
+    var memoryScopeKey by remember { mutableStateOf(existing?.memoryScopeKey.orEmpty()) }
     var agentContextName by remember { mutableStateOf(existing?.agentContextName.orEmpty()) }
     var agentContextDetail by remember { mutableStateOf(existing?.agentContextDetail.orEmpty()) }
     var preferredEndpointRole by remember { mutableStateOf(existing?.preferredEndpointRole.orEmpty()) }
@@ -199,7 +204,7 @@ fun BackendEditorScreen(existingId: String?, onDone: () -> Unit) {
                     Spacer(Modifier.height(6.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedButton(onClick = {
-                            val config = buildConfig(existing, type, displayName, baseUrl, token, host, port, useTls, modelName, useRunsApi, useStreaming, setPrimary, listOf(lanUrl, tailscaleUrl, publicUrl).filter { it.isNotBlank() }, agentContextName, agentContextDetail, preferredEndpointRole)
+                            val config = buildConfig(existing, type, displayName, baseUrl, token, host, port, useTls, modelName, useRunsApi, useStreaming, setPrimary, listOf(lanUrl, tailscaleUrl, publicUrl).filter { it.isNotBlank() }, agentContextName, agentContextDetail, preferredEndpointRole, providerName, transport, memoryScopeKey)
                             scope.launch {
                                 status = loadingHermesModels
                                 runCatching { HermesConfigApi().fetchCatalog(config) }
@@ -207,6 +212,7 @@ fun BackendEditorScreen(existingId: String?, onDone: () -> Unit) {
                                         hermesModels = catalog.models
                                         hermesProviders = catalog.providers
                                         catalog.config?.model?.takeIf { it.isNotBlank() }?.let { modelName = it }
+                                        catalog.config?.provider?.takeIf { it.isNotBlank() }?.let { providerName = it }
                                         status = buildString {
                                             val loaded = loadedModelsFormat.format(catalog.models.size)
                                             append(loaded)
@@ -219,16 +225,19 @@ fun BackendEditorScreen(existingId: String?, onDone: () -> Unit) {
                             Text(stringResource(R.string.backend_load_models))
                         }
                         OutlinedButton(onClick = {
-                            val config = buildConfig(existing, type, displayName, baseUrl, token, host, port, useTls, modelName, useRunsApi, useStreaming, setPrimary, listOf(lanUrl, tailscaleUrl, publicUrl).filter { it.isNotBlank() }, agentContextName, agentContextDetail, preferredEndpointRole)
+                            val config = buildConfig(existing, type, displayName, baseUrl, token, host, port, useTls, modelName, useRunsApi, useStreaming, setPrimary, listOf(lanUrl, tailscaleUrl, publicUrl).filter { it.isNotBlank() }, agentContextName, agentContextDetail, preferredEndpointRole, providerName, transport, memoryScopeKey)
                             scope.launch {
                                 status = applyingHermesModel
-                                runCatching { HermesConfigApi().updateModel(config, modelName) }
-                                    .onSuccess { state ->
-                                        val saved = config.copy(modelName = state.model ?: modelName.trim().ifBlank { defaultModelName })
-                                        repo.upsert(saved)
-                                        if (setPrimary) repo.setPrimary(saved.id)
-                                        status = hermesModelUpdatedFormat.format(state.model ?: modelName)
-                                    }
+                                // Hermes has no writable global config over the API
+                                // server (it advertises admin_config_rw: false), so the
+                                // choice is stored here and sent with every request as
+                                // model + provider, which the server always honours.
+                                runCatching {
+                                    repo.upsert(config)
+                                    if (setPrimary) repo.setPrimary(config.id)
+                                    com.openclaw.assistant.backend.HermesCapabilityCache.invalidate(config.id)
+                                }
+                                    .onSuccess { status = hermesModelUpdatedFormat.format(config.modelName ?: defaultModelName) }
                                     .onFailure { status = hermesModelUpdateFailedFormat.format(it.message ?: it.javaClass.simpleName) }
                             }
                         }, enabled = baseUrl.isNotBlank() && modelName.isNotBlank()) {
@@ -244,7 +253,13 @@ fun BackendEditorScreen(existingId: String?, onDone: () -> Unit) {
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             hermesModels.take(8).forEach { option ->
                                 AssistChip(
-                                    onClick = { modelName = option.id },
+                                    onClick = {
+                                        modelName = option.id
+                                        // Carry the provider with the model — without it
+                                        // Hermes ignores the model on its
+                                        // OpenAI-compatible endpoints.
+                                        option.provider?.takeIf { it.isNotBlank() }?.let { providerName = it }
+                                    },
                                     label = {
                                         Text(
                                             listOfNotNull(option.id, option.description?.takeIf { it.isNotBlank() }).joinToString(" · "),
@@ -259,9 +274,35 @@ fun BackendEditorScreen(existingId: String?, onDone: () -> Unit) {
                         }
                     }
                     Spacer(Modifier.height(8.dp))
-                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                        Checkbox(checked = useRunsApi, onCheckedChange = { useRunsApi = it }); Text(androidx.compose.ui.res.stringResource(com.openclaw.assistant.R.string.av_hermes_use_runs_api))
+                    OutlinedTextField(
+                        value = providerName,
+                        onValueChange = { providerName = it },
+                        label = { Text(stringResource(R.string.backend_hermes_provider)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Text(stringResource(R.string.backend_hermes_provider_help), style = MaterialTheme.typography.bodySmall)
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = memoryScopeKey,
+                        onValueChange = { memoryScopeKey = it },
+                        label = { Text(stringResource(R.string.backend_hermes_memory_scope)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Text(stringResource(R.string.backend_hermes_memory_scope_help), style = MaterialTheme.typography.bodySmall)
+                    Spacer(Modifier.height(8.dp))
+                    Text(stringResource(R.string.backend_hermes_transport), style = MaterialTheme.typography.titleSmall)
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        hermesTransportChoices().forEach { (choice, label) ->
+                            FilterChip(
+                                selected = transport == choice,
+                                onClick = { transport = choice },
+                                label = { Text(label) },
+                            )
+                        }
                     }
+                    Text(stringResource(R.string.backend_hermes_transport_help), style = MaterialTheme.typography.bodySmall)
                     Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                         Checkbox(checked = useStreaming, onCheckedChange = { useStreaming = it }); Text(androidx.compose.ui.res.stringResource(com.openclaw.assistant.R.string.av_hermes_stream_responses))
                     }
@@ -297,14 +338,14 @@ fun BackendEditorScreen(existingId: String?, onDone: () -> Unit) {
             val secondary = listOf(lanUrl, tailscaleUrl, publicUrl).filter { it.isNotBlank() }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = {
-                    val config = buildConfig(existing, type, displayName, baseUrl, token, host, port, useTls, modelName, useRunsApi, useStreaming, setPrimary, secondary, agentContextName, agentContextDetail, preferredEndpointRole)
+                    val config = buildConfig(existing, type, displayName, baseUrl, token, host, port, useTls, modelName, useRunsApi, useStreaming, setPrimary, secondary, agentContextName, agentContextDetail, preferredEndpointRole, providerName, transport, memoryScopeKey)
                     repo.upsert(config)
                     if (setPrimary) repo.setPrimary(config.id)
                     onDone()
                 }) { Text(stringResource(R.string.save)) }
 
                 Button(onClick = {
-                    val config = buildConfig(existing, type, displayName, baseUrl, token, host, port, useTls, modelName, useRunsApi, useStreaming, setPrimary, secondary, agentContextName, agentContextDetail, preferredEndpointRole)
+                    val config = buildConfig(existing, type, displayName, baseUrl, token, host, port, useTls, modelName, useRunsApi, useStreaming, setPrimary, secondary, agentContextName, agentContextDetail, preferredEndpointRole, providerName, transport, memoryScopeKey)
                     scope.launch {
                         status = testingLabel
                         val r = withContext(Dispatchers.IO) { AgentClientFactory.create(config).testConnection() }
@@ -335,6 +376,9 @@ private fun buildConfig(
     agentContextName: String = "",
     agentContextDetail: String = "",
     preferredEndpointRole: String = "",
+    providerName: String = "",
+    transport: com.openclaw.assistant.backend.HermesTransportPreference? = null,
+    memoryScopeKey: String = "",
 ): AgentBackendConfig {
     val base = existing ?: AgentBackendConfig(displayName = displayName, type = type)
     return base.copy(
@@ -346,7 +390,10 @@ private fun buildConfig(
         port = port.toIntOrNull(),
         useTls = useTls,
         modelName = modelName.ifBlank { null },
+        providerName = providerName.ifBlank { null },
         useRunsApi = useRunsApi,
+        transport = transport,
+        memoryScopeKey = memoryScopeKey.ifBlank { null },
         useStreaming = useStreaming,
         isPrimary = isPrimary,
         secondaryUrls = secondaryUrls,
@@ -355,6 +402,14 @@ private fun buildConfig(
         preferredEndpointRole = preferredEndpointRole.ifBlank { null },
     )
 }
+
+@Composable
+private fun hermesTransportChoices(): List<Pair<com.openclaw.assistant.backend.HermesTransportPreference, String>> = listOf(
+    com.openclaw.assistant.backend.HermesTransportPreference.AUTO to stringResource(R.string.backend_hermes_transport_auto),
+    com.openclaw.assistant.backend.HermesTransportPreference.SESSION_CHAT to stringResource(R.string.backend_hermes_transport_session),
+    com.openclaw.assistant.backend.HermesTransportPreference.RUNS to stringResource(R.string.backend_hermes_transport_runs),
+    com.openclaw.assistant.backend.HermesTransportPreference.CHAT_COMPLETIONS to stringResource(R.string.backend_hermes_transport_chat),
+)
 
 private fun shortLabel(t: BackendType) = when (t) {
     BackendType.HERMES_API_SERVER -> "Hermes Agent"

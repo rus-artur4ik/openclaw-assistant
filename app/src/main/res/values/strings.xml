@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">WakeHermesClaw</string>
+    <string name="app_name">WakeClaw</string>
     <string name="notification_channel_name">Wake Word Service</string>
     <string name="notification_channel_description">Always-on voice detection service</string>
-    <string name="notification_title">WakeHermesClaw</string>
+    <string name="notification_title">WakeClaw</string>
     <string name="agent_voice_subtitle">Voice client for OpenClaw and Hermes Agent</string>
     <string name="backends_title">Backends</string>
     <string name="backends_empty">No backends configured yet</string>
@@ -42,6 +42,26 @@
     <string name="backend_hermes_model_update_failed">Could not update Hermes model: %1$s</string>
     <string name="backend_load_models">Load Models</string>
     <string name="backend_apply_to_hermes">Apply to Hermes</string>
+    <string name="chat_stop_generating">Stop generating</string>
+    <string name="cron_run_now">Run now</string>
+    <string name="cron_job_paused">Paused</string>
+    <string name="cron_job_next_run">Next run: %1$s</string>
+    <string name="chat_tool_approval_title">Allow this tool?</string>
+    <string name="chat_tool_approval_tool">Tool: %1$s</string>
+    <string name="chat_tool_approval_once">Allow once</string>
+    <string name="chat_tool_approval_session">Allow for this session</string>
+    <string name="chat_tool_approval_always">Always allow</string>
+    <string name="chat_tool_approval_deny">Deny</string>
+    <string name="backend_hermes_transport">Conversation transport</string>
+    <string name="backend_hermes_transport_auto">Automatic (recommended)</string>
+    <string name="backend_hermes_transport_session">Server-side sessions</string>
+    <string name="backend_hermes_transport_runs">Runs API</string>
+    <string name="backend_hermes_transport_chat">Chat completions</string>
+    <string name="backend_hermes_transport_help">Automatic asks the server what it supports. Server-side sessions let Hermes keep the conversation history; Runs is the only mode that can ask you to approve tool use.</string>
+    <string name="backend_hermes_provider">Provider (optional)</string>
+    <string name="backend_hermes_provider_help">Hermes ignores a model name on its OpenAI-compatible endpoints unless a provider comes with it. Loading models fills this in for you.</string>
+    <string name="backend_hermes_memory_scope">Long-term memory scope (optional)</string>
+    <string name="backend_hermes_memory_scope_help">A stable label that lets Hermes accumulate memory about you across conversations and devices.</string>
     <string name="backend_providers_value">Providers: %1$s</string>
     <string name="backend_more_models">+%1$d more</string>
     <string name="backend_openclaw_token">OpenClaw token</string>
@@ -64,8 +84,8 @@
     <string name="bridge_token">Bridge token</string>
     <string name="bridge_generate_token">Generate new token</string>
     <string name="bridge_warning_lan">LAN bind exposes this device on the network. Use Tailscale or a trusted Wi-Fi.</string>
-    <string name="bridge_approval_required">WakeHermesClaw action approval</string>
-    <string name="accessibility_bridge_description">Lets WakeHermesClaw tap, swipe, type, and read on-screen content on behalf of a paired Hermes agent. Off by default. Every gesture requires an explicit, time-limited grant from you.</string>
+    <string name="bridge_approval_required">WakeClaw action approval</string>
+    <string name="accessibility_bridge_description">Lets WakeClaw tap, swipe, type, and read on-screen content on behalf of a paired Hermes agent. Off by default. Every gesture requires an explicit, time-limited grant from you.</string>
     <string name="av_bridge_connection_section">Connection</string>
     <string name="av_bridge_port">Port</string>
     <string name="av_bridge_lan_warning">LAN / VPN exposes this device to the network. Use it only on trusted Wi-Fi or Tailscale.</string>
@@ -88,9 +108,9 @@
     <string name="av_pair_expires_in">Expires in %1$ds</string>
     <string name="av_pair_desktop_command">On the desktop, run:\n  hermes-pair %1$s\n  (or POST {&quot;code&quot;:&quot;%1$s&quot;} to /pair on this bridge)</string>
 
-    <!-- WakeHermesClaw setup wizard -->
-    <string name="av_setup_title">Set up WakeHermesClaw</string>
-    <string name="av_setup_welcome_title">Welcome to WakeHermesClaw</string>
+    <!-- WakeClaw setup wizard -->
+    <string name="av_setup_title">Set up WakeClaw</string>
+    <string name="av_setup_welcome_title">Welcome to WakeClaw</string>
     <string name="av_setup_welcome_body">A native Android voice client for Hermes Agent and OpenClaw. Run the pairing helper on your computer, answer whether to include Hermes Agent, OpenClaw, and Tailscale, then scan one QR in this app.</string>
     <string name="av_setup_choose_title">Which backends will you use?</string>
     <string name="av_setup_choose_hint">Tick at least one. You can add more later in Settings → Backends.</string>
@@ -110,23 +130,23 @@
     <string name="av_backend_open_openclaw_setup">Open OpenClaw setup</string>
 
     <!-- Unified pairing card -->
-    <string name="av_pairing_card_title">One QR sets up WakeHermesClaw</string>
+    <string name="av_pairing_card_title">One QR sets up WakeClaw</string>
     <string name="av_setup_scope_both">Hermes Agent and OpenClaw will be included in one QR.</string>
     <string name="av_setup_scope_hermes">Only Hermes Agent will be included in the QR.</string>
     <string name="av_setup_scope_openclaw">Only OpenClaw will be included in the QR.</string>
-    <string name="av_pairing_card_step1">1. On the computer running Hermes Agent or OpenClaw, install the WakeHermesClaw pairing helper:</string>
+    <string name="av_pairing_card_step1">1. On the computer running Hermes Agent or OpenClaw, install the WakeClaw pairing helper:</string>
     <string name="av_pairing_card_step2">2. Run the helper. It reads local Hermes Agent/OpenClaw settings, detects Tailscale, and uses a temporary public tunnel when the phone is not on the same LAN/VPN:</string>
-    <string name="av_pairing_card_step3">3. Scan that QR inside WakeHermesClaw. Included backends are saved together.</string>
+    <string name="av_pairing_card_step3">3. Scan that QR inside WakeClaw. Included backends are saved together.</string>
     <string name="av_pairing_card_note">The public tunnel is temporary and useful for setup from cellular networks. For daily use, prefer Tailscale/VPN or a trusted LAN.</string>
     <string name="av_pairing_scan_qr">Scan pairing QR</string>
     <string name="av_setup_copy_command">Copy command</string>
     <string name="av_setup_command_copied">Command copied</string>
 
     <!-- Hermes QR card -->
-    <string name="av_hermes_card_title">WakeHermesClaw · one QR setup</string>
-    <string name="av_hermes_card_step1">1. On the machine running Hermes Agent/OpenClaw, install the WakeHermesClaw pairing helper:</string>
+    <string name="av_hermes_card_title">WakeClaw · one QR setup</string>
+    <string name="av_hermes_card_step1">1. On the machine running Hermes Agent/OpenClaw, install the WakeClaw pairing helper:</string>
     <string name="av_hermes_card_step2">2. Run the helper. It reads local Hermes Agent/OpenClaw settings, detects Tailscale, and prints one QR:</string>
-    <string name="av_hermes_card_step3">3. Scan that QR in WakeHermesClaw. Hermes Agent and OpenClaw settings are applied together when both are included.</string>
+    <string name="av_hermes_card_step3">3. Scan that QR in WakeClaw. Hermes Agent and OpenClaw settings are applied together when both are included.</string>
     <string name="av_hermes_card_note">For use away from home, answer yes to the Tailscale/VPN prompt so the QR includes LAN + Tailscale endpoint candidates.</string>
     <string name="av_hermes_use_runs_api">Use Runs API</string>
     <string name="av_hermes_stream_responses">Stream responses</string>
@@ -134,7 +154,7 @@
     <!-- OpenClaw card -->
     <string name="av_openclaw_card_title">OpenClaw · pair with QR</string>
     <string name="av_openclaw_card_step1">1. On your OpenClaw server, print a setup QR:</string>
-    <string name="av_openclaw_card_step2">2. Scan it in WakeHermesClaw. OpenClaw handles pairing, TLS trust, and agent discovery.</string>
+    <string name="av_openclaw_card_step2">2. Scan it in WakeClaw. OpenClaw handles pairing, TLS trust, and agent discovery.</string>
 
     <!-- Backend list -->
     <string name="av_backends_test">Test connection</string>
@@ -175,7 +195,7 @@
 
     <!-- Self-check -->
     <string name="av_selfcheck_title">Self-check</string>
-    <string name="av_selfcheck_intro">Health snapshot of WakeHermesClaw. Tap Re-run after fixing anything below.</string>
+    <string name="av_selfcheck_intro">Health snapshot of WakeClaw. Tap Re-run after fixing anything below.</string>
     <string name="av_selfcheck_rerun">Re-run</string>
     <string name="av_selfcheck_backends_configured">Backends configured</string>
     <string name="av_selfcheck_backends_none">None. Add one in Backends.</string>
@@ -237,11 +257,11 @@
     <string name="chat_settings_hermes_model_help">Usually keep default. Change it only for a specific Hermes Agent profile or model.</string>
 
     <!-- Pairing import -->
-    <string name="av_import_title">Add WakeHermesClaw backends</string>
+    <string name="av_import_title">Add WakeClaw backends</string>
     <string name="av_import_missing">This pairing QR is missing required information.</string>
     <string name="av_import_close">Close</string>
     <string name="av_import_review">Review the settings found in the QR before saving them.</string>
-    <string name="av_import_add_open">Add and open WakeHermesClaw</string>
+    <string name="av_import_add_open">Add and open WakeClaw</string>
     <string name="av_import_no_hermes">No Hermes Agent backend in this QR.</string>
     <string name="av_import_test_hermes">Test Hermes Agent connection</string>
     <string name="av_import_test_openclaw">Test OpenClaw connection</string>
@@ -326,7 +346,7 @@
     <string name="processing">Processing…</string>
     <string name="error_label">Error</string>
     <string name="try_again_button">Try again</string>
-    <string name="ask_hint">Ask WakeHermesClaw…</string>
+    <string name="ask_hint">Ask WakeClaw…</string>
     <string name="send_description">Send</string>
     <string name="stop_description">Stop</string>
     <string name="start_listening_description">Start listening</string>
@@ -377,7 +397,7 @@
     <string name="google_app_setting_title">Google App Setting</string>
     <string name="google_app_setting_desc">Open Google App → Tap Profile → Settings → Google Assistant → General → Turn off \'Google Assistant\' if it still interferes.</string>
     <string name="refresh_binding_title">Refresh Binding</string>
-    <string name="refresh_binding_desc">If status is \'Active\' but it still won\'t work, try changing \'Digital assistant app\' to \'None\' and then back to \'WakeHermesClaw\'.</string>
+    <string name="refresh_binding_desc">If status is \'Active\' but it still won\'t work, try changing \'Digital assistant app\' to \'None\' and then back to \'WakeClaw\'.</string>
     <string name="debug_force_start">Debug: Force Start Session</string>
     
     <!-- Settings Screen -->
@@ -633,7 +653,7 @@ See the official VOICEVOX website for details.</string>
 
     <!-- Pairing -->
     <string name="pairing_required_title">Device Pairing Required</string>
-    <string name="pairing_required_desc">This device is not yet approved by the server. WakeHermesClaw will try to approve it through the host command endpoint in the setup link; if that is not available, run the command on the host.</string>
+    <string name="pairing_required_desc">This device is not yet approved by the server. WakeClaw will try to approve it through the host command endpoint in the setup link; if that is not available, run the command on the host.</string>
     <string name="pairing_requested_scopes">Requested OpenClaw scopes: operator.read, operator.write, operator.admin, operator.pairing, operator.talk.secrets, operator.approvals.</string>
     <string name="pairing_copy_command">Copy Command</string>
     <string name="pairing_command_copied">Command copied to clipboard</string>
@@ -815,7 +835,7 @@ See the official VOICEVOX website for details.</string>
 
     <!-- Setup Guide -->
     <string name="setup_guide_first_run">FIRST RUN</string>
-    <string name="setup_guide_title">WakeHermesClaw\nfor Android</string>
+    <string name="setup_guide_title">WakeClaw\nfor Android</string>
     <string name="setup_guide_step_format">Step %1$d of %2$d</string>
     <string name="setup_guide_welcome_title">What You Get</string>
     <string name="setup_guide_welcome_bullet_1">Use OpenClaw and Hermes Agent from the same native voice client.</string>
@@ -844,10 +864,10 @@ See the official VOICEVOX website for details.</string>
     <string name="setup_guide_finish">Finish</string>
     <string name="setup_guide_next">Next</string>
     <string name="setup_guide_next_after_qr">Scan QR first</string>
-    <string name="setup_guide_connection_waiting">No backend has been imported yet. Scan the WakeHermesClaw QR generated by the helper.</string>
+    <string name="setup_guide_connection_waiting">No backend has been imported yet. Scan the WakeClaw QR generated by the helper.</string>
     <string name="setup_guide_connection_ready">%1$d backend(s) imported. Continue to permissions.</string>
     <string name="setup_guide_configured_backends">%1$d configured</string>
-    <string name="setup_guide_no_backends_yet">No backend is configured yet. Go back and scan the WakeHermesClaw QR.</string>
+    <string name="setup_guide_no_backends_yet">No backend is configured yet. Go back and scan the WakeClaw QR.</string>
     <string name="setup_guide_invalid_code">Invalid setup code.</string>
     <string name="setup_guide_invalid_url">Invalid OpenClaw URL.</string>
 
@@ -1081,4 +1101,48 @@ See the official VOICEVOX website for details.</string>
     <string name="av_home_disconnected">Disconnected</string>
     <string name="av_home_test_ok_short">OK</string>
     <string name="av_home_test_failed_short">Failed</string>
+
+    <!-- Guided Hermes setup -->
+    <string name="hermes_setup_title">Add Hermes Agent</string>
+    <string name="hermes_setup_step_connect">Find your server</string>
+    <string name="hermes_setup_step_review">Check what it supports</string>
+    <string name="hermes_setup_step_finish">Name it</string>
+    <string name="hermes_setup_address_label">Address</string>
+    <string name="hermes_setup_address_help">The address alone is enough — for example 192.168.1.50. The app works out the port and whether it needs TLS.</string>
+    <string name="hermes_setup_key_label">API key</string>
+    <string name="hermes_setup_key_help">The value of API_SERVER_KEY on the host.</string>
+    <string name="hermes_setup_connect">Connect</string>
+    <string name="hermes_setup_scan_lan">Search local network</string>
+    <string name="hermes_setup_scan_stop">Stop searching</string>
+    <string name="hermes_setup_scan_qr">Scan QR</string>
+    <string name="hermes_setup_scanning">Searching… %1$d of %2$d</string>
+    <string name="hermes_setup_scan_none">Nothing answered on this network. Hermes listens on 127.0.0.1 by default — bind it to your LAN, or type the address in.</string>
+    <string name="hermes_setup_scan_unavailable">Join a Wi-Fi network to search, or type the address in.</string>
+    <string name="hermes_setup_found_title">Found on this network</string>
+    <string name="hermes_setup_found_needs_key">needs a key</string>
+    <string name="hermes_setup_probing">Checking…</string>
+    <string name="hermes_setup_status_ready">Connected to %1$s</string>
+    <string name="hermes_setup_status_needs_key">Found Hermes at %1$s. It needs an API key.</string>
+    <string name="hermes_setup_status_bad_key">%1$s answered, but rejected that key.</string>
+    <string name="hermes_setup_status_not_hermes">%1$s answered, but it does not serve the Hermes API (%2$s).</string>
+    <string name="hermes_setup_status_unreachable">Nothing answered. Tried %1$s</string>
+    <string name="hermes_setup_caps_title">This server supports</string>
+    <string name="hermes_setup_caps_sessions">Server-side history</string>
+    <string name="hermes_setup_caps_approvals">Tool approval prompts</string>
+    <string name="hermes_setup_caps_no_approvals">No tool approval prompts</string>
+    <string name="hermes_setup_caps_stop">Stopping a running turn</string>
+    <string name="hermes_setup_caps_streaming">Streaming replies</string>
+    <string name="hermes_setup_caps_transport">Chosen transport: %1$s</string>
+    <string name="hermes_setup_caps_undetected">This build did not answer the capability probe, so only chat completions is assumed.</string>
+    <string name="hermes_setup_model_label">Model</string>
+    <string name="hermes_setup_provider_label">Provider</string>
+    <string name="hermes_setup_model_help">Read from the server. Leave it alone unless you want a different one.</string>
+    <string name="hermes_setup_name_label">Name</string>
+    <string name="hermes_setup_memory_label">Long-term memory scope (optional)</string>
+    <string name="hermes_setup_primary">Use as Primary backend</string>
+    <string name="hermes_setup_continue">Continue</string>
+    <string name="hermes_setup_back">Back</string>
+    <string name="hermes_setup_save">Save backend</string>
+    <string name="hermes_setup_saved">Saved %1$s</string>
+    <string name="hermes_setup_manual">Enter details manually</string>
 </resources>

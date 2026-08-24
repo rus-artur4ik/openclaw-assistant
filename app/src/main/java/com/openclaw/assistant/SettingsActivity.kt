@@ -57,6 +57,8 @@ import com.openclaw.assistant.ui.components.ConnectionState
 import com.openclaw.assistant.ui.components.PairingRequiredCard
 import com.openclaw.assistant.ui.components.StatusIndicator
 import com.openclaw.assistant.gateway.AgentInfo
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import com.openclaw.assistant.ui.backend.BackendListActivity
 import com.openclaw.assistant.ui.backend.ToolProgressFeed
 import com.openclaw.assistant.ui.bridge.MobileBridgeSettingsScreen
@@ -657,6 +659,19 @@ fun SettingsScreen(
                                 emptyText = stringResource(R.string.av_settings_no_hermes),
                                 onManage = { context.startActivity(Intent(context, BackendListActivity::class.java)) },
                             )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Button(
+                                onClick = {
+                                    context.startActivity(
+                                        com.openclaw.assistant.ui.setup.HermesSetupActivity.intent(context),
+                                    )
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                Icon(Icons.Default.Search, contentDescription = null)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(stringResource(R.string.hermes_setup_title))
+                            }
                         } else {
                             BackendSummaryBlock(
                                 backends = openClawBackends,

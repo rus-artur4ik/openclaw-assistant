@@ -135,7 +135,7 @@
             android:exported="false"
             android:theme="@style/Theme.OpenClawAssistant" />
 
-        <!-- WakeHermesClaw multi-backend UI -->
+        <!-- WakeClaw multi-backend UI -->
         <activity
             android:name="com.openclaw.assistant.ui.backend.BackendListActivity"
             android:label="@string/backends_title"
@@ -154,9 +154,14 @@
             android:name="com.openclaw.assistant.ui.setup.AgentVoiceSetupActivity"
             android:exported="false"
             android:theme="@style/Theme.OpenClawAssistant" />
-        <!-- Deep-link target for WakeHermesClaw pairing QR codes. Any QR scanner on the
+        <!-- Deep-link target for WakeClaw pairing QR codes. Any QR scanner on the
              phone (including the stock camera app on modern Android) routes
              agentvoice://setup?... or agentvoice://hermes/setup?... here. -->
+        <activity
+            android:name="com.openclaw.assistant.ui.setup.HermesSetupActivity"
+            android:exported="false"
+            android:label="@string/hermes_setup_title"
+            android:theme="@style/Theme.OpenClawAssistant" />
         <activity
             android:name="com.openclaw.assistant.ui.setup.HermesImportActivity"
             android:exported="true"
@@ -239,7 +244,7 @@
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 
-        <!-- WakeHermesClaw Accessibility Bridge — off by default. User must enable
+        <!-- WakeClaw Accessibility Bridge — off by default. User must enable
              from Settings → Accessibility. -->
         <service
             android:name="com.openclaw.assistant.bridge.accessibility.AgentVoiceAccessibilityService"

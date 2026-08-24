@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
  * *where* a request goes. Wake-word, Voice Overlay, Wear OS, and the
  * Mobile Bridge all read [primaryClient]; Chat may override per-message.
  */
-class BackendManager private constructor(private val repo: BackendRepository) {
+class BackendManager internal constructor(private val repo: BackendRepository) {
 
     val backends: StateFlow<List<AgentBackendConfig>> = repo.backends
 
@@ -27,5 +27,9 @@ class BackendManager private constructor(private val repo: BackendRepository) {
         fun getInstance(context: Context): BackendManager = instance ?: synchronized(this) {
             instance ?: BackendManager(BackendRepository.getInstance(context)).also { instance = it }
         }
+
+        /** Test seam; see [BackendRepository.Companion.setInstanceForTests]. */
+        @androidx.annotation.VisibleForTesting
+        internal fun setInstanceForTests(manager: BackendManager?) = synchronized(this) { instance = manager }
     }
 }

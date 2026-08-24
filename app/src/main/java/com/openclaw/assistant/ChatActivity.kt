@@ -180,6 +180,8 @@ class ChatActivity : ComponentActivity() {
                     },
                     onStopListening = { viewModel.stopListening() },
                     onStopSpeaking = { viewModel.stopSpeaking() },
+                    onStopGenerating = { viewModel.stopGeneration() },
+                    onApprovalChoice = { viewModel.respondToApproval(it) },
                     onInterruptAndListen = {
                         when {
                             !checkPermission() -> requestMicPermissionForListening()
@@ -328,7 +330,9 @@ fun ChatScreen(
     onAcceptGatewayTrust: () -> Unit = {},
     onDeclineGatewayTrust: () -> Unit = {},
     onAttachFiles: (List<PendingFileAttachment>) -> Unit = {},
-    onRemoveAttachment: (String) -> Unit = {}
+    onRemoveAttachment: (String) -> Unit = {},
+    onStopGenerating: () -> Unit = {},
+    onApprovalChoice: (String) -> Unit = {},
 ) {
     var inputText by rememberSaveable { mutableStateOf(initialText) }
     val listState = rememberLazyListState()
@@ -495,6 +499,9 @@ fun ChatScreen(
         ) { paddingValues ->
             Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
                 // Gateway TLS Trust prompt
+                uiState.pendingApproval?.let { approval ->
+                    ToolApprovalDialog(request = approval, onChoice = onApprovalChoice)
+                }
                 if (uiState.pendingGatewayTrust != null) {
                     GatewayTrustDialog(
                         prompt = uiState.pendingGatewayTrust,
@@ -538,6 +545,22 @@ fun ChatScreen(
                                 is ChatListItem.DateSeparator -> DateHeader(item.dateText)
                                 is ChatListItem.MessageItem -> MessageBubble(message = item.message)
                             }
+                        }
+
+                        // Partial answer from a streaming backend, shown as it arrives.
+                        uiState.streamingAssistantText?.takeIf { it.isNotBlank() }?.let { partial ->
+                            item {
+                                MessageBubble(
+                                    message = ChatMessage(
+                                        id = "streaming-draft",
+                                        text = partial,
+                                        isUser = false,
+                                    ),
+                                )
+                            }
+                        }
+                        if (uiState.activeRunId != null) {
+                            item { StopGeneratingButton(onClick = onStopGenerating) }
                         }
                     }
 
@@ -740,6 +763,69 @@ fun ChatAttachmentPreview(attachment: com.openclaw.assistant.chat.ChatMessageCon
             )
         }
     }
+}
+
+/**
+ * Lets the user cancel a run that is still executing on the agent host.
+ * Abandoning the screen is not enough — the agent keeps running tools.
+ */
+@Composable
+private fun StopGeneratingButton(onClick: () -> Unit) {
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        OutlinedButton(onClick = onClick) {
+            Text(stringResource(R.string.chat_stop_generating))
+        }
+    }
+}
+
+/**
+ * The agent is blocked waiting for permission to run a gated tool. Until this is
+ * answered the run makes no progress, so it is shown as a modal decision.
+ */
+@Composable
+private fun ToolApprovalDialog(
+    request: com.openclaw.assistant.backend.AgentEvent.ApprovalRequest,
+    onChoice: (String) -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = { onChoice("deny") },
+        title = { Text(stringResource(R.string.chat_tool_approval_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                request.tool?.takeIf { it.isNotBlank() }?.let {
+                    Text(stringResource(R.string.chat_tool_approval_tool, it))
+                }
+                request.description?.takeIf { it.isNotBlank() }?.let { Text(it) }
+                request.command?.takeIf { it.isNotBlank() }?.let {
+                    Text(it, style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        },
+        confirmButton = {
+            // Render exactly the choices the server offered — which ones are
+            // available depends on the tool and the server's policy.
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                request.choices.filter { it != "deny" }.forEach { choice ->
+                    TextButton(onClick = { onChoice(choice) }) {
+                        Text(approvalChoiceLabel(choice))
+                    }
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { onChoice("deny") }) {
+                Text(stringResource(R.string.chat_tool_approval_deny))
+            }
+        },
+    )
+}
+
+@Composable
+private fun approvalChoiceLabel(choice: String): String = when (choice) {
+    "once" -> stringResource(R.string.chat_tool_approval_once)
+    "session" -> stringResource(R.string.chat_tool_approval_session)
+    "always" -> stringResource(R.string.chat_tool_approval_always)
+    else -> choice
 }
 
 @Composable
@@ -997,13 +1083,25 @@ fun ChatSettingsDialog(
                             ) { Text(stringResource(R.string.backend_load_models)) }
                             OutlinedButton(
                                 onClick = {
-                                    val target = selectedBackend.copy(modelName = modelName.trim().ifBlank { "default" })
                                     scope.launch {
                                         modelStatus = applyingHermes
-                                        runCatching { HermesConfigApi().updateModel(target, modelName) }
-                                            .onSuccess { state ->
-                                                val saved = target.copy(modelName = state.model ?: modelName.trim().ifBlank { "default" })
-                                                repo.upsert(saved)
+                                        // Hermes exposes no writable global config over
+                                        // the API server; the choice is stored on the
+                                        // backend and sent as model + provider on every
+                                        // request, which the server always honours.
+                                        runCatching {
+                                            val saved = selectedBackend.copy(
+                                                modelName = modelName.trim().ifBlank { "default" },
+                                                providerName = hermesModels
+                                                    .firstOrNull { it.id == modelName.trim() }
+                                                    ?.provider
+                                                    ?: selectedBackend.providerName,
+                                            )
+                                            repo.upsert(saved)
+                                            com.openclaw.assistant.backend.HermesCapabilityCache.invalidate(saved.id)
+                                            saved
+                                        }
+                                            .onSuccess { saved ->
                                                 modelName = saved.modelName ?: "default"
                                                 modelStatus = hermesUpdatedFormat.format(saved.modelName)
                                             }

@@ -88,6 +88,14 @@ class BackendRepository internal constructor(
             instance ?: BackendRepository(createPrefs(context)).also { instance = it }
         }
 
+        /**
+         * Test seam. The real instance is backed by [EncryptedSharedPreferences],
+         * which needs a keystore; UI tests install a plain in-memory one so both
+         * backend branches can be rendered without a device.
+         */
+        @androidx.annotation.VisibleForTesting
+        internal fun setInstanceForTests(repo: BackendRepository?) = synchronized(this) { instance = repo }
+
         private fun createPrefs(context: Context): SharedPreferences {
             val masterKey = MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build()
             return EncryptedSharedPreferences.create(

@@ -3,7 +3,26 @@ package com.openclaw.assistant.backend
 import kotlinx.serialization.Serializable
 import java.util.UUID
 
-enum class HermesMode { CHAT_COMPLETIONS, RUNS_API }
+/**
+ * Which Hermes endpoint family carries a conversation.
+ *
+ * [AUTO] is the right answer for almost everyone: the client asks the server
+ * what it supports via `/v1/capabilities` and picks the richest transport.
+ */
+@Serializable
+enum class HermesTransportPreference {
+    /** Feature-detect and use the best transport the server offers. */
+    AUTO,
+
+    /** `/api/sessions/{id}/chat/stream` — Hermes keeps the transcript. */
+    SESSION_CHAT,
+
+    /** `/v1/runs` — the only transport that can answer tool approvals. */
+    RUNS,
+
+    /** `/v1/chat/completions` — stateless, maximum compatibility. */
+    CHAT_COMPLETIONS,
+}
 
 @Serializable
 data class AgentBackendConfig(
@@ -18,7 +37,18 @@ data class AgentBackendConfig(
     val port: Int? = null,
     val useTls: Boolean = false,
     val modelName: String? = null,
+    /**
+     * Provider slug that pairs with [modelName]. Hermes ignores a bare model on
+     * its OpenAI-compatible endpoints unless the operator opted in, but always
+     * honours a model that arrives with a provider.
+     */
+    val providerName: String? = null,
+    /**
+     * Legacy flag kept so existing installs deserialize. [transport] supersedes
+     * it; [effectiveTransport] applies the migration.
+     */
     val useRunsApi: Boolean = true,
+    val transport: HermesTransportPreference? = null,
     val useStreaming: Boolean = true,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
@@ -41,7 +71,19 @@ data class AgentBackendConfig(
     val agentContextDetail: String? = null,
     /** Optional preferred endpoint role, such as lan, vpn, or public. */
     val preferredEndpointRole: String? = null,
+    /**
+     * Stable long-term-memory scope sent as the server's session-key header, so
+     * Hermes can accumulate memory about this user across conversations.
+     */
+    val memoryScopeKey: String? = null,
 ) {
-    val hermesMode: HermesMode
-        get() = if (useRunsApi) HermesMode.RUNS_API else HermesMode.CHAT_COMPLETIONS
+    /**
+     * Transport to use, migrating installs that only ever set [useRunsApi].
+     * Those users chose between two options that both predate session chat, so
+     * they are moved to [HermesTransportPreference.AUTO] only when they left the
+     * Runs default in place.
+     */
+    val effectiveTransport: HermesTransportPreference
+        get() = transport
+            ?: if (useRunsApi) HermesTransportPreference.AUTO else HermesTransportPreference.CHAT_COMPLETIONS
 }
