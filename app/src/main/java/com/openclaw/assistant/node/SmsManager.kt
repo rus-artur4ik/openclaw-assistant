@@ -172,8 +172,9 @@ class SmsManager(private val context: Context) {
         }
 
         if (!ensureSmsPermission()) {
+            val msg = if (permissionRequester != null) "SMS_PERMISSION_REQUIRED: grant SMS permission" else "SMS_PERMISSION_REQUIRED: open OpenClaw Assistant and grant SMS permission in Settings"
             return errorResult(
-                error = "SMS_PERMISSION_REQUIRED: grant SMS permission",
+                error = msg,
             )
         }
 
@@ -253,7 +254,8 @@ class SmsManager(private val context: Context) {
             return errorReadResult("SMS_UNAVAILABLE: telephony not available")
         }
         if (!ensureReadSmsPermission()) {
-            return errorReadResult("SMS_PERMISSION_REQUIRED: grant READ_SMS permission")
+            val msg = if (permissionRequester != null) "SMS_PERMISSION_REQUIRED: grant READ_SMS permission" else "SMS_PERMISSION_REQUIRED: open OpenClaw Assistant and grant READ_SMS permission in Settings"
+            return errorReadResult(msg)
         }
 
         try {
