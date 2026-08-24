@@ -44,9 +44,10 @@ class PhotosHandler(private val appContext: Context) {
 
     suspend fun handleLatest(): GatewaySession.InvokeResult {
         if (!ensurePermission()) {
+            val msg = if (permissionRequester != null) "PHOTOS_PERMISSION_REQUIRED: grant Photos/Storage permission" else "PHOTOS_PERMISSION_REQUIRED: open OpenClaw Assistant and grant Photos/Storage permission in Settings"
             return GatewaySession.InvokeResult.error(
                 code = "PHOTOS_PERMISSION_REQUIRED",
-                message = "PHOTOS_PERMISSION_REQUIRED: grant Photos/Storage permission"
+                message = msg
             )
         }
 
