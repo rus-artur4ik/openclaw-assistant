@@ -144,16 +144,30 @@ class HermesLanScannerTest {
         assertEquals(0, progress.single().total)
     }
 
-    @Test fun `the api key is offered to each host`() = runBlocking {
+    @Test fun `discovery never sends credentials to the hosts it walks`() {
+        // The scan talks to every address on the subnet — printers, other
+        // people's laptops, whatever is on the cafe Wi-Fi. Attaching the user's
+        // API key would hand it to all of them in cleartext over plain HTTP.
         val seen = mutableListOf<String?>()
         serve { request ->
             seen += request.getHeader("Authorization")
-            MockResponse().setBody("""{"model":"hermes-agent"}""")
+            MockResponse().setResponseCode(401)
         }
 
-        scanner().scan(listOf(server.hostName), token = "secret", port = server.port).toList()
+        runBlocking { scanner().scan(listOf(server.hostName), port = server.port).toList() }
 
-        assertEquals(listOf("Bearer secret"), seen)
+        assertEquals(listOf<String?>(null), seen)
+    }
+
+    @Test fun `the scanner exposes no way to pass a credential`() {
+        // Guards the fix structurally: if someone re-adds a token parameter the
+        // leak comes back, and a header assertion alone would not catch a
+        // caller that starts passing one again.
+        val params = HermesLanScanner::class.java.methods
+            .filter { it.name == "scan" }
+            .flatMap { it.parameterTypes.toList() }
+            .map { it.simpleName }
+        assertFalse("scan() must not take a credential: $params", params.contains("String"))
     }
 
     @Test fun `it asks the capabilities endpoint`() = runBlocking {

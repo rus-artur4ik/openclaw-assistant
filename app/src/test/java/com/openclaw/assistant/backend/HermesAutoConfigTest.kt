@@ -138,7 +138,7 @@ class HermesAutoConfigTest {
         assertTrue(ready.baseUrl.startsWith("http://"))
     }
 
-    @Test fun `the bearer key reaches the server`() = runBlocking {
+    @Test fun `the bearer key reaches the endpoint that answered`() = runBlocking {
         val seen = mutableListOf<String?>()
         serve { request ->
             seen += request.getHeader("Authorization")
@@ -151,6 +151,39 @@ class HermesAutoConfigTest {
         autoConfig.probe(address(), "secret")
 
         assertTrue("headers seen: $seen", seen.any { it == "Bearer secret" })
+    }
+
+    @Test fun `discovery is anonymous so the key never rides a guess`() = runBlocking {
+        // The guess list contains a plaintext http:// candidate. Probing them
+        // all with the key attached would put it on the wire even when the
+        // server was reachable over TLS, so the first request must carry none.
+        val seen = mutableListOf<String?>()
+        serve { request ->
+            seen += request.getHeader("Authorization")
+            when {
+                request.path?.contains("/v1/models") == true -> MockResponse().setBody("""{"data":[]}""")
+                else -> MockResponse().setBody(capabilitiesBody)
+            }
+        }
+
+        autoConfig.probe(address(), "secret")
+
+        assertEquals("the discovery request must be anonymous", null, seen.first())
+    }
+
+    @Test fun `a server needing no key is never sent one`() = runBlocking {
+        val seen = mutableListOf<String?>()
+        serve { request ->
+            seen += request.getHeader("Authorization")
+            when {
+                request.path?.contains("/v1/models") == true -> MockResponse().setBody("""{"data":[]}""")
+                else -> MockResponse().setBody(capabilitiesBody)
+            }
+        }
+
+        autoConfig.probe(address(), null)
+
+        assertTrue("headers seen: $seen", seen.all { it == null })
     }
 
     @Test fun `a reachable candidate does not wait for the others to time out`() = runBlocking {

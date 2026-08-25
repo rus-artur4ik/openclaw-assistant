@@ -189,7 +189,8 @@ class HermesSetupViewModel(application: Application) : AndroidViewModel(applicat
             )
         }
         scanJob = viewModelScope.launch {
-            scanner.scan(hosts, _state.value.apiKey.takeIf { it.isNotBlank() }).collect { progress ->
+            // No key here on purpose: discovery talks to the whole subnet.
+            scanner.scan(hosts).collect { progress ->
                 _state.update {
                     it.copy(
                         scanScanned = progress.scanned,

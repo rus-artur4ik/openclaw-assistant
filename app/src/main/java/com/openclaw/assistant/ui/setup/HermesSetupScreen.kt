@@ -16,6 +16,8 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -23,6 +25,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -32,10 +35,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.openclaw.assistant.R
 import com.openclaw.assistant.backend.HermesCapabilities
@@ -110,12 +119,26 @@ private fun ConnectStep(state: HermesSetupUiState, actions: HermesSetupActions) 
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
     )
+    var keyVisible by rememberSaveable { mutableStateOf(false) }
     OutlinedTextField(
         value = state.apiKey,
         onValueChange = actions.onApiKeyChange,
         label = { Text(stringResource(R.string.hermes_setup_key_label)) },
         supportingText = { Text(stringResource(R.string.hermes_setup_key_help)) },
         singleLine = true,
+        // Masked like every other secret field in the app, with a reveal toggle
+        // so a mistyped key can still be checked.
+        visualTransformation = if (keyVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        trailingIcon = {
+            IconButton(onClick = { keyVisible = !keyVisible }) {
+                Icon(
+                    imageVector = if (keyVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                    contentDescription = stringResource(
+                        if (keyVisible) R.string.hermes_setup_key_hide else R.string.hermes_setup_key_show,
+                    ),
+                )
+            }
+        },
         modifier = Modifier.fillMaxWidth(),
     )
 

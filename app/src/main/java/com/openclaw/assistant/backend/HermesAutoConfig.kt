@@ -69,14 +69,13 @@ class HermesAutoConfig(
 ) {
 
     /**
-     * Tries every plausible reading of [rawAddress] in parallel and reports the
-     * best outcome.
+     * Works out which address actually hosts Hermes, then authenticates.
      *
-     * The first candidate that actually works wins immediately. Waiting for the
-     * rest would mean a user who typed a plain LAN address sits through the
-     * read timeout of the `https://` guess even though the `http://` one
-     * answered in milliseconds — so the losers are cancelled at the socket, not
-     * merely at the coroutine, which does not interrupt a blocking read.
+     * Two phases on purpose. Discovery runs **without** the key: the guesses
+     * include a plaintext `http://` variant, and probing them all with the key
+     * attached would put it on the wire in cleartext even when the server was
+     * reachable over TLS. A 401 identifies a Hermes as well as a 200 does, so
+     * the key is only ever sent to the single endpoint that answered.
      */
     suspend fun probe(rawAddress: String, token: String?): HermesSetupProbe {
         val candidates = HermesAddressCandidates.expand(rawAddress)
@@ -84,36 +83,62 @@ class HermesAutoConfig(
             return HermesSetupProbe.Unreachable(emptyList(), "Enter an address such as 192.168.1.50")
         }
 
+        val discovered = discover(candidates)
+        val endpoint = discovered.baseUrlOrNull
+            // Nothing worth authenticating against.
+            ?: return HermesSetupProbe.Unreachable(candidates, unreachableDetail(discovered))
+        if (discovered is HermesSetupProbe.NotHermes) return discovered
+
+        if (token.isNullOrBlank()) {
+            return withCapabilities(discovered, token = null)
+        }
+        return withCapabilities(classifyOnce(endpoint, token), token = token)
+    }
+
+    /** Phase one: which of the guesses answers at all, asked anonymously. */
+    private suspend fun discover(candidates: List<String>): HermesSetupProbe {
         val results = java.util.Collections.synchronizedList(mutableListOf<HermesSetupProbe>())
         val inFlight = java.util.Collections.synchronizedList(mutableListOf<Call>())
         val settled = CompletableDeferred<HermesSetupProbe?>()
 
-        val best = coroutineScope {
+        return coroutineScope {
             val jobs = candidates.map { candidate ->
                 launch(Dispatchers.IO) {
-                    val outcome = classify(candidate, token, inFlight)
+                    val outcome = classify(candidate, token = null, inFlight = inFlight)
                     results += outcome
-                    if (outcome is HermesSetupProbe.Ready) settled.complete(outcome)
+                    // Either answer pins the endpoint, so stop probing the rest.
+                    if (outcome is HermesSetupProbe.Ready || outcome is HermesSetupProbe.NeedsKey) {
+                        settled.complete(outcome)
+                    }
                 }
             }
             launch { jobs.joinAll(); settled.complete(null) }
 
             val winner = withTimeoutOrNull(PROBE_BUDGET_MS) { settled.await() }
+            // Cancelling a coroutine does not interrupt a blocking socket read,
+            // so the losing probes have to be aborted at the OkHttp level.
             synchronized(inFlight) { inFlight.toList() }.forEach { runCatching { it.cancel() } }
             jobs.forEach { it.cancel() }
-            winner ?: synchronized(results) { results.toList() }.minByOrNull { rank(it) }
-        } ?: return HermesSetupProbe.Unreachable(candidates, "No response within ${PROBE_BUDGET_MS / 1000}s")
-
-        return when (best) {
-            is HermesSetupProbe.Ready -> best.copy(
-                capabilities = capabilitiesProbe.fetch(best.baseUrl, token),
-            )
-            is HermesSetupProbe.Unreachable -> HermesSetupProbe.Unreachable(
-                tried = candidates,
-                detail = best.detail,
-            )
-            else -> best
+            winner
+                ?: synchronized(results) { results.toList() }.minByOrNull { rank(it) }
+                ?: HermesSetupProbe.Unreachable(candidates, "No response")
         }
+    }
+
+    /** Phase two: one authenticated request, to the endpoint discovery settled on. */
+    private suspend fun classifyOnce(endpoint: String, token: String?): HermesSetupProbe =
+        classify(endpoint, token, java.util.Collections.synchronizedList(mutableListOf()))
+
+    private suspend fun withCapabilities(probe: HermesSetupProbe, token: String?): HermesSetupProbe =
+        if (probe is HermesSetupProbe.Ready) {
+            probe.copy(capabilities = capabilitiesProbe.fetch(probe.baseUrl, token))
+        } else {
+            probe
+        }
+
+    private fun unreachableDetail(probe: HermesSetupProbe): String = when (probe) {
+        is HermesSetupProbe.Unreachable -> probe.detail
+        else -> "No response"
     }
 
     /**

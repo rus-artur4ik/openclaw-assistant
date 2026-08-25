@@ -1144,5 +1144,7 @@ See the official VOICEVOX website for details.</string>
     <string name="hermes_setup_back">Back</string>
     <string name="hermes_setup_save">Save backend</string>
     <string name="hermes_setup_saved">Saved %1$s</string>
+    <string name="hermes_setup_key_show">Show key</string>
+    <string name="hermes_setup_key_hide">Hide key</string>
     <string name="hermes_setup_manual">Enter details manually</string>
 </resources>

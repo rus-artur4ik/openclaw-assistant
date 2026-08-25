@@ -49,12 +49,19 @@ class HermesLanScanner(
     /**
      * Probes each host in parallel and emits progress as results arrive.
      *
+     * Deliberately unauthenticated. Discovery talks to every address on the
+     * subnet — printers, other people's laptops, whatever else is on the café
+     * Wi-Fi — and attaching the user's API key would hand that key, in
+     * cleartext over plain HTTP, to all of them. A server that answers 401
+     * identifies itself as Hermes just as well as one that answers 200, so the
+     * key is never needed here; it is sent only to the one endpoint the user
+     * goes on to configure.
+     *
      * Hosts are passed in rather than derived here so the caller decides how
      * much of the network to touch — and so this is testable without a network.
      */
     fun scan(
         hosts: List<String>,
-        token: String? = null,
         port: Int = HermesAddressCandidates.DEFAULT_PORT,
     ): Flow<Progress> = flow {
         if (hosts.isEmpty()) {
@@ -69,7 +76,7 @@ class HermesLanScanner(
             val gate = Semaphore(concurrency)
             launch(Dispatchers.IO) {
                 hosts.forEach { host ->
-                    launch { gate.withPermit { results.send(probe(host, port, token)) } }
+                    launch { gate.withPermit { results.send(probe(host, port)) } }
                 }
             }
             repeat(hosts.size) {
@@ -83,12 +90,10 @@ class HermesLanScanner(
         emit(Progress(hosts.size, hosts.size, found.toList(), done = true))
     }
 
-    private fun probe(host: String, port: Int, token: String?): Found? {
+    private fun probe(host: String, port: Int): Found? {
         val baseUrl = "http://$host:$port"
         return try {
-            val request = Request.Builder().url(HermesUrl.capabilitiesUrl(baseUrl)).get().apply {
-                token?.takeIf { it.isNotBlank() }?.let { header("Authorization", "Bearer $it") }
-            }.build()
+            val request = Request.Builder().url(HermesUrl.capabilitiesUrl(baseUrl)).get().build()
             httpClient.newCall(request).execute().use { response ->
                 when {
                     response.isSuccessful -> {
