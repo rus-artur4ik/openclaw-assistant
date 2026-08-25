@@ -8,7 +8,6 @@ import android.net.LinkAddress
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.AndroidViewModel
@@ -24,6 +23,7 @@ import com.openclaw.assistant.backend.HermesCapabilityCache
 import com.openclaw.assistant.backend.HermesLanScanner
 import com.openclaw.assistant.backend.HermesSetupProbe
 import com.openclaw.assistant.ui.backend.BackendEditorActivity
+import com.openclaw.assistant.ui.theme.OpenClawAssistantTheme
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,7 +43,9 @@ class HermesSetupActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
+            // The app-wide dark scheme, not the bare Material default — the
+            // wizard is reached from Settings and looked like a different app.
+            OpenClawAssistantTheme {
                 val vm: HermesSetupViewModel = viewModel()
                 val state by vm.state.collectAsState()
                 HermesSetupScreen(
