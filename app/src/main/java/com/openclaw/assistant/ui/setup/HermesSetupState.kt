@@ -48,4 +48,17 @@ data class HermesSetupUiState(
     val canContinueFromReview: Boolean get() = connected && !busy
 
     val canSave: Boolean get() = connected && displayName.isNotBlank() && !busy
+
+    /**
+     * True when the user is stuck on something only fixable on the host, so the
+     * instructions open themselves instead of hiding behind a disclosure.
+     *
+     * A wrong or missing key is deliberately excluded: that is fixed in the
+     * field right above, and the per-outcome line already says where to find
+     * the value.
+     */
+    val needsHostHelp: Boolean
+        get() = probe is HermesSetupProbe.Unreachable ||
+            probe is HermesSetupProbe.NotHermes ||
+            (scanFinished && !scanning && scanResults.isEmpty())
 }

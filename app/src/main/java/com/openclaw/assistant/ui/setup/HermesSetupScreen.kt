@@ -1,5 +1,6 @@
 package com.openclaw.assistant.ui.setup
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,11 +9,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Search
@@ -41,7 +45,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -214,7 +224,13 @@ private fun ConnectStep(state: HermesSetupUiState, actions: HermesSetupActions) 
         }
     }
 
-    state.probe?.let { ProbeStatus(it) }
+    state.probe?.let {
+        ProbeStatus(it)
+        ProbeGuidance(it)
+    }
+
+    // Opens itself when the user is stuck on something only the host can fix.
+    HostSetupHelp(startExpanded = state.needsHostHelp)
 
     TextButton(onClick = actions.onManualEntry) {
         Text(stringResource(R.string.hermes_setup_manual))
@@ -247,6 +263,101 @@ private fun ProbeStatus(probe: HermesSetupProbe) {
             tint = if (ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
         )
         Text(text, style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+/** The one-line fix for whatever the probe just reported. */
+@Composable
+private fun ProbeGuidance(probe: HermesSetupProbe) {
+    val advice = when (probe) {
+        is HermesSetupProbe.Ready -> null
+        is HermesSetupProbe.NeedsKey -> stringResource(R.string.hermes_setup_fix_needs_key)
+        is HermesSetupProbe.KeyRejected -> stringResource(R.string.hermes_setup_fix_bad_key)
+        is HermesSetupProbe.NotHermes -> stringResource(R.string.hermes_setup_fix_not_hermes)
+        is HermesSetupProbe.Unreachable -> stringResource(R.string.hermes_setup_fix_unreachable)
+    } ?: return
+    Text(
+        text = advice,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+}
+
+/**
+ * What to do on the computer running Hermes.
+ *
+ * Binding Hermes to the LAN is the single most common reason the phone finds
+ * nothing, and it cannot be fixed from here — so the steps live next to the
+ * failure rather than in documentation the user would have to go looking for.
+ */
+@Composable
+private fun HostSetupHelp(startExpanded: Boolean) {
+    var expanded by rememberSaveable(startExpanded) { mutableStateOf(startExpanded) }
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(R.string.hermes_setup_help_title),
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.weight(1f),
+                )
+                TextButton(onClick = { expanded = !expanded }) {
+                    Text(
+                        stringResource(
+                            if (expanded) R.string.hermes_setup_help_hide else R.string.hermes_setup_help_show,
+                        ),
+                    )
+                }
+            }
+            if (expanded) {
+                Text(stringResource(R.string.hermes_setup_help_intro), style = MaterialTheme.typography.bodySmall)
+                CopyableCommand(stringResource(R.string.hermes_setup_cmd_pair))
+                Text(stringResource(R.string.hermes_setup_help_manual), style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.hermes_setup_help_step_host), style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.hermes_setup_help_step_key), style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.hermes_setup_help_step_restart), style = MaterialTheme.typography.bodySmall)
+                CopyableCommand(stringResource(R.string.hermes_setup_cmd_restart))
+                Text(
+                    stringResource(R.string.hermes_setup_help_network),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+/** A shell command the user has to run elsewhere, so it is tap-to-copy. */
+@Composable
+private fun CopyableCommand(command: String) {
+    val clipboard = LocalClipboardManager.current
+    val context = LocalContext.current
+    val copyLabel = stringResource(R.string.pairing_copy_command)
+    val copiedLabel = stringResource(R.string.setup_guide_copied)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFF0D1117), RoundedCornerShape(8.dp))
+            .clickable(onClickLabel = copyLabel, role = Role.Button) {
+                clipboard.setText(AnnotatedString(command))
+                android.widget.Toast.makeText(context, copiedLabel, android.widget.Toast.LENGTH_SHORT).show()
+            }
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = command,
+            color = Color(0xFF58A6FF),
+            fontFamily = FontFamily.Monospace,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.weight(1f),
+        )
+        Icon(
+            imageVector = Icons.Default.ContentCopy,
+            contentDescription = copyLabel,
+            tint = Color(0xFF58A6FF),
+            modifier = Modifier.size(16.dp),
+        )
     }
 }
 
@@ -283,6 +394,12 @@ private fun ReviewStep(state: HermesSetupUiState, actions: HermesSetupActions) {
             )
         }
     }
+
+    Text(
+        stringResource(R.string.hermes_setup_review_help),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 
     OutlinedTextField(
         value = state.model,
@@ -364,6 +481,11 @@ private fun FinishStep(state: HermesSetupUiState, actions: HermesSetupActions) {
         Checkbox(checked = state.makePrimary, onCheckedChange = actions.onPrimaryChange)
         Text(stringResource(R.string.hermes_setup_primary))
     }
+    Text(
+        stringResource(R.string.hermes_setup_primary_help),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
     state.savedName?.let {
         Text(stringResource(R.string.hermes_setup_saved, it), style = MaterialTheme.typography.bodyMedium)
     }

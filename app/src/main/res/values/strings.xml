@@ -1146,5 +1146,24 @@ See the official VOICEVOX website for details.</string>
     <string name="hermes_setup_saved">Saved %1$s</string>
     <string name="hermes_setup_key_show">Show key</string>
     <string name="hermes_setup_key_hide">Hide key</string>
+    <!-- Guided Hermes setup: what to do on the host -->
+    <string name="hermes_setup_help_title">Hermes not showing up?</string>
+    <string name="hermes_setup_help_intro">Hermes listens on 127.0.0.1 out of the box, which a phone cannot reach. Let the helper fix that for you:</string>
+    <string name="hermes_setup_help_manual">Or do it by hand, on the computer running Hermes:</string>
+    <string name="hermes_setup_help_step_host">1. In ~/.hermes/config.yaml change <![CDATA[host: 127.0.0.1]]> to <![CDATA[host: 0.0.0.0]]></string>
+    <string name="hermes_setup_help_step_key">2. In ~/.hermes/.env set API_SERVER_KEY to a value of your choosing</string>
+    <string name="hermes_setup_help_step_restart">3. Restart the gateway:</string>
+    <string name="hermes_setup_help_network">The phone and the computer have to be on the same network. A guest Wi-Fi, or one that isolates clients from each other, blocks this even when everything else is right.</string>
+    <string name="hermes_setup_help_show">Show me what to do</string>
+    <string name="hermes_setup_help_hide">Hide</string>
+    <string name="hermes_setup_cmd_pair">agentvoice-pair</string>
+    <string name="hermes_setup_cmd_restart">hermes gateway run --replace</string>
+    <string name="hermes_setup_fix_needs_key">Open ~/.hermes/.env on that computer and copy the value of API_SERVER_KEY into the field above.</string>
+    <string name="hermes_setup_fix_bad_key">Compare the key with API_SERVER_KEY in ~/.hermes/.env — it is the whole value, without surrounding quotes.</string>
+    <string name="hermes_setup_fix_not_hermes">Something else is answering there. Check the port — the Hermes API server uses 8642 unless it was moved.</string>
+    <string name="hermes_setup_fix_unreachable">Most likely, in order: Hermes is still bound to 127.0.0.1; the phone is on a different network; or a firewall is blocking port 8642.</string>
+    <string name="hermes_setup_review_help">Detected, not chosen — the app asked the server what it supports. You can override the transport later in the backend editor.</string>
+    <string name="hermes_setup_primary_help">Primary is where the wake word, Voice Overlay and Wear OS send their turns. Chat can still be pointed at any backend per conversation.</string>
+    <string name="hermes_setup_memory_help_short">Optional. A stable label lets Hermes build up memory about you across conversations and devices.</string>
     <string name="hermes_setup_manual">Enter details manually</string>
 </resources>

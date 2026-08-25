@@ -211,6 +211,103 @@ class HermesSetupScreenTest {
         assertTrue(manual)
     }
 
+    // ---- step 1: telling the user what to actually do ----------------------
+
+    @Test fun `the host instructions are available before anything has failed`() {
+        show(HermesSetupUiState())
+        compose.onNodeWithText("Hermes not showing up?").performScrollTo().assertIsDisplayed()
+        // Collapsed until asked for, so it does not bury the address field.
+        compose.onNodeWithText("agentvoice-pair").assertDoesNotExist()
+    }
+
+    @Test fun `expanding the instructions shows both the helper and the manual steps`() {
+        show(HermesSetupUiState())
+        compose.onNodeWithText("Show me what to do").performScrollTo().performClick()
+
+        compose.onNodeWithText("agentvoice-pair").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("hermes gateway run --replace").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("1. In ~/.hermes/config.yaml change host: 127.0.0.1 to host: 0.0.0.0")
+            .performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("2. In ~/.hermes/.env set API_SERVER_KEY to a value of your choosing")
+            .performScrollTo().assertIsDisplayed()
+    }
+
+    @Test fun `an empty scan opens the instructions without being asked`() {
+        // Binding to 127.0.0.1 is the usual cause, and it cannot be fixed from
+        // this screen — so the steps appear rather than hiding behind a tap.
+        show(HermesSetupUiState(scanFinished = true, scanResults = emptyList()))
+        compose.onNodeWithText("agentvoice-pair").performScrollTo().assertIsDisplayed()
+    }
+
+    @Test fun `an unreachable address opens the instructions too`() {
+        show(
+            HermesSetupUiState(
+                address = "192.168.1.50",
+                probe = HermesSetupProbe.Unreachable(listOf("http://192.168.1.50:8642"), "timeout"),
+            ),
+        )
+        compose.onNodeWithText("agentvoice-pair").performScrollTo().assertIsDisplayed()
+    }
+
+    @Test fun `a working connection does not nag with setup instructions`() {
+        show(readyState())
+        compose.onNodeWithText("agentvoice-pair").assertDoesNotExist()
+    }
+
+    @Test fun `a missing key says where to find it`() {
+        show(
+            HermesSetupUiState(
+                address = "192.168.1.50",
+                probe = HermesSetupProbe.NeedsKey("http://192.168.1.50:8642"),
+            ),
+        )
+        compose.onNodeWithText(
+            "Open ~/.hermes/.env on that computer and copy the value of API_SERVER_KEY into the field above.",
+        ).performScrollTo().assertIsDisplayed()
+        // The fix is one field up, so the host steps stay collapsed.
+        compose.onNodeWithText("agentvoice-pair").assertDoesNotExist()
+    }
+
+    @Test fun `a rejected key points at the value to compare`() {
+        show(
+            HermesSetupUiState(
+                apiKey = "wrong",
+                probe = HermesSetupProbe.KeyRejected("http://192.168.1.50:8642", "HTTP 401"),
+            ),
+        )
+        compose.onNodeWithText(
+            "Compare the key with API_SERVER_KEY in ~/.hermes/.env — it is the whole value, without surrounding quotes.",
+        ).performScrollTo().assertIsDisplayed()
+    }
+
+    @Test fun `something that is not hermes suggests checking the port`() {
+        show(
+            HermesSetupUiState(
+                probe = HermesSetupProbe.NotHermes("http://192.168.1.1:8642", "HTTP 404"),
+            ),
+        )
+        compose.onNodeWithText(
+            "Something else is answering there. Check the port — the Hermes API server uses 8642 unless it was moved.",
+        ).performScrollTo().assertIsDisplayed()
+    }
+
+    @Test fun `an unreachable address lists the usual causes in order`() {
+        show(
+            HermesSetupUiState(
+                probe = HermesSetupProbe.Unreachable(listOf("http://192.168.1.50:8642"), "timeout"),
+            ),
+        )
+        compose.onNodeWithText(
+            "Most likely, in order: Hermes is still bound to 127.0.0.1; the phone is on a different network; or a firewall is blocking port 8642.",
+        ).performScrollTo().assertIsDisplayed()
+    }
+
+    @Test fun `a successful probe offers no fix-it line`() {
+        show(readyState())
+        compose.onNodeWithText("Most likely, in order", substring = true).assertDoesNotExist()
+        compose.onNodeWithText("Open ~/.hermes/.env", substring = true).assertDoesNotExist()
+    }
+
     // ---- step 2: review -----------------------------------------------------
 
     private fun reviewState(caps: HermesCapabilities) = readyState().copy(
@@ -241,6 +338,13 @@ class HermesSetupScreenTest {
         show(reviewState(HermesCapabilities(detected = true, sessionChatStreaming = true)))
         compose.onNodeWithText("No tool approval prompts").assertIsDisplayed()
         compose.onNodeWithText("Tool approval prompts").assertDoesNotExist()
+    }
+
+    @Test fun `the review explains that the transport was detected, not chosen`() {
+        show(reviewState(HermesCapabilities(detected = true, sessionChatStreaming = true)))
+        compose.onNodeWithText(
+            "Detected, not chosen — the app asked the server what it supports. You can override the transport later in the backend editor.",
+        ).performScrollTo().assertIsDisplayed()
     }
 
     @Test fun `the chosen transport is named`() {
@@ -308,6 +412,13 @@ class HermesSetupScreenTest {
         compose.onNodeWithText("Home Hermes").assertIsDisplayed()
         compose.onNodeWithText("Use as Primary backend").assertIsDisplayed()
         compose.onNodeWithText("Save backend").assertIsEnabled()
+    }
+
+    @Test fun `the last step explains what Primary actually changes`() {
+        show(readyState().copy(step = HermesSetupStep.FINISH, displayName = "Home Hermes"))
+        compose.onNodeWithText(
+            "Primary is where the wake word, Voice Overlay and Wear OS send their turns. Chat can still be pointed at any backend per conversation.",
+        ).performScrollTo().assertIsDisplayed()
     }
 
     @Test fun `saving is refused without a name`() {
