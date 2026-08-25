@@ -313,8 +313,10 @@ private fun HostSetupHelp(startExpanded: Boolean) {
                 Text(stringResource(R.string.hermes_setup_help_intro), style = MaterialTheme.typography.bodySmall)
                 CopyableCommand(stringResource(R.string.hermes_setup_cmd_pair))
                 Text(stringResource(R.string.hermes_setup_help_manual), style = MaterialTheme.typography.bodySmall)
-                Text(stringResource(R.string.hermes_setup_help_step_host), style = MaterialTheme.typography.bodySmall)
-                Text(stringResource(R.string.hermes_setup_help_step_key), style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.hermes_setup_help_step_enable), style = MaterialTheme.typography.bodySmall)
+                CopyableCommand(stringResource(R.string.hermes_setup_cmd_enable))
+                Text(stringResource(R.string.hermes_setup_help_step_env), style = MaterialTheme.typography.bodySmall)
+                CopyableCommand(stringResource(R.string.hermes_setup_cmd_env))
                 Text(stringResource(R.string.hermes_setup_help_step_restart), style = MaterialTheme.typography.bodySmall)
                 CopyableCommand(stringResource(R.string.hermes_setup_cmd_restart))
                 Text(

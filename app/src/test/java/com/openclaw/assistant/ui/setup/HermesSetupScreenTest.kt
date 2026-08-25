@@ -226,9 +226,12 @@ class HermesSetupScreenTest {
 
         compose.onNodeWithText("agentvoice-pair").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("hermes gateway run --replace").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("1. In ~/.hermes/config.yaml change host: 127.0.0.1 to host: 0.0.0.0")
+        // The exact steps matter: on a fresh install the API server platform is
+        // off, and its bind address comes from API_SERVER_HOST — there is no
+        // host: line in config.yaml to edit.
+        compose.onNodeWithText("hermes config set platforms.api_server.enabled true")
             .performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("2. In ~/.hermes/.env set API_SERVER_KEY to a value of your choosing")
+        compose.onNodeWithText("API_SERVER_HOST=0.0.0.0\nAPI_SERVER_KEY=pick-a-long-random-value")
             .performScrollTo().assertIsDisplayed()
     }
 
