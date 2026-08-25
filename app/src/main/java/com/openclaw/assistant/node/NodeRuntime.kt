@@ -335,6 +335,7 @@ class NodeRuntime(context: Context) {
         _remoteAddress.value = remote
         _serverVersion.value = version
         applyMainSessionKey(mainSessionKey)
+        chat.onConnected()
         updateStatus()
         scope.launch { refreshBrandingFromGateway() }
         scope.launch { gatewayEventHandler.refreshWakeWordsFromGateway() }
@@ -407,10 +408,20 @@ class NodeRuntime(context: Context) {
       },
     )
 
+  /** Adapts the operator socket to the narrow surface chat needs. */
+  private val chatSession =
+    object : com.openclaw.assistant.chat.ChatGatewaySession {
+      override suspend fun request(method: String, paramsJson: String?, timeoutMs: Long): String =
+        operatorSession.request(method, paramsJson, timeoutMs)
+
+      override suspend fun sendNodeEvent(event: String, payloadJson: String?): Boolean =
+        operatorSession.sendNodeEvent(event, payloadJson)
+    }
+
   private val chat: ChatController =
     ChatController(
       scope = scope,
-      session = operatorSession,
+      session = chatSession,
       json = json,
       supportsChatSubscribe = false, // node.event is node-role only; operator connections receive events automatically
     )

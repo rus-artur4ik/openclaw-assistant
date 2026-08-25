@@ -1,7 +1,6 @@
 package com.openclaw.assistant.chat
 
 import android.util.Log
-import com.openclaw.assistant.gateway.GatewaySession
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.CancellationException
@@ -22,7 +21,7 @@ import kotlinx.serialization.json.buildJsonObject
 
 class ChatController(
   private val scope: CoroutineScope,
-  private val session: GatewaySession,
+  private val session: ChatGatewaySession,
   private val json: Json,
   private val supportsChatSubscribe: Boolean,
 ) {
@@ -64,6 +63,19 @@ class ChatController(
   private var bootstrapJob: Job? = null
 
   private var lastHealthPollAtMs: Long? = null
+
+  /**
+   * The gateway socket came back up.
+   *
+   * [onDisconnected] clears the health flag and nothing used to restore it: a bootstrap only runs
+   * when a chat screen loads a session, so after a reconnect the rest of the app — voice sessions,
+   * the Talk engine card — kept reporting the gateway as unreachable while it was fine.
+   */
+  fun onConnected() {
+    // A bootstrap already force-polls health; don't pay for a second round trip.
+    if (bootstrapJob?.isActive == true) return
+    scope.launch { pollHealthIfNeeded(force = true) }
+  }
 
   fun onDisconnected(message: String) {
     _healthOk.value = false
