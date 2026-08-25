@@ -24,7 +24,7 @@ data class GithubRelease(
 
 object UpdateChecker {
     private const val TAG = "UpdateChecker"
-    private const val GITHUB_API_URL = "https://api.github.com/repos/yuga-hashimoto/openclaw-assistant/releases/latest"
+    private const val GITHUB_API_URL = com.openclaw.assistant.ProjectLinks.RELEASES_API_URL
     
     // Use a short timeout for update checks so it doesn't block startup long
     private val client = OkHttpClient.Builder()
@@ -42,6 +42,13 @@ object UpdateChecker {
                 .build()
 
             client.newCall(request).execute().use { response ->
+                if (response.code == 404) {
+                    // Not a failure: this repository has published no releases
+                    // yet. Logging it as an error would send anyone reading
+                    // logcat chasing a network problem that does not exist.
+                    Log.i(TAG, "No releases published for $GITHUB_API_URL yet; nothing to update to")
+                    return@withContext null
+                }
                 if (!response.isSuccessful) {
                     Log.w(TAG, "Failed to check update: HTTP ${response.code}")
                     return@withContext null

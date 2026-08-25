@@ -117,9 +117,9 @@
 ---
 
 # OpenClaw Assistant 🦞 (legacy README continues below)
-![CI](https://github.com/yuga-hashimoto/OpenClawAssistant/actions/workflows/ci.yml/badge.svg)
-[![Latest Release](https://img.shields.io/github/v/release/yuga-hashimoto/OpenClawAssistant?display_name=tag)](https://github.com/yuga-hashimoto/OpenClawAssistant/releases/latest)
-[![License: MIT](https://img.shields.io/github/license/yuga-hashimoto/OpenClawAssistant)](https://github.com/yuga-hashimoto/OpenClawAssistant/blob/main/LICENSE)
+![CI](https://github.com/rus-artur4ik/openclaw-assistant/actions/workflows/ci.yml/badge.svg)
+[![Latest Release](https://img.shields.io/github/v/release/rus-artur4ik/openclaw-assistant?display_name=tag)](https://github.com/rus-artur4ik/openclaw-assistant/releases/latest)
+[![License: MIT](https://img.shields.io/github/license/rus-artur4ik/openclaw-assistant)](https://github.com/rus-artur4ik/openclaw-assistant/blob/main/LICENSE)
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R5R51S97C4)
 
@@ -132,7 +132,7 @@
 <p>Built for OpenClaw, designed to feel like a real assistant on your phone instead of a thin chat wrapper.</p>
 
 <p>
-  <a href="https://github.com/yuga-hashimoto/OpenClawAssistant/releases/latest">Download APK</a>
+  <a href="https://github.com/rus-artur4ik/openclaw-assistant/releases/latest">Download APK</a>
   ·
   <a href="#quick-start">5-Minute Quick Start</a>
   ·
@@ -183,7 +183,7 @@
 
 ### 🚀 5-Minute Quick Start
 
-1. Install the latest APK from [Releases](https://github.com/yuga-hashimoto/OpenClawAssistant/releases/latest)
+1. Install the latest APK from [Releases](https://github.com/rus-artur4ik/openclaw-assistant/releases/latest)
 2. On your server, run `openclaw qr`
 3. Open the app and tap **Scan QR Code**
 4. Approve the device on your server if pairing is requested
@@ -269,7 +269,7 @@ Need the server first? Start with [OpenClaw](https://github.com/openclaw/opencla
 
 #### 1. Install the App
 
-Download APK from [Releases](https://github.com/yuga-hashimoto/OpenClawAssistant/releases), or build from source.
+Download APK from [Releases](https://github.com/rus-artur4ik/openclaw-assistant/releases), or build from source.
 
 For local source builds, see [BUILDING.md](BUILDING.md). It covers the checked-in debug Firebase stub, test commands, and release signing requirements.
 
@@ -434,7 +434,7 @@ Bundled third-party binaries and assets are documented in [THIRD_PARTY_LICENSES.
 
 ### 🚀 5分クイックスタート
 
-1. [Releases](https://github.com/yuga-hashimoto/OpenClawAssistant/releases/latest) から最新 APK をインストール
+1. [Releases](https://github.com/rus-artur4ik/openclaw-assistant/releases/latest) から最新 APK をインストール
 2. サーバー側で `openclaw qr` を実行
 3. アプリで **QRコードをスキャン** をタップ
 4. ペアリング要求が出たらサーバー側で承認
@@ -519,7 +519,7 @@ Bundled third-party binaries and assets are documented in [THIRD_PARTY_LICENSES.
 
 #### 1. アプリのインストール
 
-[Releases](https://github.com/yuga-hashimoto/OpenClawAssistant/releases) からAPKをダウンロード、またはソースからビルド。
+[Releases](https://github.com/rus-artur4ik/openclaw-assistant/releases) からAPKをダウンロード、またはソースからビルド。
 
 ローカルでのソースビルド手順は [BUILDING.md](BUILDING.md) を参照してください。debug 用 Firebase スタブ、テストコマンド、release 署名の前提をまとめています。
 
@@ -671,7 +671,7 @@ MIT License - 詳細は [LICENSE](LICENSE) を参照。
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=yuga-hashimoto/openclaw-assistant&type=Date)](https://star-history.com/#yuga-hashimoto/openclaw-assistant&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=rus-artur4ik/openclaw-assistant&type=Date)](https://star-history.com/#rus-artur4ik/openclaw-assistant&Date)
 
 ---
 

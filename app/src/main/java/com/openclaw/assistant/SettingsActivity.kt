@@ -2265,7 +2265,7 @@ fun SettingsScreen(
                             Log.d("SettingsActivity", "Report Issue clicked. serverVersion: $openClawVersion")
                             val systemInfo = SystemInfoProvider.getSystemInfoReport(context, settings, openClawVersion)
                             val body = "\n\n$systemInfo"
-                            val uri = Uri.parse("https://github.com/yuga-hashimoto/openclaw-assistant/issues/new")
+                            val uri = Uri.parse(com.openclaw.assistant.ProjectLinks.NEW_ISSUE_URL)
                                 .buildUpon()
                                 .appendQueryParameter("body", body)
                                 .build()

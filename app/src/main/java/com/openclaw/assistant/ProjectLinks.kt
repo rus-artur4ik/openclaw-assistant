@@ -26,4 +26,15 @@ object ProjectLinks {
 
     /** Elided form of [RAW_BASE], so a long URL does not overflow the card. */
     const val RAW_BASE_ELIDED = "https://raw.githubusercontent.com/.../"
+
+    const val REPO_URL = "https://github.com/$OWNER/$REPO"
+
+    /**
+     * Releases of *this* build. A fork that offers its users the parent
+     * project's APK is offering them a different app.
+     */
+    const val RELEASES_API_URL = "https://api.github.com/repos/$OWNER/$REPO/releases/latest"
+
+    /** Where a bug report about this build should land. */
+    const val NEW_ISSUE_URL = "$REPO_URL/issues/new"
 }
