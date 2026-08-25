@@ -1,9 +1,9 @@
 ---
 name: agent-voice-self-setup
-description: Diagnose and repair an WakeHermesClaw install end-to-end. Use when the user reports that paired devices stopped working, when bridge auto-disabled, or when "is everything wired correctly?" — equivalent to running `hermes-status` plus walking through the WakeHermesClaw setup wizard.
+description: Diagnose and repair a WakeClaw install end-to-end. Use when the user reports that paired devices stopped working, when bridge auto-disabled, or when "is everything wired correctly?" — equivalent to running `hermes-status` plus walking through the WakeClaw setup wizard.
 ---
 
-# WakeHermesClaw - self-setup / status skill
+# WakeClaw - self-setup / status skill
 
 Use this skill when:
 
@@ -14,7 +14,7 @@ Use this skill when:
 
 ## What to do
 
-1. **Read the manifest** (`GET /manifest` on the WakeHermesClaw Mobile Bridge).
+1. **Read the manifest** (`GET /manifest` on the WakeClaw Mobile Bridge).
    If it 401s, the token rotated → ask the user to re-pair via
    `agentvoice-pair` on the PC and re-scan the QR.
 2. **Cross-check expected capabilities**. The minimum a healthy install
@@ -37,7 +37,7 @@ Use this skill when:
 ## When NOT to use this skill
 
 - The user's question is about modifying a Hermes prompt or model, not
-  the WakeHermesClaw connection.
+  the WakeClaw connection.
 - They explicitly want to factory-reset; use a teardown skill instead.
 
 ## What to report back

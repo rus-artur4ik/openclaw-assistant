@@ -1,4 +1,4 @@
-"""Python helper for the WakeHermesClaw for Android Mobile Bridge.
+"""Python helper for the WakeClaw for Android Mobile Bridge.
 
 Designed to be dropped into a Hermes Agent tool directory. Reads
 `AGENT_VOICE_BRIDGE_URL` and `AGENT_VOICE_BRIDGE_TOKEN` from the

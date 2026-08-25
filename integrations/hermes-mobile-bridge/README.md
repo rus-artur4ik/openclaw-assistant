@@ -1,6 +1,6 @@
-# WakeHermesClaw pairing helper
+# WakeClaw pairing helper
 
-The fastest way to set up WakeHermesClaw is to install the host-side helper, then
+The fastest way to set up WakeClaw is to install the host-side helper, then
 scan the one QR it prints:
 
 ```bash
@@ -9,9 +9,9 @@ agentvoice-pair
 ```
 
 The helper checks whether Hermes, OpenClaw, and Tailscale are installed locally,
-asks which backends to include, and creates one WakeHermesClaw setup QR. If the QR
+asks which backends to include, and creates one WakeClaw setup QR. If the QR
 is too large for the current terminal, it opens a generated SVG QR image instead
-of printing an unreadable terminal block. Scanning that single QR in WakeHermesClaw
+of printing an unreadable terminal block. Scanning that single QR in WakeClaw
 can configure both Hermes and OpenClaw.
 If you want the phone to work outside your LAN, answer yes when it asks about
 Tailscale/VPN endpoint candidates.
@@ -20,7 +20,7 @@ Tailscale/VPN endpoint candidates.
 
 # hermes-mobile-bridge
 
-Python helper for calling the **WakeHermesClaw for Android** Mobile Bridge
+Python helper for calling the **WakeClaw for Android** Mobile Bridge
 from a Hermes Agent toolchain.
 
 The bridge itself is documented at
@@ -40,7 +40,7 @@ The helper reads two environment variables:
 | Variable                    | Description                                |
 |-----------------------------|--------------------------------------------|
 | `AGENT_VOICE_BRIDGE_URL`    | e.g. `http://192.168.1.42:8787`            |
-| `AGENT_VOICE_BRIDGE_TOKEN`  | The token shown in WakeHermesClaw Settings   |
+| `AGENT_VOICE_BRIDGE_TOKEN`  | The token shown in WakeClaw Settings       |
 
 Never commit the token; it grants execute access to opt-in capabilities.
 
@@ -57,7 +57,7 @@ print(bridge.execute("device.info"))
 
 ```python
 # Launch an app — assumes the user has approved apps.launch in
-# WakeHermesClaw and is on hand to confirm the medium-risk prompt.
+# WakeClaw and is on hand to confirm the medium-risk prompt.
 bridge.execute("apps.launch", {"packageName": "com.android.settings"})
 ```
 

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""agentvoice-pair / hermes-pair — print one QR for WakeHermesClaw setup.
+"""agentvoice-pair / hermes-pair — print one QR for WakeClaw setup.
 
 The helper is intentionally host-side and mostly automatic:
 
 1. Detect whether Hermes, OpenClaw, and Tailscale are installed locally.
 2. Read common env vars, .env files, and config JSON files before asking.
 3. Include detected Hermes/OpenClaw/Tailscale candidates automatically.
-4. Print one WakeHermesClaw setup JSON QR. Scanning that single QR in WakeHermesClaw
+4. Print one WakeClaw setup JSON QR. Scanning that single QR in WakeClaw
    can configure both Hermes Agent and OpenClaw. A deep-link fallback is also
    printed for external camera apps.
 
@@ -791,7 +791,7 @@ def maybe_configure_hermes_remote_access(hermes_key: Optional[str], remote_host:
     if not is_port_open("127.0.0.1", 8642):
         return hermes_key
     print("Hermes API Server is reachable only from this Mac right now.")
-    print(f"To use WakeHermesClaw from your phone, Hermes must listen on Tailscale/LAN: http://{remote_host}:8642")
+    print(f"To use WakeClaw from your phone, Hermes must listen on Tailscale/LAN: http://{remote_host}:8642")
     if not ask_yes_no("Configure Hermes API Server for phone access and restart it now?", True):
         return hermes_key
     env_path = Path.home() / ".hermes" / ".env"
@@ -1132,7 +1132,7 @@ def openclaw_setup_code_from_cli() -> Optional[str]:
 
 def openclaw_setup_code_from_local_install() -> Optional[str]:
     # Prefer local config credentials when available. Current OpenClaw `qr`
-    # emits a bootstrapToken for device pairing; WakeHermesClaw also opens an
+    # emits a bootstrapToken for device pairing; WakeClaw also opens an
     # operator session, so include both the local password and bootstrapToken
     # when we can resolve them on the user's own machine.
     config_code = openclaw_setup_code_from_config()
@@ -1647,7 +1647,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     discovered_hermes_url = discover_hermes_url()
     discovered_openclaw_setup_code = args.openclaw_setup_code or discover_openclaw_setup_code() or openclaw_setup_code_from_local_install()
 
-    print("WakeHermesClaw pairing helper")
+    print("WakeClaw pairing helper")
     print(f"  Hermes:   {'found' if hermes_installed else 'not found'}; API port {'open' if hermes_port_open else 'not detected'}; dashboard {'open' if dashboard_port_open else 'not detected'}")
     print(f"  OpenClaw: {'found' if openclaw_installed else 'not found'}; gateway port {'open' if openclaw_port_open else 'not detected'}")
     print(f"  Tailscale:{' found' if tailscale_installed else ' not found'}")
@@ -1848,7 +1848,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     cols, rows = shutil.get_terminal_size(fallback=(80, 24))
     fits_terminal = terminal_width <= cols and terminal_height + 8 <= rows
 
-    print("\nScan this one QR inside WakeHermesClaw:")
+    print("\nScan this one QR inside WakeClaw:")
     opened = False if args.no_open else open_file(qr_path)
     print(f"  QR image: {qr_path}")
     if opened:
@@ -1862,7 +1862,7 @@ def main(argv: Optional[List[str]] = None) -> int:
             print("(QR rendering unavailable on this machine.)")
     else:
         print(f"  Terminal QR omitted because it is {terminal_width}x{terminal_height} cells and your terminal is {cols}x{rows}.")
-    print("\nQR payload for WakeHermesClaw in-app scanner:")
+    print("\nQR payload for WakeClaw in-app scanner:")
     print(f"  {qr_payload}\n")
     print("External-camera fallback link:")
     print(f"  {deep_link}\n")
