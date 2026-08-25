@@ -417,6 +417,7 @@
     <string name="voice_engine_openclaw_settings_desc">Read-only, taken from the gateway. Change them in openclaw itself.</string>
     <string name="voice_engine_openclaw_settings_refresh">Refresh</string>
     <string name="voice_engine_openclaw_settings_unavailable">Could not read the Talk configuration from the gateway.</string>
+    <string name="voice_engine_openclaw_settings_offline">Nothing to read yet — the openclaw gateway is not reachable. These appear once it connects.</string>
     <string name="voice_engine_field_provider">Voice provider</string>
     <string name="voice_engine_field_voice">Voice</string>
     <string name="voice_engine_field_model">Model</string>

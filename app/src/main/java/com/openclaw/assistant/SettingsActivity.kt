@@ -307,6 +307,9 @@ fun SettingsScreen(
     var talkConfig by remember { mutableStateOf<com.openclaw.assistant.talk.TalkConfigSummary?>(null) }
     var talkConfigLoading by remember { mutableStateOf(false) }
     var talkConfigFetched by remember { mutableStateOf(false) }
+    // Bumped by Refresh. Clearing `fetched` cannot retrigger the fetch when it
+    // is already false, which is exactly the case after an attempt that never ran.
+    var talkConfigAttempt by remember { mutableIntStateOf(0) }
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -1169,13 +1172,12 @@ fun SettingsScreen(
             val relayUsable = relayAvailability.isRelay
             val relaySelected = voiceEngine == SettingsRepository.VOICE_ENGINE_OPENCLAW_TALK
 
-            LaunchedEffect(relaySelected, relayUsable, talkConfigFetched) {
-                if (relaySelected && relayUsable && !talkConfigFetched) {
-                    talkConfigLoading = true
-                    talkConfig = com.openclaw.assistant.talk.TalkRelayClient(runtime).fetchConfig()
-                    talkConfigFetched = true
-                    talkConfigLoading = false
-                }
+            LaunchedEffect(relaySelected, relayUsable, talkConfigAttempt) {
+                if (!relaySelected || !relayUsable) return@LaunchedEffect
+                talkConfigLoading = true
+                talkConfig = com.openclaw.assistant.talk.TalkRelayClient(runtime).fetchConfig()
+                talkConfigFetched = true
+                talkConfigLoading = false
             }
 
             Text(
@@ -1261,7 +1263,8 @@ fun SettingsScreen(
                     summary = talkConfig,
                     loading = talkConfigLoading,
                     fetched = talkConfigFetched,
-                    onRefresh = { talkConfigFetched = false }
+                    relayUsable = relayUsable,
+                    onRefresh = { talkConfigAttempt++ }
                 )
             }
 
@@ -2388,6 +2391,7 @@ private fun TalkConfigCard(
     summary: com.openclaw.assistant.talk.TalkConfigSummary?,
     loading: Boolean,
     fetched: Boolean,
+    relayUsable: Boolean,
     onRefresh: () -> Unit,
 ) {
     Text(
@@ -2410,20 +2414,32 @@ private fun TalkConfigCard(
             )
             Spacer(modifier = Modifier.height(12.dp))
 
-            when {
-                loading || !fetched -> {
+            when (com.openclaw.assistant.ui.settings.TalkConfigCardState.of(
+                relayUsable = relayUsable,
+                loading = loading,
+                fetched = fetched,
+                hasSummary = summary != null,
+            )) {
+                com.openclaw.assistant.ui.settings.TalkConfigCardState.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                 }
-                summary == null -> {
+                com.openclaw.assistant.ui.settings.TalkConfigCardState.Offline -> {
+                    Text(
+                        stringResource(R.string.voice_engine_openclaw_settings_offline),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+                }
+                com.openclaw.assistant.ui.settings.TalkConfigCardState.Failed -> {
                     Text(
                         stringResource(R.string.voice_engine_openclaw_settings_unavailable),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error
                     )
                 }
-                else -> {
+                com.openclaw.assistant.ui.settings.TalkConfigCardState.Loaded -> {
                     val rows = buildList {
-                        summary.provider?.let { add(stringResource(R.string.voice_engine_field_provider) to it) }
+                        summary!!.provider?.let { add(stringResource(R.string.voice_engine_field_provider) to it) }
                         summary.voiceId?.let { add(stringResource(R.string.voice_engine_field_voice) to it) }
                         summary.modelId?.let { add(stringResource(R.string.voice_engine_field_model) to it) }
                         summary.languageCode?.let { add(stringResource(R.string.voice_engine_field_language) to it) }
