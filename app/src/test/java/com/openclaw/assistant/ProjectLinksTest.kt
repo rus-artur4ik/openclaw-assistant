@@ -37,15 +37,13 @@ class ProjectLinksTest {
         assertEquals("https://github.com/rus-artur4ik/openclaw-assistant/issues/new", ProjectLinks.NEW_ISSUE_URL)
     }
 
-    @Test fun `the setup script is fetched from a stable, revision-agnostic url`() {
-        // A gist raw URL that carries a commit sha freezes to that revision, so
-        // fixing the script would never reach anyone who already has the app.
+    @Test fun `the setup link points at a gist this account owns`() {
+        // Shipped in the app and meant to be opened on a computer, so it has to
+        // be a plain page URL rather than a raw file pinned to one revision.
         assertEquals(
-            "https://gist.githubusercontent.com/rus-artur4ik/a1edddd8bcbc2885831b0b378d72ba95/raw/wakeclaw-hermes-setup.sh",
-            ProjectLinks.SETUP_SCRIPT_RAW_URL,
+            "https://gist.github.com/rus-artur4ik/a1edddd8bcbc2885831b0b378d72ba95",
+            ProjectLinks.SETUP_GIST_URL,
         )
-        assertTrue(ProjectLinks.SETUP_ONE_LINER.contains(ProjectLinks.SETUP_SCRIPT_RAW_URL))
-        assertTrue(ProjectLinks.SETUP_GIST_URL.startsWith("https://gist.github.com/rus-artur4ik/"))
     }
 
     @Test fun `nothing shipped still references the project this was forked from`() {

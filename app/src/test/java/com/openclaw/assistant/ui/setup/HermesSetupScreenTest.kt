@@ -223,13 +223,15 @@ class HermesSetupScreenTest {
         compose.onNodeWithText("agentvoice-pair").assertDoesNotExist()
     }
 
-    @Test fun `expanding the instructions offers the one-command shortcut`() {
+    @Test fun `expanding the instructions hands over a link for the computer`() {
+        // The commands cannot run on the phone, so the phone's job is to get
+        // the link across to the machine that hosts Hermes.
         show(HermesSetupUiState())
         compose.onNodeWithText("Show me what to do").performScrollTo().performClick()
 
-        compose.onNodeWithText(ProjectLinks.SETUP_ONE_LINER).performScrollTo().assertIsDisplayed()
-        // Piping a URL into a shell should never be the only option offered.
-        compose.onNodeWithText("Read the script first").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText(ProjectLinks.SETUP_GIST_URL).performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Send to my computer").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Open").performScrollTo().assertIsDisplayed()
     }
 
     @Test fun `expanding the instructions shows the three host steps`() {

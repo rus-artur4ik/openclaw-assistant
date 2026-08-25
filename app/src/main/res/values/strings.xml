@@ -1141,9 +1141,10 @@ See the official VOICEVOX website for details.</string>
     <string name="hermes_setup_key_hide">Hide key</string>
     <!-- Guided Hermes setup: what to do on the host -->
     <string name="hermes_setup_help_title">How to set Hermes up for this phone</string>
-    <string name="hermes_setup_help_oneliner">One command does all of it — it enables the API server, binds it, generates a key, restarts the gateway, then prints the address and key to type above:</string>
-    <string name="hermes_setup_help_view_script">Read the script first</string>
-    <string name="hermes_setup_help_manual_intro">Or run the three steps yourself:</string>
+    <string name="hermes_setup_help_oneliner">These commands run on the computer, not here. Send yourself this link and open it there — it lists every step, and a script that does all of them at once:</string>
+    <string name="hermes_setup_help_open_link">Open</string>
+    <string name="hermes_setup_help_share_link">Send to my computer</string>
+    <string name="hermes_setup_help_manual_intro">The same steps, if you would rather type them:</string>
     <string name="hermes_setup_help_intro">Hermes listens on 127.0.0.1 out of the box, which a phone cannot reach. Let the helper fix that for you:</string>
     <string name="hermes_setup_help_step_enable">1. Turn the API server on — it is off on a fresh install:</string>
     <string name="hermes_setup_help_step_env">2. Add two lines to ~/.hermes/.env. The first is what makes it reachable from this phone; the second is the key you type above:</string>

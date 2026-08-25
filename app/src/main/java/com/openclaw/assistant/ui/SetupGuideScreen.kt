@@ -743,13 +743,25 @@ private fun HermesConnectContent(configuredBackendCount: Int) {
                     fontWeight = FontWeight.Bold
                 )
                 Text(stringResource(R.string.av_pairing_card_step1), style = MaterialTheme.typography.bodyMedium, color = OnboardingTextPrimary)
-                // Same shortcut the setup wizard offers, so onboarding is not
-                // the slower path.
+                // The commands belong on the computer, so onboarding hands over
+                // the link rather than pretending the phone can run them.
                 Text(stringResource(R.string.hermes_setup_help_oneliner), style = MaterialTheme.typography.bodySmall, color = OnboardingTextSecondary)
-                CommandBlock(com.openclaw.assistant.ProjectLinks.SETUP_ONE_LINER)
+                CommandBlock(com.openclaw.assistant.ProjectLinks.SETUP_GIST_URL)
                 val uriHandler = LocalUriHandler.current
-                TextButton(onClick = { uriHandler.openUri(com.openclaw.assistant.ProjectLinks.SETUP_GIST_URL) }) {
-                    Text(stringResource(R.string.hermes_setup_help_view_script))
+                val shareTitle = stringResource(R.string.hermes_setup_help_share_link)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    TextButton(
+                        onClick = {
+                            val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(android.content.Intent.EXTRA_TEXT, com.openclaw.assistant.ProjectLinks.SETUP_GIST_URL)
+                            }
+                            context.startActivity(android.content.Intent.createChooser(intent, shareTitle))
+                        },
+                    ) { Text(shareTitle) }
+                    TextButton(onClick = { uriHandler.openUri(com.openclaw.assistant.ProjectLinks.SETUP_GIST_URL) }) {
+                        Text(stringResource(R.string.hermes_setup_help_open_link))
+                    }
                 }
                 Text(stringResource(R.string.hermes_setup_help_manual_intro), style = MaterialTheme.typography.bodySmall, color = OnboardingTextSecondary)
                 // The same three commands the setup wizard shows, so there is one

@@ -309,15 +309,11 @@ private fun HostSetupHelp(startExpanded: Boolean) {
             if (expanded) {
                 Text(stringResource(R.string.hermes_setup_help_intro), style = MaterialTheme.typography.bodySmall)
 
-                // The shortcut first, because it is what most people want; the
-                // explicit steps stay right below it for anyone who would
-                // rather not pipe a URL into a shell.
+                // None of this can be done from the phone, so the useful thing
+                // the phone can do is hand the link to the computer.
                 Text(stringResource(R.string.hermes_setup_help_oneliner), style = MaterialTheme.typography.bodySmall)
-                CopyableCommand(ProjectLinks.SETUP_ONE_LINER)
-                val uriHandler = LocalUriHandler.current
-                TextButton(onClick = { uriHandler.openUri(ProjectLinks.SETUP_GIST_URL) }) {
-                    Text(stringResource(R.string.hermes_setup_help_view_script))
-                }
+                CopyableCommand(ProjectLinks.SETUP_GIST_URL)
+                SetupLinkActions()
 
                 Text(stringResource(R.string.hermes_setup_help_manual_intro), style = MaterialTheme.typography.bodySmall)
                 Text(stringResource(R.string.hermes_setup_help_step_enable), style = MaterialTheme.typography.bodySmall)
@@ -332,6 +328,33 @@ private fun HostSetupHelp(startExpanded: Boolean) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
+        }
+    }
+}
+
+/**
+ * Ways to get the setup link onto the computer that actually runs Hermes.
+ *
+ * Copying it on the phone is not much use on its own, so sharing is offered
+ * alongside opening.
+ */
+@Composable
+private fun SetupLinkActions() {
+    val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
+    val shareTitle = stringResource(R.string.hermes_setup_help_share_link)
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        TextButton(
+            onClick = {
+                val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(android.content.Intent.EXTRA_TEXT, ProjectLinks.SETUP_GIST_URL)
+                }
+                context.startActivity(android.content.Intent.createChooser(intent, shareTitle))
+            },
+        ) { Text(shareTitle) }
+        TextButton(onClick = { uriHandler.openUri(ProjectLinks.SETUP_GIST_URL) }) {
+            Text(stringResource(R.string.hermes_setup_help_open_link))
         }
     }
 }
