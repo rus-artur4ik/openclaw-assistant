@@ -498,8 +498,6 @@
 <string name="setup_guide_step_format">Шаг %1$d из %2$d</string>
 <string name="setup_guide_welcome_title">Что вы получаете</string>
 <string name="setup_guide_welcome_bullet_1">Управляйте шлюзом и чатом оператора с одной мобильной поверхности.</string>
-<string name="setup_guide_welcome_bullet_2">Подключитесь с помощью кода настройки и восстановите сопряжение с помощью команд CLI.</string>
-<string name="setup_guide_welcome_bullet_3">Включите только те разрешения и возможности, которые вам нужны.</string>
 <string name="setup_guide_welcome_bullet_4">Завершите проверку реального соединения перед входом в приложение.</string>
 <string name="setup_guide_connection_title">Подключение backend</string>
 <string name="setup_guide_connection_guide_title">Получите код настройки + URL-адрес шлюза</string>
@@ -720,15 +718,9 @@
 
     <string name="av_backend_hermes">Hermes Agent</string>
     <string name="av_backend_openclaw">OpenClaw</string>
-    <string name="av_backend_hermes_subtitle">Hermes API Server. Helper обнаруживает Hermes, читает локальную конфигурацию/env и добавляет его в общий QR.</string>
     <string name="av_backend_openclaw_subtitle">OpenClaw Gateway / HTTP. Тот же helper обнаруживает OpenClaw и добавляет setup code в общий QR.</string>
     <string name="av_backend_open_openclaw_setup">Открыть настройку OpenClaw</string>
 
-    <string name="av_hermes_card_title">WakeClaw · настройка одним QR</string>
-    <string name="av_hermes_card_step1">1. На машине с Hermes/OpenClaw установите helper WakeClaw:</string>
-    <string name="av_hermes_card_step2">2. Запустите helper. Он прочитает локальные настройки Hermes/OpenClaw, обнаружит Tailscale и покажет один QR:</string>
-    <string name="av_hermes_card_step3">3. Отсканируйте этот QR в WakeClaw. Если включены Hermes и OpenClaw, обе настройки применяются вместе.</string>
-    <string name="av_hermes_card_note">Для использования вне дома ответьте да на вопрос Tailscale/VPN, чтобы QR включал LAN + Tailscale endpoints.</string>
 
     <string name="av_openclaw_card_title">OpenClaw · отсканируйте QR с сервера</string>
     <string name="av_openclaw_card_step1">1. На сервере OpenClaw:</string>

@@ -470,8 +470,6 @@ Para más detalles, consulta el sitio oficial de VOICEVOX.</string>
 <string name="setup_guide_step_format">Paso %1$d de %2$d</string>
 <string name="setup_guide_welcome_title">Lo que obtienes</string>
 <string name="setup_guide_welcome_bullet_1">Controle la puerta de enlace y el chat del operador desde una superficie móvil.</string>
-<string name="setup_guide_welcome_bullet_2">Conéctese con el código de configuración y recupere el emparejamiento con los comandos CLI.</string>
-<string name="setup_guide_welcome_bullet_3">Habilite solo los permisos y capacidades que desee.</string>
 <string name="setup_guide_welcome_bullet_4">Termine con una verificación de conexión real antes de ingresar a la aplicación.</string>
 <string name="setup_guide_connection_title">Conexión de backend</string>
 <string name="setup_guide_connection_guide_title">Obtener código de configuración + URL de puerta de enlace</string>
@@ -692,15 +690,9 @@ Para más detalles, consulta el sitio oficial de VOICEVOX.</string>
 
     <string name="av_backend_hermes">Hermes Agent</string>
     <string name="av_backend_openclaw">OpenClaw</string>
-    <string name="av_backend_hermes_subtitle">Hermes API Server. El helper detecta Hermes, lee la configuración/env local y lo incluye en el QR compartido.</string>
     <string name="av_backend_openclaw_subtitle">OpenClaw Gateway / HTTP. El mismo helper detecta OpenClaw y añade su setup code al QR compartido.</string>
     <string name="av_backend_open_openclaw_setup">Abrir configuración de OpenClaw</string>
 
-    <string name="av_hermes_card_title">WakeClaw · configuración con un QR</string>
-    <string name="av_hermes_card_step1">1. En la máquina que ejecuta Hermes/OpenClaw, instala el helper de WakeClaw:</string>
-    <string name="av_hermes_card_step2">2. Ejecuta el helper. Lee la configuración local de Hermes/OpenClaw, detecta Tailscale y muestra un QR:</string>
-    <string name="av_hermes_card_step3">3. Escanea ese QR dentro de WakeClaw. Si incluye Hermes y OpenClaw, ambas configuraciones se aplican juntas.</string>
-    <string name="av_hermes_card_note">Para usarlo fuera de casa, responde sí a la pregunta de Tailscale/VPN para incluir candidatos LAN + Tailscale en el QR.</string>
 
     <string name="av_openclaw_card_title">OpenClaw · escanea un QR desde tu servidor</string>
     <string name="av_openclaw_card_step1">1. En tu servidor OpenClaw:</string>

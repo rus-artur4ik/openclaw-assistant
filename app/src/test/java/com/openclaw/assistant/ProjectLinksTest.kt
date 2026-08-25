@@ -37,6 +37,17 @@ class ProjectLinksTest {
         assertEquals("https://github.com/rus-artur4ik/openclaw-assistant/issues/new", ProjectLinks.NEW_ISSUE_URL)
     }
 
+    @Test fun `the setup script is fetched from a stable, revision-agnostic url`() {
+        // A gist raw URL that carries a commit sha freezes to that revision, so
+        // fixing the script would never reach anyone who already has the app.
+        assertEquals(
+            "https://gist.githubusercontent.com/rus-artur4ik/a1edddd8bcbc2885831b0b378d72ba95/raw/wakeclaw-hermes-setup.sh",
+            ProjectLinks.SETUP_SCRIPT_RAW_URL,
+        )
+        assertTrue(ProjectLinks.SETUP_ONE_LINER.contains(ProjectLinks.SETUP_SCRIPT_RAW_URL))
+        assertTrue(ProjectLinks.SETUP_GIST_URL.startsWith("https://gist.github.com/rus-artur4ik/"))
+    }
+
     @Test fun `nothing shipped still references the project this was forked from`() {
         assertEquals(emptyList<String>(), scanFor(FORK_PARENT))
     }
@@ -47,6 +58,16 @@ class ProjectLinksTest {
         // longer exists in this repository.
         assertEquals(emptyList<String>(), scanFor("agentvoice-pair"))
         assertEquals(emptyList<String>(), scanFor("integrations/agentvoice-pair"))
+    }
+
+    @Test fun `no shipped copy still describes the removed pairing flow`() {
+        // Searching only for the command name missed the strings that described
+        // the helper in prose, in ten languages.
+        // Not "scan the QR" on its own: OpenClaw keeps its own QR, carrying a
+        // setup code from `openclaw qr`, and that one never involved the helper.
+        listOf("pairing helper", "scan one QR", "hermes_pair", "WakeClaw QR").forEach { phrase ->
+            assertEquals("still describes the removed flow: $phrase", emptyList<String>(), scanFor(phrase))
+        }
     }
 
     @Test fun `the pairing deep link is no longer advertised`() {

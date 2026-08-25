@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -742,6 +743,15 @@ private fun HermesConnectContent(configuredBackendCount: Int) {
                     fontWeight = FontWeight.Bold
                 )
                 Text(stringResource(R.string.av_pairing_card_step1), style = MaterialTheme.typography.bodyMedium, color = OnboardingTextPrimary)
+                // Same shortcut the setup wizard offers, so onboarding is not
+                // the slower path.
+                Text(stringResource(R.string.hermes_setup_help_oneliner), style = MaterialTheme.typography.bodySmall, color = OnboardingTextSecondary)
+                CommandBlock(com.openclaw.assistant.ProjectLinks.SETUP_ONE_LINER)
+                val uriHandler = LocalUriHandler.current
+                TextButton(onClick = { uriHandler.openUri(com.openclaw.assistant.ProjectLinks.SETUP_GIST_URL) }) {
+                    Text(stringResource(R.string.hermes_setup_help_view_script))
+                }
+                Text(stringResource(R.string.hermes_setup_help_manual_intro), style = MaterialTheme.typography.bodySmall, color = OnboardingTextSecondary)
                 // The same three commands the setup wizard shows, so there is one
                 // story about how Hermes is made reachable rather than two.
                 Text(stringResource(R.string.hermes_setup_help_step_enable), style = MaterialTheme.typography.bodySmall, color = OnboardingTextSecondary)

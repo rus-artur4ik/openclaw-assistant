@@ -125,7 +125,6 @@
     <!-- Backend cards -->
     <string name="av_backend_hermes">Hermes Agent</string>
     <string name="av_backend_openclaw">OpenClaw</string>
-    <string name="av_backend_hermes_subtitle">Hermes Agent API Server. The pairing helper detects Hermes Agent, reads config/env, and includes it in the shared QR.</string>
     <string name="av_backend_openclaw_subtitle">OpenClaw. The same helper detects OpenClaw and adds its setup code to the shared QR.</string>
     <string name="av_backend_open_openclaw_setup">Open OpenClaw setup</string>
 
@@ -134,7 +133,7 @@
     <string name="av_setup_scope_both">Hermes Agent and OpenClaw will be included in one QR.</string>
     <string name="av_setup_scope_hermes">Only Hermes Agent will be included in the QR.</string>
     <string name="av_setup_scope_openclaw">Only OpenClaw will be included in the QR.</string>
-    <string name="av_pairing_card_step1">On the computer running Hermes, the API server has to be switched on and told to listen beyond localhost. Three commands:</string>
+    <string name="av_pairing_card_step1">On the computer running Hermes, the API server has to be switched on and told to listen beyond localhost.</string>
     <string name="av_pairing_card_step2">Then add the backend here — the app finds the address itself, or you can type it in.</string>
     <string name="av_pairing_card_step3">Add Hermes Agent</string>
     <string name="av_pairing_card_note">The phone and the computer have to reach each other — same Wi-Fi, or a VPN such as Tailscale. A guest network that isolates clients will block this.</string>
@@ -143,11 +142,6 @@
     <string name="av_setup_command_copied">Command copied</string>
 
     <!-- Hermes QR card -->
-    <string name="av_hermes_card_title">WakeClaw · one QR setup</string>
-    <string name="av_hermes_card_step1">1. On the machine running Hermes Agent/OpenClaw, install the WakeClaw pairing helper:</string>
-    <string name="av_hermes_card_step2">2. Run the helper. It reads local Hermes Agent/OpenClaw settings, detects Tailscale, and prints one QR:</string>
-    <string name="av_hermes_card_step3">3. Scan that QR in WakeClaw. Hermes Agent and OpenClaw settings are applied together when both are included.</string>
-    <string name="av_hermes_card_note">For use away from home, answer yes to the Tailscale/VPN prompt so the QR includes LAN + Tailscale endpoint candidates.</string>
     <string name="av_hermes_use_runs_api">Use Runs API</string>
     <string name="av_hermes_stream_responses">Stream responses</string>
 
@@ -839,8 +833,8 @@ See the official VOICEVOX website for details.</string>
     <string name="setup_guide_step_format">Step %1$d of %2$d</string>
     <string name="setup_guide_welcome_title">What You Get</string>
     <string name="setup_guide_welcome_bullet_1">Use OpenClaw and Hermes Agent from the same native voice client.</string>
-    <string name="setup_guide_welcome_bullet_2">Install one helper on your computer and scan one QR in this app.</string>
-    <string name="setup_guide_welcome_bullet_3">Include LAN or Tailscale endpoints without hand-copying URLs.</string>
+    <string name="setup_guide_welcome_bullet_2">One command on your computer opens Hermes to the phone, or run the three steps yourself.</string>
+    <string name="setup_guide_welcome_bullet_3">The app finds the server on your network — no URLs to copy by hand.</string>
     <string name="setup_guide_welcome_bullet_4">Review the configured backends before entering the app.</string>
     <string name="setup_guide_connection_title">Backend Connection</string>
     <string name="setup_guide_connection_guide_title">Get setup code + OpenClaw URL</string>
@@ -867,7 +861,7 @@ See the official VOICEVOX website for details.</string>
     <string name="setup_guide_connection_waiting">No backend yet. Add one to continue.</string>
     <string name="setup_guide_connection_ready">%1$d backend(s) configured. Continue to permissions.</string>
     <string name="setup_guide_configured_backends">%1$d configured</string>
-    <string name="setup_guide_no_backends_yet">No backend is configured yet. Go back and scan the WakeClaw QR.</string>
+    <string name="setup_guide_no_backends_yet">No backend is configured yet. Go back and add one.</string>
     <string name="setup_guide_invalid_code">Invalid setup code.</string>
     <string name="setup_guide_invalid_url">Invalid OpenClaw URL.</string>
 
@@ -1146,7 +1140,10 @@ See the official VOICEVOX website for details.</string>
     <string name="hermes_setup_key_show">Show key</string>
     <string name="hermes_setup_key_hide">Hide key</string>
     <!-- Guided Hermes setup: what to do on the host -->
-    <string name="hermes_setup_help_title">Hermes not showing up?</string>
+    <string name="hermes_setup_help_title">How to set Hermes up for this phone</string>
+    <string name="hermes_setup_help_oneliner">One command does all of it — it enables the API server, binds it, generates a key, restarts the gateway, then prints the address and key to type above:</string>
+    <string name="hermes_setup_help_view_script">Read the script first</string>
+    <string name="hermes_setup_help_manual_intro">Or run the three steps yourself:</string>
     <string name="hermes_setup_help_intro">Hermes listens on 127.0.0.1 out of the box, which a phone cannot reach. Let the helper fix that for you:</string>
     <string name="hermes_setup_help_step_enable">1. Turn the API server on — it is off on a fresh install:</string>
     <string name="hermes_setup_help_step_env">2. Add two lines to ~/.hermes/.env. The first is what makes it reachable from this phone; the second is the key you type above:</string>

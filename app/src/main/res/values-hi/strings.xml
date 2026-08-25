@@ -470,8 +470,6 @@
 <string name="setup_guide_step_format">%2$d का चरण %1$d</string>
 <string name="setup_guide_welcome_title">आपको क्या मिलता है</string>
 <string name="setup_guide_welcome_bullet_1">एक मोबाइल सतह से गेटवे और ऑपरेटर चैट को नियंत्रित करें।</string>
-<string name="setup_guide_welcome_bullet_2">सेटअप कोड से कनेक्ट करें और सीएलआई कमांड के साथ पेयरिंग पुनर्प्राप्त करें।</string>
-<string name="setup_guide_welcome_bullet_3">केवल वही अनुमतियाँ और क्षमताएँ सक्षम करें जो आप चाहते हैं।</string>
 <string name="setup_guide_welcome_bullet_4">ऐप में प्रवेश करने से पहले वास्तविक कनेक्शन जांच के साथ समाप्त करें।</string>
 <string name="setup_guide_connection_title">बैकएंड कनेक्शन सेटअप</string>
 <string name="setup_guide_connection_guide_title">सेटअप कोड + गेटवे यूआरएल प्राप्त करें</string>
@@ -692,15 +690,9 @@
 
     <string name="av_backend_hermes">Hermes Agent</string>
     <string name="av_backend_openclaw">OpenClaw</string>
-    <string name="av_backend_hermes_subtitle">Hermes API Server। pairing helper Hermes को पहचानता है, स्थानीय config/env पढ़ता है, और उसे साझा QR में शामिल करता है।</string>
     <string name="av_backend_openclaw_subtitle">OpenClaw Gateway / HTTP। वही helper OpenClaw को पहचानता है और उसके setup code को साझा QR में जोड़ता है।</string>
     <string name="av_backend_open_openclaw_setup">OpenClaw सेटअप खोलें</string>
 
-    <string name="av_hermes_card_title">WakeClaw · एक QR से सेटअप</string>
-    <string name="av_hermes_card_step1">1. Hermes/OpenClaw चलाने वाली मशीन पर WakeClaw pairing helper इंस्टॉल करें:</string>
-    <string name="av_hermes_card_step2">2. helper चलाएँ। यह स्थानीय Hermes/OpenClaw सेटिंग पढ़ेगा, Tailscale का पता लगाएगा और एक QR दिखाएगा:</string>
-    <string name="av_hermes_card_step3">3. उस QR को WakeClaw में स्कैन करें। यदि Hermes और OpenClaw दोनों शामिल हैं, तो दोनों सेटिंग एक साथ लागू होंगी।</string>
-    <string name="av_hermes_card_note">घर से बाहर उपयोग के लिए Tailscale/VPN वाले सवाल में हाँ चुनें, ताकि QR में LAN + Tailscale endpoint candidates शामिल हों।</string>
 
     <string name="av_openclaw_card_title">OpenClaw · सर्वर से QR स्कैन करें</string>
     <string name="av_openclaw_card_step1">1. अपने OpenClaw सर्वर पर:</string>

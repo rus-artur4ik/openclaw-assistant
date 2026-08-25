@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import com.openclaw.assistant.ProjectLinks
 import com.openclaw.assistant.backend.HermesCapabilities
 import com.openclaw.assistant.backend.HermesLanScanner
 import com.openclaw.assistant.backend.HermesModelOption
@@ -217,9 +218,18 @@ class HermesSetupScreenTest {
 
     @Test fun `the host instructions are available before anything has failed`() {
         show(HermesSetupUiState())
-        compose.onNodeWithText("Hermes not showing up?").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("How to set Hermes up for this phone").performScrollTo().assertIsDisplayed()
         // Collapsed until asked for, so it does not bury the address field.
         compose.onNodeWithText("agentvoice-pair").assertDoesNotExist()
+    }
+
+    @Test fun `expanding the instructions offers the one-command shortcut`() {
+        show(HermesSetupUiState())
+        compose.onNodeWithText("Show me what to do").performScrollTo().performClick()
+
+        compose.onNodeWithText(ProjectLinks.SETUP_ONE_LINER).performScrollTo().assertIsDisplayed()
+        // Piping a URL into a shell should never be the only option offered.
+        compose.onNodeWithText("Read the script first").performScrollTo().assertIsDisplayed()
     }
 
     @Test fun `expanding the instructions shows the three host steps`() {

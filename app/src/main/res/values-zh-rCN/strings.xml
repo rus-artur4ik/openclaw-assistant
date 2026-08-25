@@ -470,8 +470,6 @@
 <string name="setup_guide_step_format">%2$d 的步骤 %1$d</string>
 <string name="setup_guide_welcome_title">您得到什么</string>
 <string name="setup_guide_welcome_bullet_1">从一个移动表面控制网关和操作员聊天。</string>
-<string name="setup_guide_welcome_bullet_2">连接设置代码并使用 CLI 命令恢复配对。</string>
-<string name="setup_guide_welcome_bullet_3">仅启用所需的权限和功能。</string>
 <string name="setup_guide_welcome_bullet_4">在进入应用程序之前完成真实连接检查。</string>
 <string name="setup_guide_connection_title">后端连接设置</string>
 <string name="setup_guide_connection_guide_title">获取设置代码 + 网关 URL</string>
@@ -692,15 +690,9 @@
 
     <string name="av_backend_hermes">Hermes Agent</string>
     <string name="av_backend_openclaw">OpenClaw</string>
-    <string name="av_backend_hermes_subtitle">Hermes API Server。配对 helper 会检测 Hermes，读取本机配置/env，并加入共享 QR。</string>
     <string name="av_backend_openclaw_subtitle">OpenClaw Gateway / HTTP。同一个 helper 会检测 OpenClaw，并把 setup code 加入共享 QR。</string>
     <string name="av_backend_open_openclaw_setup">打开 OpenClaw 设置</string>
 
-    <string name="av_hermes_card_title">WakeClaw · 一个 QR 完成设置</string>
-    <string name="av_hermes_card_step1">1. 在运行 Hermes/OpenClaw 的机器上安装 WakeClaw 配对 helper:</string>
-    <string name="av_hermes_card_step2">2. 运行 helper。它会读取本机 Hermes/OpenClaw 设置，检测 Tailscale，然后显示一个 QR:</string>
-    <string name="av_hermes_card_step3">3. 在 WakeClaw 内扫描这个 QR。若同时包含 Hermes 和 OpenClaw，两者设置会一起应用。</string>
-    <string name="av_hermes_card_note">如果要在外出时使用，请在 Tailscale/VPN 提问中选择“是”，让 QR 包含 LAN + Tailscale 候选地址。</string>
 
     <string name="av_openclaw_card_title">OpenClaw · 扫描服务器上的 QR</string>
     <string name="av_openclaw_card_step1">1. 在 OpenClaw 服务器上:</string>

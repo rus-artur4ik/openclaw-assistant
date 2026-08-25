@@ -47,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
@@ -55,6 +56,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.openclaw.assistant.ProjectLinks
 import com.openclaw.assistant.R
 import com.openclaw.assistant.backend.HermesCapabilities
 import com.openclaw.assistant.backend.HermesLanScanner
@@ -306,6 +308,18 @@ private fun HostSetupHelp(startExpanded: Boolean) {
             }
             if (expanded) {
                 Text(stringResource(R.string.hermes_setup_help_intro), style = MaterialTheme.typography.bodySmall)
+
+                // The shortcut first, because it is what most people want; the
+                // explicit steps stay right below it for anyone who would
+                // rather not pipe a URL into a shell.
+                Text(stringResource(R.string.hermes_setup_help_oneliner), style = MaterialTheme.typography.bodySmall)
+                CopyableCommand(ProjectLinks.SETUP_ONE_LINER)
+                val uriHandler = LocalUriHandler.current
+                TextButton(onClick = { uriHandler.openUri(ProjectLinks.SETUP_GIST_URL) }) {
+                    Text(stringResource(R.string.hermes_setup_help_view_script))
+                }
+
+                Text(stringResource(R.string.hermes_setup_help_manual_intro), style = MaterialTheme.typography.bodySmall)
                 Text(stringResource(R.string.hermes_setup_help_step_enable), style = MaterialTheme.typography.bodySmall)
                 CopyableCommand(stringResource(R.string.hermes_setup_cmd_enable))
                 Text(stringResource(R.string.hermes_setup_help_step_env), style = MaterialTheme.typography.bodySmall)

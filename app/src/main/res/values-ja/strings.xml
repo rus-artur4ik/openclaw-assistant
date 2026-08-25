@@ -517,8 +517,6 @@
 <string name="setup_guide_step_format">ステップ %1$d / %2$d</string>
 <string name="setup_guide_welcome_title">できること</string>
 <string name="setup_guide_welcome_bullet_1">OpenClaw と Hermes Agent を同じネイティブ音声クライアントから使えます。</string>
-<string name="setup_guide_welcome_bullet_2">PCにhelperを1つ入れて、このアプリ内でQRを1つ読み取るだけです。</string>
-<string name="setup_guide_welcome_bullet_3">LANやTailscaleの接続先をURL手入力なしで取り込めます。</string>
 <string name="setup_guide_welcome_bullet_4">アプリに入る前に、取り込んだバックエンドを確認できます。</string>
 <string name="setup_guide_connection_title">バックエンド接続設定</string>
 <string name="setup_guide_connection_guide_title">セットアップコードとURLの取得</string>
@@ -541,11 +539,7 @@
 <string name="setup_guide_final_check_desc">接続と設定内容を確認します。</string>
 <string name="setup_guide_finish">完了</string>
 <string name="setup_guide_next">次へ</string>
-<string name="setup_guide_next_after_qr">先にQRを読み取ってください</string>
-<string name="setup_guide_connection_waiting">まだバックエンドが取り込まれていません。helperが表示するWakeClaw QRを読み取ってください。</string>
-<string name="setup_guide_connection_ready">%1$d個のバックエンドを取り込みました。権限設定へ進めます。</string>
 <string name="setup_guide_configured_backends">%1$d件設定済み</string>
-<string name="setup_guide_no_backends_yet">バックエンドがまだ設定されていません。戻ってWakeClaw QRを読み取ってください。</string>
 <string name="setup_guide_invalid_code">セットアップコードが無効です。</string>
 <string name="setup_guide_invalid_url">OpenClawのURLが無効です。</string>
 <string name="http_use_gateway_url">OpenClawのURLを使用</string>
@@ -750,7 +744,6 @@
 
     <string name="av_backend_hermes">Hermes Agent</string>
     <string name="av_backend_openclaw">OpenClaw</string>
-    <string name="av_backend_hermes_subtitle">Hermes Agent API Server。ペアリングhelperがHermes Agentを検出し、設定/envを読み取って共通QRに含めます。</string>
     <string name="av_backend_openclaw_subtitle">OpenClaw。同じhelperがOpenClawを検出し、setup codeを共通QRに含めます。</string>
     <string name="av_backend_open_openclaw_setup">OpenClaw のセットアップを開く</string>
 
@@ -766,11 +759,6 @@
     <string name="av_setup_copy_command">コマンドをコピー</string>
     <string name="av_setup_command_copied">コマンドをコピーしました</string>
 
-    <string name="av_hermes_card_title">WakeClaw · 1つのQRでセットアップ</string>
-    <string name="av_hermes_card_step1">1. Hermes Agent/OpenClaw を動かしているマシンでWakeClawのペアリングhelperをインストール:</string>
-    <string name="av_hermes_card_step2">2. helperを実行します。ローカルのHermes Agent/OpenClaw設定を読み取り、Tailscaleを検出して、1つのQRを表示します:</string>
-    <string name="av_hermes_card_step3">3. WakeClaw内でQRを読み取ります。Hermes AgentとOpenClawを両方含めた場合は、両方の設定がまとめて適用されます。</string>
-    <string name="av_hermes_card_note">外出先でも使う場合は、Tailscale/VPNを含める質問で「はい」を選んでください。LAN + Tailscale候補をQRに入れられます。</string>
     <string name="av_hermes_use_runs_api">Runs API を使う</string>
     <string name="av_hermes_stream_responses">レスポンスをストリーミングする</string>
 
