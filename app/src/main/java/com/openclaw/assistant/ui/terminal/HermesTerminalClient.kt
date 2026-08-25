@@ -68,7 +68,7 @@ object HermesTerminalClient {
     private suspend fun submitPrompt(context: Context, prompt: String, settleMs: Long): Result<Unit> =
         withContext(Dispatchers.IO) {
             val endpoint = resolveRpcEndpoint(context.applicationContext)
-                ?: return@withContext Result.failure(IllegalStateException("Hermes Terminal is not connected. Scan an agentvoice-pair QR that includes Terminal."))
+                ?: return@withContext Result.failure(IllegalStateException("Hermes Terminal is not connected. Set the Terminal URL on your Hermes backend in Settings."))
             val opened = CompletableDeferred<WebSocket>()
             val sessionCreated = CompletableDeferred<String>()
             val createRequestId = UUID.randomUUID().toString()
@@ -119,7 +119,7 @@ object HermesTerminalClient {
     suspend fun runCommand(context: Context, command: String, settleMs: Long = 3_000L): Result<Unit> =
         withContext(Dispatchers.IO) {
             val endpoint = resolveEndpoint(context.applicationContext)
-                ?: return@withContext Result.failure(IllegalStateException("Hermes Terminal is not connected. Scan an agentvoice-pair QR that includes Terminal."))
+                ?: return@withContext Result.failure(IllegalStateException("Hermes Terminal is not connected. Set the Terminal URL on your Hermes backend in Settings."))
             val opened = CompletableDeferred<WebSocket>()
             val closed = CompletableDeferred<Unit>()
             val request = Request.Builder().url(endpoint).build()

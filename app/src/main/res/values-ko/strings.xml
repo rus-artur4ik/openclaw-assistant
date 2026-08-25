@@ -91,7 +91,6 @@
     <!-- WakeClaw setup wizard -->
     <string name="av_setup_title">WakeClaw 설정</string>
     <string name="av_setup_welcome_title">WakeClaw에 오신 것을 환영합니다</string>
-    <string name="av_setup_welcome_body">Hermes Agent 및 OpenClaw를 위한 네이티브 Android 음성 클라이언트입니다. 컴퓨터에서 페어링 도우미를 실행하고, Hermes Agent, OpenClaw, Tailscale 포함 여부를 선택한 후 이 앱에서 QR 하나를 스캔하세요.</string>
     <string name="av_setup_choose_title">어떤 백엔드를 사용하시겠습니까?</string>
     <string name="av_setup_choose_hint">하나 이상 선택하세요. 설정 → 백엔드에서 나중에 추가할 수 있습니다.</string>
     <string name="av_setup_choose_recommended">권장: 지금 둘 다 설정하세요. 나중에 기본값을 변경할 수 있습니다.</string>
@@ -793,7 +792,7 @@
     <string name="setup_guide_mode_setup_code">OpenClaw</string>
     <string name="setup_guide_mode_manual">수동</string>
     <string name="setup_guide_setup_code_label">설정 코드</string>
-    <string name="setup_guide_setup_code_hint">`agentvoice-pair`에서 코드 붙여넣기</string>
+    <string name="setup_guide_setup_code_hint">`openclaw qr`에서 코드 붙여넣기</string>
     <string name="setup_guide_manual_host">호스트</string>
     <string name="setup_guide_manual_port">포트</string>
     <string name="setup_guide_manual_tls">TLS 사용</string>

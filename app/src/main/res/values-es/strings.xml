@@ -481,7 +481,7 @@ Para más detalles, consulta el sitio oficial de VOICEVOX.</string>
 <string name="setup_guide_mode_setup_code">OpenClaw</string>
 <string name="setup_guide_mode_manual">Manual</string>
 <string name="setup_guide_setup_code_label">CÓDIGO DE CONFIGURACIÓN</string>
-<string name="setup_guide_setup_code_hint">Pegue el código de `agentvoice-pair`</string>
+<string name="setup_guide_setup_code_hint">Pegue el código de `openclaw qr`</string>
 <string name="setup_guide_manual_host">HOST</string>
 <string name="setup_guide_manual_port">PUERTO</string>
 <string name="setup_guide_manual_tls">Usar TLS</string>
@@ -681,7 +681,6 @@ Para más detalles, consulta el sitio oficial de VOICEVOX.</string>
     <!-- WakeClaw setup wizard -->
     <string name="av_setup_title">Configurar WakeClaw</string>
     <string name="av_setup_welcome_title">Bienvenido a WakeClaw</string>
-    <string name="av_setup_welcome_body">Un cliente de voz Android nativo para Hermes Agent y OpenClaw. Ejecuta el helper de emparejamiento en tu equipo, elige si incluir Hermes, OpenClaw y Tailscale, y escanea un único QR dentro de esta app.</string>
     <string name="av_setup_choose_title">¿Qué backends vas a usar?</string>
     <string name="av_setup_choose_hint">Selecciona al menos uno. Puedes añadir más en Ajustes → Backends.</string>
     <string name="av_setup_get_started">Empezar</string>

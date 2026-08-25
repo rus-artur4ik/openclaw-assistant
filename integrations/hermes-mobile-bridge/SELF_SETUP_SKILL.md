@@ -16,7 +16,8 @@ Use this skill when:
 
 1. **Read the manifest** (`GET /manifest` on the WakeClaw Mobile Bridge).
    If it 401s, the token rotated → ask the user to re-pair via
-   `agentvoice-pair` on the PC and re-scan the QR.
+   the key: compare API_SERVER_KEY in `~/.hermes/.env` with what the app
+   has stored for that backend.
 2. **Cross-check expected capabilities**. The minimum a healthy install
    should advertise is `device.info`, `apps.list`, and `clipboard.read`. If
    any of those are missing despite Mobile Bridge being on, prompt the

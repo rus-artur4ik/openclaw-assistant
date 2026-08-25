@@ -151,30 +151,10 @@
             android:exported="false"
             android:theme="@style/Theme.OpenClawAssistant" />
         <activity
-            android:name="com.openclaw.assistant.ui.setup.AgentVoiceSetupActivity"
-            android:exported="false"
-            android:theme="@style/Theme.OpenClawAssistant" />
-        <!-- Deep-link target for WakeClaw pairing QR codes. Any QR scanner on the
-             phone (including the stock camera app on modern Android) routes
-             agentvoice://setup?... or agentvoice://hermes/setup?... here. -->
-        <activity
             android:name="com.openclaw.assistant.ui.setup.HermesSetupActivity"
             android:exported="false"
             android:label="@string/hermes_setup_title"
             android:theme="@style/Theme.OpenClawAssistant" />
-        <activity
-            android:name="com.openclaw.assistant.ui.setup.HermesImportActivity"
-            android:exported="true"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.OpenClawAssistant">
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="agentvoice" android:host="setup" />
-                <data android:scheme="agentvoice" android:host="hermes" />
-            </intent-filter>
-        </activity>
         <activity
             android:name="com.openclaw.assistant.bridge.BridgeApprovalActivity"
             android:exported="false"

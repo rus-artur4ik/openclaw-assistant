@@ -480,7 +480,7 @@
 <string name="setup_guide_mode_setup_code">OpenClaw</string>
 <string name="setup_guide_mode_manual">手動輸入</string>
 <string name="setup_guide_setup_code_label">設定代碼</string>
-<string name="setup_guide_setup_code_hint">貼上來自 `agentvoice-pair` 的程式碼</string>
+<string name="setup_guide_setup_code_hint">貼上來自 `openclaw qr` 的程式碼</string>
 <string name="setup_guide_manual_host">主持人</string>
 <string name="setup_guide_manual_port">港口</string>
 <string name="setup_guide_manual_tls">使用 TLS</string>
@@ -680,7 +680,6 @@
     <!-- WakeClaw setup wizard -->
     <string name="av_setup_title">設定 WakeClaw</string>
     <string name="av_setup_welcome_title">歡迎使用 WakeClaw</string>
-    <string name="av_setup_welcome_body">支援 Hermes Agent 與 OpenClaw 的 Android 原生語音用戶端。在電腦上執行配對 helper，選擇是否包含 Hermes、OpenClaw 與 Tailscale，最後在本 App 內掃描一個 QR 即可完成。</string>
     <string name="av_setup_choose_title">使用哪些後端?</string>
     <string name="av_setup_choose_hint">至少選擇一個。稍後可從「設定 → Backends」新增。</string>
     <string name="av_setup_get_started">開始</string>

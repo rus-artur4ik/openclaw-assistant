@@ -53,7 +53,9 @@ class HermesSetupScreenTest {
         compose.onNodeWithText("Address").assertIsDisplayed()
         compose.onNodeWithText("API key").assertIsDisplayed()
         compose.onNodeWithText("Search local network").assertIsDisplayed()
-        compose.onNodeWithText("Scan QR").assertIsDisplayed()
+        // No QR: the pairing helper that produced one was removed, and the app
+        // now states the host steps itself.
+        compose.onNodeWithText("Scan QR").assertDoesNotExist()
     }
 
     @Test fun `connect is disabled until an address is typed`() {
@@ -220,11 +222,10 @@ class HermesSetupScreenTest {
         compose.onNodeWithText("agentvoice-pair").assertDoesNotExist()
     }
 
-    @Test fun `expanding the instructions shows both the helper and the manual steps`() {
+    @Test fun `expanding the instructions shows the three host steps`() {
         show(HermesSetupUiState())
         compose.onNodeWithText("Show me what to do").performScrollTo().performClick()
 
-        compose.onNodeWithText("agentvoice-pair").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("hermes gateway run --replace").performScrollTo().assertIsDisplayed()
         // The exact steps matter: on a fresh install the API server platform is
         // off, and its bind address comes from API_SERVER_HOST — there is no
@@ -239,7 +240,8 @@ class HermesSetupScreenTest {
         // Binding to 127.0.0.1 is the usual cause, and it cannot be fixed from
         // this screen — so the steps appear rather than hiding behind a tap.
         show(HermesSetupUiState(scanFinished = true, scanResults = emptyList()))
-        compose.onNodeWithText("agentvoice-pair").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("hermes config set platforms.api_server.enabled true")
+            .performScrollTo().assertIsDisplayed()
     }
 
     @Test fun `an unreachable address opens the instructions too`() {
@@ -249,12 +251,13 @@ class HermesSetupScreenTest {
                 probe = HermesSetupProbe.Unreachable(listOf("http://192.168.1.50:8642"), "timeout"),
             ),
         )
-        compose.onNodeWithText("agentvoice-pair").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("hermes config set platforms.api_server.enabled true")
+            .performScrollTo().assertIsDisplayed()
     }
 
     @Test fun `a working connection does not nag with setup instructions`() {
         show(readyState())
-        compose.onNodeWithText("agentvoice-pair").assertDoesNotExist()
+        compose.onNodeWithText("hermes config set platforms.api_server.enabled true").assertDoesNotExist()
     }
 
     @Test fun `a missing key says where to find it`() {
@@ -268,7 +271,7 @@ class HermesSetupScreenTest {
             "Open ~/.hermes/.env on that computer and copy the value of API_SERVER_KEY into the field above.",
         ).performScrollTo().assertIsDisplayed()
         // The fix is one field up, so the host steps stay collapsed.
-        compose.onNodeWithText("agentvoice-pair").assertDoesNotExist()
+        compose.onNodeWithText("hermes config set platforms.api_server.enabled true").assertDoesNotExist()
     }
 
     @Test fun `a rejected key points at the value to compare`() {

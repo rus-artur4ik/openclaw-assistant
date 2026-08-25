@@ -51,7 +51,7 @@ class TerminalViewModel(application: Application) : AndroidViewModel(application
             _uiState.value = TerminalUiState(
                 connected = false,
                 connecting = false,
-                message = "Run `hermes dashboard --tui`, then scan an `agentvoice-pair` QR that includes Terminal.",
+                message = "Run `hermes dashboard --tui`, then add its PTY URL as the Terminal URL of your Hermes backend in Settings.",
             )
             return
         }

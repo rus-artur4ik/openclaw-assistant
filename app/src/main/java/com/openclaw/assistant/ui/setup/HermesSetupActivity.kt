@@ -13,9 +13,6 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.mlkit.vision.barcode.common.Barcode
-import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
-import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import com.openclaw.assistant.backend.AgentBackendConfig
 import com.openclaw.assistant.backend.BackendRepository
 import com.openclaw.assistant.backend.HermesAutoConfig
@@ -56,7 +53,6 @@ class HermesSetupActivity : ComponentActivity() {
                         onConnect = vm::connect,
                         onScanLan = vm::scanLan,
                         onStopScan = vm::stopScan,
-                        onScanQr = ::scanQr,
                         onPickFound = vm::pickFound,
                         onModelChange = vm::setModel,
                         onProviderChange = vm::setProvider,
@@ -74,43 +70,6 @@ class HermesSetupActivity : ComponentActivity() {
                 )
             }
         }
-    }
-
-    /**
-     * Reads a setup QR produced by `integrations/hermes-mobile-bridge/hermes_pair.py`.
-     *
-     * A payload that carries Hermes details fills the form in; anything else is
-     * handed to the deep-link importer, which already knows every other form.
-     */
-    private fun scanQr() {
-        val options = GmsBarcodeScannerOptions.Builder()
-            .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
-            .build()
-        GmsBarcodeScanning.getClient(this, options).startScan()
-            .addOnSuccessListener { barcode ->
-                val raw = barcode.rawValue?.trim().orEmpty()
-                val hermes = parsePairingPayload(raw)?.hermes
-                if (hermes != null) {
-                    val vm = androidx.lifecycle.ViewModelProvider(this)[HermesSetupViewModel::class.java]
-                    vm.applyScannedPayload(hermes.baseUrl, hermes.apiKey, hermes.displayName)
-                } else if (raw.startsWith("agentvoice://")) {
-                    startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse(raw)))
-                    finish()
-                } else {
-                    android.widget.Toast.makeText(
-                        this,
-                        getString(com.openclaw.assistant.R.string.qr_scan_unavailable),
-                        android.widget.Toast.LENGTH_LONG,
-                    ).show()
-                }
-            }
-            .addOnFailureListener {
-                android.widget.Toast.makeText(
-                    this,
-                    getString(com.openclaw.assistant.R.string.qr_scan_unavailable),
-                    android.widget.Toast.LENGTH_LONG,
-                ).show()
-            }
     }
 
     companion object {

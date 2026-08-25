@@ -509,7 +509,7 @@
 <string name="setup_guide_mode_setup_code">OpenClaw</string>
 <string name="setup_guide_mode_manual">Вручную</string>
 <string name="setup_guide_setup_code_label">КОД НАСТРОЙКИ</string>
-<string name="setup_guide_setup_code_hint">Вставьте код из `agentvoice-pair`</string>
+<string name="setup_guide_setup_code_hint">Вставьте код из `openclaw qr`</string>
 <string name="setup_guide_manual_host">ХОСТ</string>
 <string name="setup_guide_manual_port">PORT</string>
 <string name="setup_guide_manual_tls">Использовать TLS</string>
@@ -709,7 +709,6 @@
     <!-- WakeClaw setup wizard -->
     <string name="av_setup_title">Настройка WakeClaw</string>
     <string name="av_setup_welcome_title">Добро пожаловать в WakeClaw</string>
-    <string name="av_setup_welcome_body">Нативный голосовой клиент Android для Hermes Agent и OpenClaw. Запустите helper сопряжения на компьютере, выберите Hermes, OpenClaw и Tailscale, затем отсканируйте один QR в этом приложении.</string>
     <string name="av_setup_choose_title">Какие бэкенды вы будете использовать?</string>
     <string name="av_setup_choose_hint">Выберите хотя бы один. Позже можно добавить ещё в «Настройки → Backends».</string>
     <string name="av_setup_get_started">Начать</string>

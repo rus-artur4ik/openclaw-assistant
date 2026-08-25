@@ -481,7 +481,7 @@
 <string name="setup_guide_mode_setup_code">OpenClaw</string>
 <string name="setup_guide_mode_manual">मैनुअल</string>
 <string name="setup_guide_setup_code_label">सेटअप कोड</string>
-<string name="setup_guide_setup_code_hint">`agentvoice-pair` से code चिपकाएँ</string>
+<string name="setup_guide_setup_code_hint">`openclaw qr` से code चिपकाएँ</string>
 <string name="setup_guide_manual_host">मेज़बान</string>
 <string name="setup_guide_manual_port">पत्तन</string>
 <string name="setup_guide_manual_tls">टीएलएस का प्रयोग करें</string>
@@ -681,7 +681,6 @@
     <!-- WakeClaw setup wizard -->
     <string name="av_setup_title">WakeClaw सेट करें</string>
     <string name="av_setup_welcome_title">WakeClaw में आपका स्वागत है</string>
-    <string name="av_setup_welcome_body">Hermes Agent और OpenClaw के लिए Android नेटिव वॉइस क्लाइंट। कंप्यूटर पर pairing helper चलाएँ, Hermes, OpenClaw और Tailscale को शामिल करना है या नहीं चुनें, फिर इस ऐप में एक QR स्कैन करें।</string>
     <string name="av_setup_choose_title">कौन-कौन से बैकएंड उपयोग करेंगे?</string>
     <string name="av_setup_choose_hint">कम से कम एक चुनें। बाद में «सेटिंग्स → Backends» से और जोड़ सकते हैं।</string>
     <string name="av_setup_get_started">शुरू करें</string>

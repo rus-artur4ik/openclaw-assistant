@@ -70,12 +70,6 @@ import com.openclaw.assistant.ui.components.ConnectionState
 import com.openclaw.assistant.ui.components.PairingRequiredCard
 import com.openclaw.assistant.ui.components.StatusIndicator
 import com.openclaw.assistant.ui.GatewayTrustDialog
-import com.openclaw.assistant.ui.setup.EditablePairingPayload
-import com.openclaw.assistant.ui.setup.PairingPayloadReviewEditor
-import com.openclaw.assistant.ui.setup.applyPairingPayload
-import com.openclaw.assistant.ui.setup.parsePairingPayload
-import com.openclaw.assistant.ui.setup.toEditablePairingPayload
-import com.openclaw.assistant.ui.setup.toPairingPayload
 import com.openclaw.assistant.ui.theme.*
 import com.openclaw.assistant.utils.GatewayConfigUtils
 import androidx.compose.ui.graphics.Brush
@@ -515,7 +509,6 @@ private fun ConnectionStep(
     val context = LocalContext.current
     val effectiveMode = if (mode == ConnectionMode.Manual) ConnectionMode.SetupCode else mode
     var pairingStatus by rememberSaveable { mutableStateOf<String?>(null) }
-    var pairingReview by remember { mutableStateOf<EditablePairingPayload?>(null) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -539,14 +532,7 @@ private fun ConnectionStep(
         Spacer(modifier = Modifier.height(24.dp))
 
         if (effectiveMode == ConnectionMode.Hermes) {
-            AgentVoiceUnifiedPairingContent(configuredBackendCount = configuredBackendCount)
-            pairingReview?.let { draft ->
-                Spacer(modifier = Modifier.height(16.dp))
-                PairingPayloadReviewEditor(
-                    value = draft,
-                    onChange = { pairingReview = it },
-                )
-            }
+            HermesConnectContent(configuredBackendCount = configuredBackendCount)
         } else {
             val decodedSetupCode = GatewayConfigUtils.decodeGatewaySetupCode(setupCode)
             val isCodeValid = decodedSetupCode != null
@@ -567,7 +553,7 @@ private fun ConnectionStep(
                 color = OnboardingTextSecondary
             )
             Spacer(modifier = Modifier.height(8.dp))
-            CommandBlock("agentvoice-pair")
+            CommandBlock("openclaw qr")
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedButton(
@@ -584,23 +570,16 @@ private fun ConnectionStep(
                                     .addOnSuccessListener { barcode ->
                                         barcode.rawValue?.let { rawValue ->
                                             val raw = rawValue.trim()
-                                            val pairingPayload = parsePairingPayload(raw)
-                                            if (pairingPayload != null) {
-                                                applyPairingPayload(context, pairingPayload, BackendType.OPENCLAW_GATEWAY)
-                                                pairingPayload.openClawSetupCode?.let(onSetupCodeChange)
-                                                onModeChange(ConnectionMode.SetupCode)
-                                            } else {
-                                                // agentvoice-pair/openclaw can wrap the Gateway setup code in
-                                                // {"setupCode":"base64..."} JSON; extract the inner code.
-                                                val code = try {
-                                                    org.json.JSONObject(raw)
-                                                        .optString("setupCode")
-                                                        .takeIf { it.isNotBlank() } ?: raw
-                                                } catch (_: Exception) {
-                                                    raw
-                                                }
-                                                onSetupCodeChange(code)
+                                            // `openclaw qr` prints either the bare setup code or
+                                            // {"setupCode":"base64..."}; accept both.
+                                            val code = try {
+                                                org.json.JSONObject(raw)
+                                                    .optString("setupCode")
+                                                    .takeIf { it.isNotBlank() } ?: raw
+                                            } catch (_: Exception) {
+                                                raw
                                             }
+                                            onSetupCodeChange(code)
                                         }
                                     }
                                     .addOnFailureListener { /* scan cancelled or failed — no action needed */ }
@@ -702,20 +681,13 @@ private fun ConnectionStep(
         } // end of scrollable Column
 
         val canContinue = when (mode) {
-            ConnectionMode.Hermes -> configuredBackendCount > 0 || pairingReview?.toPairingPayload() != null
+            ConnectionMode.Hermes -> configuredBackendCount > 0
             ConnectionMode.SetupCode -> GatewayConfigUtils.decodeGatewaySetupCode(setupCode) != null
             ConnectionMode.Manual -> GatewayConfigUtils.decodeGatewaySetupCode(setupCode) != null
         }
 
         Spacer(modifier = Modifier.height(12.dp))
         if (mode == ConnectionMode.Hermes) {
-            PairingScanButton(
-                modifier = Modifier.fillMaxWidth().height(52.dp),
-                onScanned = { payload ->
-                    pairingReview = payload.toEditablePairingPayload()
-                    pairingStatus = context.getString(R.string.av_pairing_review_loaded)
-                }
-            )
             val readyText = pairingStatus ?: if (configuredBackendCount > 0) {
                 stringResource(R.string.setup_guide_connection_ready, configuredBackendCount)
             } else {
@@ -732,13 +704,6 @@ private fun ConnectionStep(
         }
         Button(
             onClick = {
-                if (mode == ConnectionMode.Hermes) {
-                    pairingReview?.let { draft ->
-                        draft.toPairingPayload()?.let { payload ->
-                            applyPairingPayload(context, payload, null)
-                        }
-                    }
-                }
                 onNext()
             },
             enabled = canContinue,
@@ -748,7 +713,7 @@ private fun ConnectionStep(
         ) {
             Text(
                 stringResource(
-                    if (mode == ConnectionMode.Hermes && configuredBackendCount == 0 && pairingReview == null) {
+                    if (mode == ConnectionMode.Hermes && configuredBackendCount == 0) {
                         R.string.setup_guide_next_after_qr
                     } else {
                         R.string.setup_guide_next
@@ -761,7 +726,8 @@ private fun ConnectionStep(
 }
 
 @Composable
-private fun AgentVoiceUnifiedPairingContent(configuredBackendCount: Int) {
+private fun HermesConnectContent(configuredBackendCount: Int) {
+    val context = LocalContext.current
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -776,10 +742,27 @@ private fun AgentVoiceUnifiedPairingContent(configuredBackendCount: Int) {
                     fontWeight = FontWeight.Bold
                 )
                 Text(stringResource(R.string.av_pairing_card_step1), style = MaterialTheme.typography.bodyMedium, color = OnboardingTextPrimary)
-                CommandBlock(com.openclaw.assistant.ProjectLinks.PAIRING_INSTALL_COMMAND)
+                // The same three commands the setup wizard shows, so there is one
+                // story about how Hermes is made reachable rather than two.
+                Text(stringResource(R.string.hermes_setup_help_step_enable), style = MaterialTheme.typography.bodySmall, color = OnboardingTextSecondary)
+                CommandBlock(stringResource(R.string.hermes_setup_cmd_enable))
+                Text(stringResource(R.string.hermes_setup_help_step_env), style = MaterialTheme.typography.bodySmall, color = OnboardingTextSecondary)
+                CommandBlock(stringResource(R.string.hermes_setup_cmd_env))
+                Text(stringResource(R.string.hermes_setup_help_step_restart), style = MaterialTheme.typography.bodySmall, color = OnboardingTextSecondary)
+                CommandBlock(stringResource(R.string.hermes_setup_cmd_restart))
                 Text(stringResource(R.string.av_pairing_card_step2), style = MaterialTheme.typography.bodyMedium, color = OnboardingTextPrimary)
-                CommandBlock("agentvoice-pair")
-                Text(stringResource(R.string.av_pairing_card_step3), style = MaterialTheme.typography.bodyMedium, color = OnboardingTextPrimary)
+                Button(
+                    onClick = {
+                        context.startActivity(
+                            com.openclaw.assistant.ui.setup.HermesSetupActivity.intent(context),
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = OnboardingGradientMid),
+                ) {
+                    Text(stringResource(R.string.av_pairing_card_step3))
+                }
                 Text(stringResource(R.string.av_pairing_card_note), style = MaterialTheme.typography.bodySmall, color = OnboardingTextSecondary)
                 if (configuredBackendCount > 0) {
                     AssistChip(
@@ -795,52 +778,6 @@ private fun AgentVoiceUnifiedPairingContent(configuredBackendCount: Int) {
     }
 }
 
-@Composable
-private fun PairingScanButton(
-    modifier: Modifier = Modifier,
-    onScanned: (com.openclaw.assistant.ui.setup.PairingPayload) -> Unit
-) {
-    val context = LocalContext.current
-    OutlinedButton(
-        onClick = {
-            val options = GmsBarcodeScannerOptions.Builder()
-                .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
-                .build()
-            val scanner = GmsBarcodeScanning.getClient(context, options)
-            scanner.startScan()
-                .addOnSuccessListener { barcode ->
-                    val raw = barcode.rawValue?.trim().orEmpty()
-                    val pairingPayload = parsePairingPayload(raw)
-                    if (pairingPayload != null) {
-                        onScanned(pairingPayload)
-                    } else if (raw.startsWith("agentvoice://")) {
-                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(raw)))
-                    } else {
-                        android.widget.Toast.makeText(
-                            context,
-                            context.getString(R.string.qr_scan_unavailable),
-                            android.widget.Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
-                .addOnFailureListener {
-                    android.widget.Toast.makeText(
-                        context,
-                        context.getString(R.string.qr_scan_unavailable),
-                        android.widget.Toast.LENGTH_LONG
-                    ).show()
-                }
-        },
-        modifier = modifier,
-        shape = RoundedCornerShape(14.dp),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = OnboardingGradientMid),
-        border = androidx.compose.foundation.BorderStroke(1.dp, OnboardingGradientMid)
-    ) {
-        Icon(Icons.Default.QrCodeScanner, contentDescription = null)
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(stringResource(R.string.av_pairing_scan_qr))
-    }
-}
 
 @Composable
 private fun PermissionsStep(onNext: () -> Unit) {
@@ -1711,14 +1648,8 @@ private fun CommandBlock(command: String) {
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val displayCommand = remember(command) {
-            command.replace(
-                com.openclaw.assistant.ProjectLinks.RAW_BASE,
-                com.openclaw.assistant.ProjectLinks.RAW_BASE_ELIDED,
-            )
-        }
         Text(
-            text = displayCommand,
+            text = command,
             color = Color(0xFF58A6FF),
             fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
             fontSize = 12.sp,

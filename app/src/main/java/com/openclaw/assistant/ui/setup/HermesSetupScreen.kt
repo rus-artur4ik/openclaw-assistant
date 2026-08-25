@@ -18,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.ErrorOutline
-import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -69,7 +68,6 @@ data class HermesSetupActions(
     val onConnect: () -> Unit = {},
     val onScanLan: () -> Unit = {},
     val onStopScan: () -> Unit = {},
-    val onScanQr: () -> Unit = {},
     val onPickFound: (HermesLanScanner.Found) -> Unit = {},
     val onModelChange: (String) -> Unit = {},
     val onProviderChange: (String) -> Unit = {},
@@ -152,15 +150,12 @@ private fun ConnectStep(state: HermesSetupUiState, actions: HermesSetupActions) 
         modifier = Modifier.fillMaxWidth(),
     )
 
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Button(onClick = actions.onConnect, enabled = state.canConnect) {
-            Text(stringResource(R.string.hermes_setup_connect))
-        }
-        OutlinedButton(onClick = actions.onScanQr) {
-            Icon(Icons.Default.QrCodeScanner, contentDescription = null)
-            Spacer(Modifier.height(4.dp))
-            Text(stringResource(R.string.hermes_setup_scan_qr))
-        }
+    Button(
+        onClick = actions.onConnect,
+        enabled = state.canConnect,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Text(stringResource(R.string.hermes_setup_connect))
     }
 
     if (state.scanning) {
@@ -311,8 +306,6 @@ private fun HostSetupHelp(startExpanded: Boolean) {
             }
             if (expanded) {
                 Text(stringResource(R.string.hermes_setup_help_intro), style = MaterialTheme.typography.bodySmall)
-                CopyableCommand(stringResource(R.string.hermes_setup_cmd_pair))
-                Text(stringResource(R.string.hermes_setup_help_manual), style = MaterialTheme.typography.bodySmall)
                 Text(stringResource(R.string.hermes_setup_help_step_enable), style = MaterialTheme.typography.bodySmall)
                 CopyableCommand(stringResource(R.string.hermes_setup_cmd_enable))
                 Text(stringResource(R.string.hermes_setup_help_step_env), style = MaterialTheme.typography.bodySmall)

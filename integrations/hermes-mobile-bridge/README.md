@@ -1,20 +1,30 @@
-# WakeClaw pairing helper
+# Connecting WakeClaw to Hermes
 
-The fastest way to set up WakeClaw is to install the host-side helper, then
-scan the one QR it prints:
+There is no host-side helper any more — the app states the steps itself, under
+**Settings → Connection Settings → Hermes Agent → Add Hermes Agent**. For
+reference, they are:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rus-artur4ik/openclaw-assistant/main/integrations/agentvoice-pair/install.sh | bash
-agentvoice-pair
+hermes config set platforms.api_server.enabled true
 ```
 
-The helper checks whether Hermes, OpenClaw, and Tailscale are installed locally,
-asks which backends to include, and creates one WakeClaw setup QR. If the QR
-is too large for the current terminal, it opens a generated SVG QR image instead
-of printing an unreadable terminal block. Scanning that single QR in WakeClaw
-can configure both Hermes and OpenClaw.
-If you want the phone to work outside your LAN, answer yes when it asks about
-Tailscale/VPN endpoint candidates.
+Then in `~/.hermes/.env`:
+
+```
+API_SERVER_HOST=0.0.0.0
+API_SERVER_KEY=pick-a-long-random-value
+```
+
+```bash
+hermes gateway run --replace
+```
+
+The API server platform is off on a fresh install, and its bind address
+defaults to `127.0.0.1`, which a phone cannot reach — those two facts are why
+both of the first steps are needed. Afterwards the app can find the server by
+walking the local subnet, or you can type the address in.
+
+OpenClaw is paired separately, with the setup code from `openclaw qr`.
 
 ---
 

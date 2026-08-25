@@ -26,11 +26,21 @@
 > Voice Overlay, Wear OS, and node capabilities continue to target the
 > Primary backend.
 >
-> **Hermes setup in 30 seconds.** Run `hermes gateway` with the API
-> server enabled (default port `8642`) and bind it to your LAN or VPN —
-> it listens on `127.0.0.1` out of the box, which a phone cannot reach.
-> Then open **Settings → Connection Settings → Hermes Agent → Add Hermes
-> Agent** and give it an address; everything else is discovered:
+> **Hermes setup in 30 seconds.** The API server is a gateway platform
+> that is off on a fresh install, and it binds `127.0.0.1`, which a phone
+> cannot reach. Two commands and two env lines fix both — the app prints
+> them for you, tap-to-copy, under **Settings → Connection Settings →
+> Hermes Agent → Add Hermes Agent**:
+>
+> ```
+> hermes config set platforms.api_server.enabled true
+> # ~/.hermes/.env:
+> #   API_SERVER_HOST=0.0.0.0
+> #   API_SERVER_KEY=pick-a-long-random-value
+> hermes gateway run --replace
+> ```
+>
+> After that the app works the address out for itself:
 >
 > - **Search local network** walks the phone's own /24 on port `8642` and
 >   lists what answers, with the model each server advertises. Hermes
@@ -42,10 +52,6 @@
 >   work: the app expands the address into the plausible scheme/port
 >   combinations, probes them in parallel and keeps the first that
 >   answers, cancelling the rest.
-> - **Scan QR** reads the code printed by
->   `integrations/hermes-mobile-bridge/hermes_pair.py`, which can carry
->   Hermes and OpenClaw in one payload.
->
 > The result is a diagnosis rather than a boolean: *found it, it needs a
 > key* / *it rejected that key* / *something answered but it is not
 > Hermes* / *nothing answered, here is what I tried*. Once connected the

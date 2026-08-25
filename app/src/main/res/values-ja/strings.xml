@@ -528,7 +528,7 @@
 <string name="setup_guide_mode_setup_code">OpenClaw</string>
 <string name="setup_guide_mode_manual">手動入力</string>
 <string name="setup_guide_setup_code_label">セットアップコード</string>
-<string name="setup_guide_setup_code_hint">`agentvoice-pair` で取得したコードを貼り付けてください</string>
+<string name="setup_guide_setup_code_hint">`openclaw qr` で取得したコードを貼り付けてください</string>
 <string name="setup_guide_manual_host">ホスト</string>
 <string name="setup_guide_manual_port">ポート</string>
 <string name="setup_guide_manual_tls">TLSを使用</string>
@@ -738,7 +738,6 @@
     <!-- WakeClaw setup wizard -->
     <string name="av_setup_title">WakeClaw のセットアップ</string>
     <string name="av_setup_welcome_title">WakeClaw へようこそ</string>
-    <string name="av_setup_welcome_body">Hermes Agent と OpenClaw に対応した Android ネイティブ音声クライアントです。PC側のペアリングhelperでHermes Agent、OpenClaw、Tailscaleを含めるか選び、最後に出る1つのQRをこのアプリ内で読み取れば完了します。</string>
     <string name="av_setup_choose_title">どの backend を使いますか?</string>
     <string name="av_setup_choose_hint">最低 1 つ選んでください。後から「設定 → Backends」で追加もできます。</string>
     <string name="av_setup_choose_recommended">おすすめは両方のセットアップです。Primary は後から切り替えられます。</string>

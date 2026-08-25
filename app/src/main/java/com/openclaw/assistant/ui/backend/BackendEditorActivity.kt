@@ -89,6 +89,9 @@ fun BackendEditorScreen(existingId: String?, onDone: () -> Unit) {
         mutableStateOf(existing?.effectiveTransport ?: com.openclaw.assistant.backend.HermesTransportPreference.AUTO)
     }
     var memoryScopeKey by remember { mutableStateOf(existing?.memoryScopeKey.orEmpty()) }
+    // Used to arrive only inside a pairing QR; that flow is gone, so it is typed here.
+    var terminalUrl by remember { mutableStateOf(existing?.terminalUrl.orEmpty()) }
+    var terminalToken by remember { mutableStateOf(existing?.terminalSessionToken.orEmpty()) }
     var agentContextName by remember { mutableStateOf(existing?.agentContextName.orEmpty()) }
     var agentContextDetail by remember { mutableStateOf(existing?.agentContextDetail.orEmpty()) }
     var preferredEndpointRole by remember { mutableStateOf(existing?.preferredEndpointRole.orEmpty()) }
@@ -204,7 +207,7 @@ fun BackendEditorScreen(existingId: String?, onDone: () -> Unit) {
                     Spacer(Modifier.height(6.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedButton(onClick = {
-                            val config = buildConfig(existing, type, displayName, baseUrl, token, host, port, useTls, modelName, useRunsApi, useStreaming, setPrimary, listOf(lanUrl, tailscaleUrl, publicUrl).filter { it.isNotBlank() }, agentContextName, agentContextDetail, preferredEndpointRole, providerName, transport, memoryScopeKey)
+                            val config = buildConfig(existing, type, displayName, baseUrl, token, host, port, useTls, modelName, useRunsApi, useStreaming, setPrimary, listOf(lanUrl, tailscaleUrl, publicUrl).filter { it.isNotBlank() }, agentContextName, agentContextDetail, preferredEndpointRole, providerName, transport, memoryScopeKey, terminalUrl, terminalToken)
                             scope.launch {
                                 status = loadingHermesModels
                                 runCatching { HermesConfigApi().fetchCatalog(config) }
@@ -225,7 +228,7 @@ fun BackendEditorScreen(existingId: String?, onDone: () -> Unit) {
                             Text(stringResource(R.string.backend_load_models))
                         }
                         OutlinedButton(onClick = {
-                            val config = buildConfig(existing, type, displayName, baseUrl, token, host, port, useTls, modelName, useRunsApi, useStreaming, setPrimary, listOf(lanUrl, tailscaleUrl, publicUrl).filter { it.isNotBlank() }, agentContextName, agentContextDetail, preferredEndpointRole, providerName, transport, memoryScopeKey)
+                            val config = buildConfig(existing, type, displayName, baseUrl, token, host, port, useTls, modelName, useRunsApi, useStreaming, setPrimary, listOf(lanUrl, tailscaleUrl, publicUrl).filter { it.isNotBlank() }, agentContextName, agentContextDetail, preferredEndpointRole, providerName, transport, memoryScopeKey, terminalUrl, terminalToken)
                             scope.launch {
                                 status = applyingHermesModel
                                 // Hermes has no writable global config over the API
@@ -292,6 +295,23 @@ fun BackendEditorScreen(existingId: String?, onDone: () -> Unit) {
                     )
                     Text(stringResource(R.string.backend_hermes_memory_scope_help), style = MaterialTheme.typography.bodySmall)
                     Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = terminalUrl,
+                        onValueChange = { terminalUrl = it },
+                        label = { Text(stringResource(R.string.backend_hermes_terminal)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Text(stringResource(R.string.backend_hermes_terminal_help), style = MaterialTheme.typography.bodySmall)
+                    Spacer(Modifier.height(4.dp))
+                    OutlinedTextField(
+                        value = terminalToken,
+                        onValueChange = { terminalToken = it },
+                        label = { Text(stringResource(R.string.backend_hermes_terminal_token)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(Modifier.height(8.dp))
                     Text(stringResource(R.string.backend_hermes_transport), style = MaterialTheme.typography.titleSmall)
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         hermesTransportChoices().forEach { (choice, label) ->
@@ -338,14 +358,14 @@ fun BackendEditorScreen(existingId: String?, onDone: () -> Unit) {
             val secondary = listOf(lanUrl, tailscaleUrl, publicUrl).filter { it.isNotBlank() }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = {
-                    val config = buildConfig(existing, type, displayName, baseUrl, token, host, port, useTls, modelName, useRunsApi, useStreaming, setPrimary, secondary, agentContextName, agentContextDetail, preferredEndpointRole, providerName, transport, memoryScopeKey)
+                    val config = buildConfig(existing, type, displayName, baseUrl, token, host, port, useTls, modelName, useRunsApi, useStreaming, setPrimary, secondary, agentContextName, agentContextDetail, preferredEndpointRole, providerName, transport, memoryScopeKey, terminalUrl, terminalToken)
                     repo.upsert(config)
                     if (setPrimary) repo.setPrimary(config.id)
                     onDone()
                 }) { Text(stringResource(R.string.save)) }
 
                 Button(onClick = {
-                    val config = buildConfig(existing, type, displayName, baseUrl, token, host, port, useTls, modelName, useRunsApi, useStreaming, setPrimary, secondary, agentContextName, agentContextDetail, preferredEndpointRole, providerName, transport, memoryScopeKey)
+                    val config = buildConfig(existing, type, displayName, baseUrl, token, host, port, useTls, modelName, useRunsApi, useStreaming, setPrimary, secondary, agentContextName, agentContextDetail, preferredEndpointRole, providerName, transport, memoryScopeKey, terminalUrl, terminalToken)
                     scope.launch {
                         status = testingLabel
                         val r = withContext(Dispatchers.IO) { AgentClientFactory.create(config).testConnection() }
@@ -379,6 +399,8 @@ private fun buildConfig(
     providerName: String = "",
     transport: com.openclaw.assistant.backend.HermesTransportPreference? = null,
     memoryScopeKey: String = "",
+    terminalUrl: String = "",
+    terminalSessionToken: String = "",
 ): AgentBackendConfig {
     val base = existing ?: AgentBackendConfig(displayName = displayName, type = type)
     return base.copy(
@@ -394,6 +416,8 @@ private fun buildConfig(
         useRunsApi = useRunsApi,
         transport = transport,
         memoryScopeKey = memoryScopeKey.ifBlank { null },
+        terminalUrl = terminalUrl.ifBlank { null },
+        terminalSessionToken = terminalSessionToken.ifBlank { null },
         useStreaming = useStreaming,
         isPrimary = isPrimary,
         secondaryUrls = secondaryUrls,
