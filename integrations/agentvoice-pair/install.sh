@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_RAW_BASE="${AGENT_VOICE_RAW_BASE:-https://raw.githubusercontent.com/yuga-hashimoto/openclaw-assistant/main}"
+REPO_RAW_BASE="${AGENT_VOICE_RAW_BASE:-https://raw.githubusercontent.com/rus-artur4ik/openclaw-assistant/main}"
 INSTALL_DIR="${AGENT_VOICE_INSTALL_DIR:-$HOME/.local/bin}"
 SCRIPT_URL="$REPO_RAW_BASE/integrations/hermes-mobile-bridge/hermes_pair.py"
 TARGET="$INSTALL_DIR/agentvoice-pair"

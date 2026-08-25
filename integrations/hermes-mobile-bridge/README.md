@@ -4,7 +4,7 @@ The fastest way to set up WakeClaw is to install the host-side helper, then
 scan the one QR it prints:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yuga-hashimoto/openclaw-assistant/main/integrations/agentvoice-pair/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rus-artur4ik/openclaw-assistant/main/integrations/agentvoice-pair/install.sh | bash
 agentvoice-pair
 ```
 

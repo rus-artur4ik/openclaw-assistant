@@ -170,7 +170,7 @@ private fun UnifiedPairingCard(includeHermes: Boolean, includeOpenClaw: Boolean)
     val context = LocalContext.current
     var status by remember { mutableStateOf<String?>(null) }
     var pairingReview by remember { mutableStateOf<EditablePairingPayload?>(null) }
-    val installCommand = "curl -fsSL https://raw.githubusercontent.com/yuga-hashimoto/openclaw-assistant/main/integrations/agentvoice-pair/install.sh | bash"
+    val installCommand = com.openclaw.assistant.ProjectLinks.PAIRING_INSTALL_COMMAND
     val pairCommand = "agentvoice-pair"
     val scopeText = when {
         includeHermes && includeOpenClaw -> stringResource(R.string.av_setup_scope_both)

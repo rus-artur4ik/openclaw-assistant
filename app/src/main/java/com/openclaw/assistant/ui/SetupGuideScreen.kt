@@ -776,7 +776,7 @@ private fun AgentVoiceUnifiedPairingContent(configuredBackendCount: Int) {
                     fontWeight = FontWeight.Bold
                 )
                 Text(stringResource(R.string.av_pairing_card_step1), style = MaterialTheme.typography.bodyMedium, color = OnboardingTextPrimary)
-                CommandBlock("curl -fsSL https://raw.githubusercontent.com/yuga-hashimoto/openclaw-assistant/main/integrations/agentvoice-pair/install.sh | bash")
+                CommandBlock(com.openclaw.assistant.ProjectLinks.PAIRING_INSTALL_COMMAND)
                 Text(stringResource(R.string.av_pairing_card_step2), style = MaterialTheme.typography.bodyMedium, color = OnboardingTextPrimary)
                 CommandBlock("agentvoice-pair")
                 Text(stringResource(R.string.av_pairing_card_step3), style = MaterialTheme.typography.bodyMedium, color = OnboardingTextPrimary)
@@ -1713,8 +1713,8 @@ private fun CommandBlock(command: String) {
     ) {
         val displayCommand = remember(command) {
             command.replace(
-                "https://raw.githubusercontent.com/yuga-hashimoto/openclaw-assistant/main/",
-                "https://raw.githubusercontent.com/.../"
+                com.openclaw.assistant.ProjectLinks.RAW_BASE,
+                com.openclaw.assistant.ProjectLinks.RAW_BASE_ELIDED,
             )
         }
         Text(
