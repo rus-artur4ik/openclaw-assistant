@@ -322,6 +322,8 @@ private fun HostSetupHelp(startExpanded: Boolean) {
                 CopyableCommand(stringResource(R.string.hermes_setup_cmd_env))
                 Text(stringResource(R.string.hermes_setup_help_step_restart), style = MaterialTheme.typography.bodySmall)
                 CopyableCommand(stringResource(R.string.hermes_setup_cmd_restart))
+                Text(stringResource(R.string.hermes_setup_help_step_service), style = MaterialTheme.typography.bodySmall)
+                CopyableCommand(stringResource(R.string.hermes_setup_cmd_service))
                 Text(
                     stringResource(R.string.hermes_setup_help_network),
                     style = MaterialTheme.typography.bodySmall,

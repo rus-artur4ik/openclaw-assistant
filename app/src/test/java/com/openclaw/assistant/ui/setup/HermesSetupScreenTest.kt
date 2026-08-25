@@ -238,7 +238,11 @@ class HermesSetupScreenTest {
         show(HermesSetupUiState())
         compose.onNodeWithText("Show me what to do").performScrollTo().performClick()
 
-        compose.onNodeWithText("hermes gateway run --replace").performScrollTo().assertIsDisplayed()
+        // `gateway run` is the foreground mode meant for WSL/Docker/Termux —
+        // closing the terminal would drop the phone's connection.
+        compose.onNodeWithText("hermes gateway restart").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("hermes gateway install --start-now --start-on-login")
+            .performScrollTo().assertIsDisplayed()
         // The exact steps matter: on a fresh install the API server platform is
         // off, and its bind address comes from API_SERVER_HOST — there is no
         // host: line in config.yaml to edit.

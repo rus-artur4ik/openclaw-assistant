@@ -1149,13 +1149,15 @@ See the official VOICEVOX website for details.</string>
     <string name="hermes_setup_help_intro">Hermes listens on 127.0.0.1 out of the box, which a phone cannot reach. Let the helper fix that for you:</string>
     <string name="hermes_setup_help_step_enable">1. Turn the API server on — it is off on a fresh install:</string>
     <string name="hermes_setup_help_step_env">2. Add two lines to ~/.hermes/.env. The first is what makes it reachable from this phone; the second is the key you type above:</string>
-    <string name="hermes_setup_help_step_restart">3. Restart the gateway:</string>
+    <string name="hermes_setup_help_step_restart">3. Restart the gateway so it picks up the change:</string>
+    <string name="hermes_setup_help_step_service">If that says no service is installed, run this once — it keeps the gateway running after you close the terminal, and starts it again at login:</string>
+    <string name="hermes_setup_cmd_service">hermes gateway install --start-now --start-on-login</string>
     <string name="hermes_setup_help_network">The phone and the computer have to be on the same network. A guest Wi-Fi, or one that isolates clients from each other, blocks this even when everything else is right.</string>
     <string name="hermes_setup_help_show">Show me what to do</string>
     <string name="hermes_setup_help_hide">Hide</string>
     <string name="hermes_setup_cmd_enable">hermes config set platforms.api_server.enabled true</string>
     <string name="hermes_setup_cmd_env">API_SERVER_HOST=0.0.0.0\nAPI_SERVER_KEY=pick-a-long-random-value</string>
-    <string name="hermes_setup_cmd_restart">hermes gateway run --replace</string>
+    <string name="hermes_setup_cmd_restart">hermes gateway restart</string>
     <string name="hermes_setup_fix_needs_key">Open ~/.hermes/.env on that computer and copy the value of API_SERVER_KEY into the field above.</string>
     <string name="hermes_setup_fix_bad_key">Compare the key with API_SERVER_KEY in ~/.hermes/.env — it is the whole value, without surrounding quotes.</string>
     <string name="hermes_setup_fix_not_hermes">Something else is answering there. Check the port — the Hermes API server uses 8642 unless it was moved.</string>

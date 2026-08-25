@@ -772,6 +772,8 @@ private fun HermesConnectContent(configuredBackendCount: Int) {
                 CommandBlock(stringResource(R.string.hermes_setup_cmd_env))
                 Text(stringResource(R.string.hermes_setup_help_step_restart), style = MaterialTheme.typography.bodySmall, color = OnboardingTextSecondary)
                 CommandBlock(stringResource(R.string.hermes_setup_cmd_restart))
+                Text(stringResource(R.string.hermes_setup_help_step_service), style = MaterialTheme.typography.bodySmall, color = OnboardingTextSecondary)
+                CommandBlock(stringResource(R.string.hermes_setup_cmd_service))
                 Text(stringResource(R.string.av_pairing_card_step2), style = MaterialTheme.typography.bodyMedium, color = OnboardingTextPrimary)
                 Button(
                     onClick = {

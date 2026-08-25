@@ -16,7 +16,14 @@ API_SERVER_KEY=pick-a-long-random-value
 ```
 
 ```bash
-hermes gateway run --replace
+hermes gateway restart
+```
+
+If no service is installed yet, run this once — `gateway run` is the
+foreground mode, and closing that terminal drops the phone:
+
+```bash
+hermes gateway install --start-now --start-on-login
 ```
 
 The API server platform is off on a fresh install, and its bind address

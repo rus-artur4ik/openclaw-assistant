@@ -37,7 +37,7 @@
 > # ~/.hermes/.env:
 > #   API_SERVER_HOST=0.0.0.0
 > #   API_SERVER_KEY=pick-a-long-random-value
-> hermes gateway run --replace
+> hermes gateway restart
 > ```
 >
 > After that the app works the address out for itself:
